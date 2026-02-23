@@ -1,10 +1,7 @@
-// frontend/src/constants.js
+export const BACKEND_API_BASE_URL = import.meta.env.VITE_BACKEND_API_BASE_URL || "http://localhost:3000";
+export const FRONTEND_API_BASE_URL = import.meta.env.VITE_FRONTEND_API_BASE_URL || "http://localhost:3001";
 
-// Attempt to get API URL from import.meta.env (standard Vite) or process.env (as mapped in vite.config.js)
-// If neither is found or if it points to an old vercel deployment, fallback to local backend.
-// @ts-ignore
-const envApiUrl = import.meta.env?.VITE_API_URL || process.env?.API_BASE_URL;
-export const API_BASE_URL = envApiUrl && !envApiUrl.includes('vercel.app') ? envApiUrl : "http://localhost:3001";
+export const API_BASE_URL = BACKEND_API_BASE_URL;
 
 export const API_ENDPOINTS = {
   AUTH: {
@@ -15,7 +12,6 @@ export const API_ENDPOINTS = {
   INTERVIEW: {
     START: "/api/interview/start",
     END: "/api/interview/end",
-    // Used for fetching a specific report by ID (GET /api/interview/:reportId)
     GET_REPORT: "/api/interview",
   },
 };

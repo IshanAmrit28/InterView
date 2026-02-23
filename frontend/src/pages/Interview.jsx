@@ -4,6 +4,7 @@ import ReactMarkdown from 'react-markdown'
 import PageHeader from '../components/PageHeader'
 import Button from '../components/Button'
 import AnimatedBackground from '../components/AnimatedBackground'
+import { FRONTEND_API_BASE_URL } from '../constants'
 import './Interview.css'
 
 // Predefined Interview Questions by Role
@@ -204,9 +205,6 @@ function Interview() {
     const [completedQuestions, setCompletedQuestions] = useState([])
     const textareaRef = useRef(null)
 
-    // Backend API URL - Smart default: Localhost in dev, relative in prod
-    const API_URL = import.meta.env.VITE_API_URL || (import.meta.env.DEV ? 'http://localhost:3001' : '')
-
     const selectQuestion = (question) => {
         setCurrentQuestion(question)
         setUserAnswer('')
@@ -219,7 +217,7 @@ function Interview() {
         setIsAnalyzing(true)
         try {
             // Call backend API instead of Gemini directly
-            const response = await fetch(`${API_URL}/api/interview/analyze`, {
+            const response = await fetch(`${FRONTEND_API_BASE_URL}/api/interview/analyze`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -273,8 +271,7 @@ function Interview() {
             <AnimatedBackground />
             <PageHeader
                 title="Interview Practice"
-                description="Practice interview questions by role and get AI-powered feedback"
-                icon={<Briefcase size={40} />}
+                subtitle="Practice interview questions by role and get AI-powered feedback"
             />
 
             <div className="interview-container">

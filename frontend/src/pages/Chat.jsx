@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from "react";
 import { Send, Bot, User, Loader2, Mic, Volume2 } from "lucide-react";
 import ReactMarkdown from "react-markdown";
 import AnimatedBackground from "../components/AnimatedBackground";
+import { FRONTEND_API_BASE_URL } from "../constants";
 import "./Chat.css";
 
 function Chat() {
@@ -20,14 +21,9 @@ function Chat() {
   const [knowledgeBase, setKnowledgeBase] = useState([]);
   const messagesEndRef = useRef(null);
 
-  // Backend API URL - Smart default: Localhost in dev, relative in prod
-  const API_URL =
-    import.meta.env.VITE_API_URL ||
-    (import.meta.env.DEV ? "http://localhost:3001" : "");
-
   // Speech
   const SpeechRecognition =
-    window.SpeechRecognition || window.webkitSpeechRecognition;
+    window.SpeechRecognition || window['webkitSpeechRecognition'];
   const recognition = SpeechRecognition ? new SpeechRecognition() : null;
 
   useEffect(() => {
@@ -98,7 +94,7 @@ function Chat() {
       const context = getContext(userMessage.text);
 
       // Call backend API instead of Gemini directly
-      const response = await fetch(`${API_URL}/api/chat`, {
+      const response = await fetch(`${FRONTEND_API_BASE_URL}/api/chat`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

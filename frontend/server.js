@@ -4,7 +4,7 @@ import dotenv from "dotenv";
 import { GoogleGenerativeAI } from "@google/generative-ai";
 
 // Load environment variables
-dotenv.config({ path: ".env.server" });
+dotenv.config({ path: ".env" });
 
 const app = express();
 const PORT = process.env.PORT || 3001;
@@ -14,9 +14,9 @@ app.use(cors());
 app.use(express.json());
 
 // Initialize Gemini AI
-const apiKey = process.env.GEMINI_API_KEY;
+const apiKey = process.env.VITE_GEMINI_API_KEY || process.env.GEMINI_API_KEY;
 if (!apiKey) {
-  console.error("ERROR: GEMINI_API_KEY is not set in .env.server");
+  console.error("ERROR: GEMINI_API_KEY is not set in .env");
   process.exit(1);
 }
 
@@ -37,7 +37,7 @@ app.post("/api/chat", async (req, res) => {
     }
 
     // Use model from environment variable (Vercel) or default
-    const modelName = process.env.GEMINI_MODEL || "gemini-2.5-flash";
+    const modelName = process.env.VITE_GEMINI_MODEL || process.env.GEMINI_MODEL || "gemini-2.5-flash";
     const model = genAI.getGenerativeModel({ model: modelName });
 
     const systemPrompt = `You are InterView, an AI assistant specialized in study and interview preparation. Your role is to help users with:
@@ -106,7 +106,7 @@ app.post("/api/interview/analyze", async (req, res) => {
     }
 
     // Use model from environment variable (Vercel) or default
-    const modelName = process.env.GEMINI_MODEL || "gemini-2.5-flash";
+    const modelName = process.env.VITE_GEMINI_MODEL || process.env.GEMINI_MODEL || "gemini-2.5-flash";
     const model = genAI.getGenerativeModel({ model: modelName });
 
     const prompt = `You are an expert technical interviewer specializing in professional interview preparation. 

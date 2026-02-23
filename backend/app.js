@@ -20,7 +20,11 @@ const app = express();
 // FIX: Ensure body parsers are executed FIRST to populate req.body
 app.use(express.urlencoded({ extended: true })); // Handles application/x-www-form-urlencoded
 app.use(express.json()); // Handles application/json (used by Login/Signup)
-app.use(cors()); // CORS should also run before the routers
+app.use(cors({
+  origin: '*', // Allow all origins (standard for public/development APIs)
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization']
+})); // CORS should also run before the routers
 
 app.use("/api/questions", questionRouter);
 app.use("/api/interview", reportRouter);
