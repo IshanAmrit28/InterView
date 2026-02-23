@@ -1,0 +1,242 @@
+/* Notes Layout */
+.notes-layout {
+    display: grid;
+    grid-template-columns: 240px 1fr;
+    /* Fixed Sidebar + Fluid Grid */
+    gap: var(--sp-6);
+    align-items: start;
+}
+
+@media (max-width: 1024px) {
+    .notes-layout {
+        grid-template-columns: 200px 1fr;
+        gap: var(--sp-4);
+    }
+}
+
+@media (max-width: 768px) {
+    .notes-layout {
+        grid-template-columns: 1fr;
+        gap: var(--sp-3);
+    }
+
+    .notes-sidebar {
+        position: static;
+        margin-bottom: var(--sp-4);
+    }
+}
+
+/* Sidebar */
+.notes-sidebar {
+    position: sticky;
+    top: 80px;
+    /* Below Navbar */
+    background: var(--bg-surface);
+    border: 1px solid var(--border-main);
+    border-radius: var(--radius-md);
+    padding: var(--sp-2);
+}
+
+.category-btn {
+    display: flex;
+    align-items: center;
+    width: 100%;
+    padding: var(--sp-3) var(--sp-4);
+    border: none;
+    background: transparent;
+    color: var(--text-muted);
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 13px;
+    font-weight: 500;
+    transition: all 0.2s;
+    justify-content: space-between;
+}
+
+.category-btn:hover {
+    background: var(--bg-subtle);
+    color: var(--text-main);
+}
+
+.category-btn.active {
+    background: var(--primary-light);
+    color: var(--primary);
+    font-weight: 600;
+}
+
+.count-badge {
+    background: var(--bg-inset);
+    padding: 1px 6px;
+    border-radius: 10px;
+    font-size: 10px;
+    color: var(--text-muted);
+}
+
+/* Note Cards Grid */
+.notes-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: var(--sp-4);
+}
+
+.note-card {
+    background: var(--bg-surface);
+    border: 1px solid var(--border-main);
+    border-radius: var(--radius-md);
+    padding: var(--sp-5);
+    display: flex;
+    flex-direction: column;
+    transition: border-color 0.2s;
+    cursor: pointer;
+    height: 100%;
+}
+
+.note-card:hover {
+    border-color: var(--primary);
+    box-shadow: var(--shadow-card);
+}
+
+.note-header {
+    margin-bottom: var(--sp-3);
+}
+
+.note-header h3 {
+    font-size: 16px;
+    font-weight: 600;
+    margin: 0 0 4px 0;
+    color: var(--text-main);
+}
+
+.note-meta {
+    display: flex;
+    gap: 8px;
+    font-size: 12px;
+    color: var(--text-muted);
+}
+
+.note-footer p {
+    margin: 0;
+    font-size: 12px;
+    color: var(--text-muted);
+}
+
+/* PDF Card Styles */
+.pdf-card {
+    transition: all 0.3s;
+}
+
+.pdf-card:hover {
+    border-color: var(--primary);
+    box-shadow: var(--shadow-md);
+}
+
+.pdf-action-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    padding: 8px 12px;
+    background: #FFFFFF;
+    color: #000000;
+    border: 1px solid #E5E7EB;
+    border-radius: 6px;
+    font-size: 12px;
+    font-weight: 500;
+    cursor: pointer;
+    text-decoration: none;
+    transition: all 300ms ease;
+}
+
+/* Dark theme - White text on black background */
+[data-theme='dark'] .pdf-action-btn {
+    background: #000000;
+    color: #FFFFFF;
+    border: 1px solid #4B5563;
+}
+
+.pdf-action-btn:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+[data-theme='dark'] .pdf-action-btn:hover {
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5);
+}
+
+.pdf-action-btn.secondary {
+    background: var(--bg-subtle);
+    color: var(--text-main);
+    border: 1px solid var(--border-main);
+}
+
+.pdf-action-btn.secondary:hover {
+    background: var(--bg-surface);
+    border-color: var(--primary);
+}
+
+.note-desc {
+    font-size: 13px;
+    color: var(--text-muted);
+    line-height: 1.5;
+    margin-bottom: var(--sp-4);
+    flex-grow: 1;
+    /* Pushes footer down */
+}
+
+.note-footer {
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+}
+
+.tag-pill {
+    padding: 2px 8px;
+    background: var(--bg-inset);
+    color: var(--text-faint);
+    border-radius: 4px;
+    font-size: 11px;
+}
+
+/* Enhanced Mobile Responsiveness */
+@media (max-width: 768px) {
+    .notes-grid {
+        grid-template-columns: 1fr;
+        gap: var(--sp-3);
+    }
+
+    .note-card {
+        padding: var(--sp-4);
+    }
+
+    .pdf-action-btn {
+        padding: 10px;
+        font-size: 13px;
+    }
+}
+
+@media (max-width: 480px) {
+    .notes-grid {
+        gap: 12px;
+    }
+
+    .note-card {
+        padding: 12px;
+    }
+
+    .note-header h3 {
+        font-size: 14px;
+    }
+
+    .pdf-action-btn {
+        padding: 8px;
+        font-size: 12px;
+    }
+
+    .note-meta {
+        flex-wrap: wrap;
+    }
+
+    .tag-pill {
+        font-size: 10px;
+    }
+}

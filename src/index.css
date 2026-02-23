@@ -1,0 +1,361 @@
+:root {
+  /* 
+    MODERN DATA-RICH THEME (Notion-esque)
+    Focus: High density, Borders, Clean Typography.
+  */
+
+  /* Font */
+  --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+
+  /* Sizing */
+  --max-width: 1400px;
+  /* Wider for dashboard */
+  --header-height: 72px;
+  /* Matched to Navbar height */
+  --sidebar-width: 260px;
+
+  --radius-xs: 4px;
+  --radius-sm: 6px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+
+  /* Spacing */
+  --sp-1: 4px;
+  --sp-2: 8px;
+  --sp-3: 12px;
+  --sp-4: 16px;
+  --sp-5: 20px;
+  --sp-6: 24px;
+  --sp-8: 32px;
+  --sp-10: 40px;
+  --sp-12: 48px;
+}
+
+/* Light Theme (Default) - Grayscale */
+:root {
+  /* Backgrounds - Employee Task Tracker Light Theme */
+  --bg-main: #F9FAFB;
+  /* Gray-50 - Main background */
+  --bg-surface: #FFFFFF;
+  /* White - Card backgrounds */
+  --bg-secondary: #F3F4F6;
+  /* Gray-100 - Subtle backgrounds */
+  --bg-subtle: #F3F4F6;
+  /* Gray-100 */
+  --bg-inset: #E5E7EB;
+  /* Gray-200 */
+
+  /* Borders */
+  --border-main: #E5E7EB;
+  /* Gray-200 */
+  --border-subtle: #F3F4F6;
+  /* Gray-100 */
+  --border-color: #E5E7EB;
+  /* Gray-200 */
+
+  /* Text */
+  --text-main: #111827;
+  /* Gray-900 - Primary text */
+  --text-primary: #111827;
+  /* Gray-900 */
+  --text-secondary: #6B7280;
+  /* Gray-500 - Secondary text */
+  --text-muted: #6B7280;
+  /* Gray-500 */
+  --text-faint: #9CA3AF;
+  /* Gray-400 */
+
+  /* Primary/Accents */
+  --primary: #374151;
+  /* Gray-700 */
+  --primary-dark: #1F2937;
+  /* Gray-800 */
+  --primary-light: #D1D5DB;
+  /* Gray-300 */
+
+  /* Accent colors - Grayscale */
+  --accent-orange: #6B7280;
+  /* Gray-500 */
+  --accent-green: #4B5563;
+  /* Gray-600 */
+  --accent-purple: #6B7280;
+  /* Gray-500 */
+
+  /* Shadows */
+  --shadow-card: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+
+  /* Legacy support */
+  --card-bg: #FFFFFF;
+}
+
+/* Dark Theme - Grayscale - Employee Task Tracker */
+[data-theme='dark'] {
+  /* Backgrounds */
+  --bg-main: #111827;
+  /* Gray-900 - Main background */
+  --bg-surface: #1F2937;
+  /* Gray-800 - Card backgrounds */
+  --bg-secondary: #374151;
+  /* Gray-700 - Subtle backgrounds */
+  --bg-subtle: #374151;
+  /* Gray-700 */
+  --bg-inset: #4B5563;
+  /* Gray-600 */
+
+  /* Borders */
+  --border-main: #4B5563;
+  /* Gray-600 */
+  --border-subtle: #374151;
+  /* Gray-700 */
+  --border-color: #4B5563;
+  /* Gray-600 */
+
+  /* Text */
+  --text-main: #F9FAFB;
+  /* Gray-50 - Primary text */
+  --text-primary: #F9FAFB;
+  /* Gray-50 */
+  --text-secondary: #9CA3AF;
+  /* Gray-400 - Secondary text */
+  --text-muted: #9CA3AF;
+  /* Gray-400 */
+  --text-faint: #6B7280;
+  /* Gray-500 */
+
+  /* Primary/Accents */
+  --primary: #E5E7EB;
+  /* Gray-200 */
+  --primary-dark: #F9FAFB;
+  /* Gray-50 */
+  --primary-light: #4B5563;
+  /* Gray-600 */
+
+  /* Accent colors - Grayscale */
+  --accent-orange: #9CA3AF;
+  /* Gray-400 */
+  --accent-green: #D1D5DB;
+  /* Gray-300 */
+  --accent-purple: #9CA3AF;
+  /* Gray-400 */
+
+  /* Shadows */
+  --shadow-card: 0 4px 6px -1px rgba(0, 0, 0, 0.3), 0 2px 4px -1px rgba(0, 0, 0, 0.2);
+  --shadow-md: 0 10px 15px -3px rgba(0, 0, 0, 0.4), 0 4px 6px -2px rgba(0, 0, 0, 0.3);
+  --shadow-lg: 0 20px 25px -5px rgba(0, 0, 0, 0.5), 0 10px 10px -5px rgba(0, 0, 0, 0.4);
+
+  /* Legacy support */
+  --card-bg: #1F2937;
+  /* Gray-800 */
+}
+
+body {
+  margin: 0;
+  font-family: var(--font-sans);
+  background: var(--bg-main);
+  color: var(--text-main);
+  line-height: 1.5;
+  font-size: 14px;
+  /* Slightly denser text */
+  -webkit-font-smoothing: antialiased;
+  transition: background-color 300ms ease, color 300ms ease;
+}
+
+/* Smooth transitions for all theme-aware elements */
+* {
+  transition: background-color 300ms ease,
+    border-color 300ms ease,
+    color 300ms ease,
+    box-shadow 300ms ease;
+}
+
+#root {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Layout Utilities included in index for global use */
+.app-container {
+  max-width: var(--max-width);
+  margin: 0 auto;
+  padding: 0 var(--sp-6);
+}
+
+.page-header {
+  padding: var(--sp-8) 0 var(--sp-6) 0;
+  border-bottom: 1px solid var(--border-main);
+  margin-bottom: var(--sp-6);
+}
+
+.page-title {
+  font-size: 24px;
+  font-weight: 600;
+  color: var(--text-main);
+  margin: 0;
+}
+
+.page-subtitle {
+  color: var(--text-muted);
+  font-size: 14px;
+  margin-top: var(--sp-1);
+}
+
+/* Dense Card */
+.dense-card {
+  background: var(--bg-surface);
+  border: 1px solid var(--border-main);
+  border-radius: var(--radius-md);
+  padding: var(--sp-4);
+  box-shadow: var(--shadow-card);
+  transition: transform 300ms ease, box-shadow 300ms ease;
+}
+
+.dense-card:hover {
+  transform: scale(1.02);
+  box-shadow: var(--shadow-md);
+}
+
+/* Buttons */
+button {
+  font-family: inherit;
+}
+
+/* Grid */
+.grid-2 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--sp-4);
+}
+
+.grid-3 {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--sp-4);
+}
+
+.grid-4 {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: var(--sp-4);
+}
+
+/* Badge */
+.badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-size: 11px;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.badge-blue {
+  background: rgba(37, 99, 235, 0.1);
+  color: var(--primary);
+}
+
+.badge-green {
+  background: rgba(16, 185, 129, 0.1);
+  color: var(--accent-green);
+}
+
+.badge-orange {
+  background: rgba(249, 115, 22, 0.1);
+  color: var(--accent-orange);
+}
+
+.badge-purple {
+  background: rgba(139, 92, 246, 0.1);
+  color: var(--accent-purple);
+}
+
+/* Enhanced Responsive Utilities */
+@media (max-width: 1200px) {
+  :root {
+    --max-width: 100%;
+    --sp-8: 24px;
+    --sp-10: 32px;
+    --sp-12: 40px;
+  }
+
+  .app-container {
+    padding: 0 var(--sp-4);
+  }
+}
+
+@media (max-width: 768px) {
+  :root {
+    --header-height: 56px;
+    --sp-6: 20px;
+    --sp-8: 20px;
+  }
+
+  body {
+    font-size: 13px;
+  }
+
+  .app-container {
+    padding: 0 var(--sp-3);
+  }
+
+  .page-header {
+    padding: var(--sp-6) 0 var(--sp-4) 0;
+  }
+
+  .page-title {
+    font-size: 20px;
+  }
+
+  .grid-2,
+  .grid-3,
+  .grid-4 {
+    grid-template-columns: 1fr;
+    gap: var(--sp-3);
+  }
+}
+
+@media (max-width: 480px) {
+  :root {
+    --sp-4: 12px;
+    --sp-6: 16px;
+  }
+
+  body {
+    font-size: 12px;
+  }
+
+  .app-container {
+    padding: 0 12px;
+  }
+
+  .page-title {
+    font-size: 18px;
+  }
+
+  .dense-card {
+    padding: 12px;
+  }
+}
+
+/* Scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--border-main);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--text-faint);
+}

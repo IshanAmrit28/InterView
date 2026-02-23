@@ -1,0 +1,281 @@
+/* Resume Analyzer Styles */
+
+.resume-analyzer-container {
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.upload-section {
+    margin-bottom: 32px;
+}
+
+.upload-card {
+    background: var(--bg-secondary);
+    border: 2px dashed var(--border-color);
+    border-radius: 20px;
+    padding: 48px;
+    text-align: center;
+    transition: all 0.3s;
+}
+
+.upload-card:hover {
+    border-color: #667eea;
+    background: var(--bg-main);
+}
+
+.upload-icon {
+    width: 80px;
+    height: 80px;
+    margin: 0 auto 24px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border-radius: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+}
+
+.upload-card h3 {
+    font-size: 24px;
+    font-weight: 700;
+    margin: 0 0 12px 0;
+    color: var(--text-main);
+}
+
+.upload-card p {
+    font-size: 14px;
+    color: var(--text-muted);
+    margin: 0 0 24px 0;
+}
+
+.upload-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 12px 24px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    border-radius: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.upload-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+}
+
+.file-info {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    margin-top: 16px;
+    padding: 12px 20px;
+    background: rgba(16, 185, 129, 0.1);
+    border-radius: 12px;
+    color: #10b981;
+    font-weight: 600;
+}
+
+.analysis-section {
+    margin-bottom: 32px;
+}
+
+.analysis-card {
+    background: var(--bg-secondary);
+    border: 1px solid var(--border-color);
+    border-radius: 20px;
+    padding: 32px;
+}
+
+.analysis-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 24px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.analysis-header h3 {
+    font-size: 20px;
+    font-weight: 700;
+    margin: 0;
+    color: var(--text-main);
+}
+
+.analysis-content {
+    font-size: 14px;
+    line-height: 1.8;
+    color: var(--text-main);
+}
+
+.analysis-content strong {
+    color: #667eea;
+    font-weight: 700;
+}
+
+.tips-section {
+    margin-top: 48px;
+}
+
+.tips-section h3 {
+    font-size: 20px;
+    font-weight: 700;
+    margin: 0 0 24px 0;
+    color: var(--text-main);
+}
+
+.tips-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 20px;
+}
+
+.tip-card {
+    background: var(--bg-secondary);
+    border: 1px solid var(--border-color);
+    border-radius: 16px;
+    padding: 24px;
+    transition: all 0.3s;
+}
+
+.tip-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+}
+
+.tip-card h4 {
+    font-size: 16px;
+    font-weight: 600;
+    margin: 12px 0 8px 0;
+    color: var(--text-main);
+}
+
+.tip-card p {
+    font-size: 13px;
+    color: var(--text-muted);
+    margin: 0;
+    line-height: 1.6;
+}
+
+.animate-spin {
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    from {
+        transform: rotate(0deg);
+    }
+
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+@media (max-width: 1024px) {
+    .upload-card {
+        padding: 40px 24px;
+    }
+    
+    .upload-icon {
+        width: 70px;
+        height: 70px;
+    }
+    
+    .analysis-card {
+        padding: 24px;
+    }
+}
+
+@media (max-width: 768px) {
+    .upload-card {
+        padding: 32px 20px;
+    }
+    
+    .upload-icon {
+        width: 60px;
+        height: 60px;
+        margin-bottom: 16px;
+    }
+    
+    .upload-card h3 {
+        font-size: 20px;
+    }
+    
+    .upload-card p {
+        font-size: 13px;
+    }
+
+    .tips-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .analysis-card {
+        padding: 20px;
+        border-radius: 16px;
+    }
+    
+    .analysis-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 12px;
+    }
+    
+    .analysis-header h3 {
+        font-size: 18px;
+    }
+    
+    .tip-card {
+        padding: 16px;
+    }
+}
+
+@media (max-width: 480px) {
+    .upload-card {
+        padding: 24px 16px;
+        border-radius: 16px;
+    }
+    
+    .upload-icon {
+        width: 50px;
+        height: 50px;
+        border-radius: 12px;
+    }
+    
+    .upload-card h3 {
+        font-size: 18px;
+    }
+    
+    .upload-btn {
+        padding: 10px 20px;
+        font-size: 14px;
+    }
+    
+    .analysis-card {
+        padding: 16px;
+    }
+    
+    .analysis-header h3 {
+        font-size: 16px;
+    }
+    
+    .analysis-content {
+        font-size: 13px;
+    }
+    
+    .tip-card {
+        padding: 14px;
+        border-radius: 12px;
+    }
+    
+    .tip-card h4 {
+        font-size: 14px;
+    }
+    
+    .tip-card p {
+        font-size: 12px;
+    }
+}

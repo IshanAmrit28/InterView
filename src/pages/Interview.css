@@ -1,0 +1,660 @@
+/* Interview Practice Page Styles */
+
+.interview-page {
+    min-height: 100vh;
+    background: var(--bg-main);
+    padding-bottom: 40px;
+}
+
+.interview-container {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 32px 24px;
+}
+
+/* Role Selection Screen */
+.role-selection {
+    text-align: center;
+}
+
+.role-selection h2 {
+    font-size: 32px;
+    font-weight: 700;
+    color: var(--text-main);
+    margin-bottom: 48px;
+}
+
+.roles-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 24px;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.role-card {
+    background: var(--card-bg);
+    border: 2px solid var(--border-color);
+    border-radius: 16px;
+    padding: 32px 24px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-align: center;
+}
+
+.role-card:hover {
+    border-color: var(--primary);
+    transform: translateY(-4px);
+    box-shadow: 0 12px 24px rgba(0, 0, 0, 0.1);
+}
+
+.role-icon {
+    width: 64px;
+    height: 64px;
+    margin: 0 auto 20px;
+    background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+    border-radius: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+}
+
+.role-card h3 {
+    font-size: 20px;
+    font-weight: 600;
+    color: var(--text-main);
+    margin-bottom: 8px;
+}
+
+.role-card p {
+    font-size: 14px;
+    color: var(--text-muted);
+    margin-bottom: 16px;
+}
+
+.role-progress {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--primary);
+    background: var(--primary-light);
+    padding: 8px 16px;
+    border-radius: 8px;
+    display: inline-block;
+}
+
+/* Question Selection Screen */
+.question-selection {
+    max-width: 900px;
+    margin: 0 auto;
+}
+
+.selection-header {
+    text-align: center;
+    margin-bottom: 40px;
+    position: relative;
+}
+
+.btn-back {
+    position: absolute;
+    left: 0;
+    top: 0;
+    background: var(--card-bg);
+    border: 2px solid var(--border-color);
+    color: var(--text-main);
+    padding: 10px 20px;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.btn-back:hover {
+    border-color: var(--primary);
+    color: var(--primary);
+}
+
+.selection-header h2 {
+    font-size: 28px;
+    font-weight: 700;
+    color: var(--text-main);
+    margin-bottom: 8px;
+}
+
+.selection-header p {
+    font-size: 16px;
+    color: var(--text-muted);
+}
+
+.questions-list {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.question-item {
+    background: var(--card-bg);
+    border: 2px solid var(--border-color);
+    border-radius: 12px;
+    padding: 20px 24px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.question-item:hover {
+    border-color: var(--primary);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
+
+.question-item.completed {
+    background: linear-gradient(135deg, rgba(16, 185, 129, 0.05), rgba(16, 185, 129, 0.1));
+    border-color: #10b981;
+}
+
+.question-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 12px;
+}
+
+.difficulty-badge {
+    font-size: 12px;
+    font-weight: 700;
+    color: white;
+    padding: 4px 12px;
+    border-radius: 6px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.category-tag {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--text-muted);
+    background: var(--bg-main);
+    padding: 4px 12px;
+    border-radius: 6px;
+}
+
+.completed-icon {
+    margin-left: auto;
+    color: #10b981;
+}
+
+.question-text {
+    font-size: 16px;
+    color: var(--text-main);
+    margin: 0;
+    line-height: 1.6;
+}
+
+/* Question Practice Screen */
+.question-practice {
+    max-width: 900px;
+    margin: 0 auto;
+}
+
+.practice-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 32px;
+}
+
+.practice-meta {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.question-content {
+    background: var(--card-bg);
+    border: 2px solid var(--border-color);
+    border-radius: 16px;
+    padding: 32px;
+}
+
+.question-content h3 {
+    font-size: 24px;
+    font-weight: 600;
+    color: var(--text-main);
+    margin-bottom: 24px;
+    line-height: 1.4;
+}
+
+/* Hints Section */
+.hints-section {
+    background: linear-gradient(135deg, rgba(59, 130, 246, 0.05), rgba(59, 130, 246, 0.1));
+    border: 2px solid rgba(59, 130, 246, 0.2);
+    border-radius: 12px;
+    padding: 16px 20px;
+    margin-bottom: 24px;
+}
+
+.hints-section summary {
+    font-size: 14px;
+    font-weight: 600;
+    color: #3b82f6;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    user-select: none;
+}
+
+.hints-section summary:hover {
+    opacity: 0.8;
+}
+
+.hints-section ul {
+    margin-top: 16px;
+    padding-left: 24px;
+}
+
+.hints-section li {
+    font-size: 14px;
+    color: var(--text-main);
+    margin-bottom: 8px;
+    line-height: 1.6;
+}
+
+/* Answer Section */
+.answer-section {
+    margin-bottom: 24px;
+}
+
+.answer-section label {
+    display: block;
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text-main);
+    margin-bottom: 12px;
+}
+
+.answer-section textarea {
+    width: 100%;
+    padding: 16px;
+    border: 2px solid var(--border-color);
+    border-radius: 12px;
+    font-size: 14px;
+    font-family: inherit;
+    color: var(--text-main);
+    background: var(--bg-main);
+    resize: vertical;
+    transition: all 0.2s ease;
+}
+
+.answer-section textarea:focus {
+    outline: none;
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+.answer-section textarea:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+.answer-meta {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 12px;
+}
+
+.char-count {
+    font-size: 13px;
+    color: var(--text-muted);
+}
+
+/* Buttons */
+.btn-primary {
+    background: #000000;
+    color: white;
+    border: none;
+    padding: 12px 24px;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    transition: all 0.2s ease;
+}
+
+.btn-primary:hover:not(:disabled) {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.4);
+}
+
+.btn-primary:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.btn-secondary {
+    background: var(--card-bg);
+    color: var(--text-main);
+    border: 2px solid var(--border-color);
+    padding: 10px 20px;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.btn-secondary:hover {
+    border-color: var(--primary);
+    color: var(--primary);
+}
+
+.btn-reset {
+    position: fixed;
+    bottom: 32px;
+    right: 32px;
+    background: #ef4444;
+    color: white;
+    border: none;
+    padding: 14px 28px;
+    border-radius: 12px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    box-shadow: 0 8px 16px rgba(239, 68, 68, 0.3);
+    transition: all 0.2s ease;
+}
+
+.btn-reset:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 12px 24px rgba(239, 68, 68, 0.4);
+}
+
+/* Feedback Section */
+.feedback-section {
+    background: linear-gradient(135deg, rgba(16, 185, 129, 0.05), rgba(16, 185, 129, 0.1));
+    border: 2px solid rgba(16, 185, 129, 0.3);
+    border-radius: 12px;
+    padding: 24px;
+    margin-top: 24px;
+    animation: slideIn 0.3s ease;
+}
+
+@keyframes slideIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.feedback-section h4 {
+    font-size: 18px;
+    font-weight: 600;
+    color: #10b981;
+    margin-bottom: 16px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.feedback-content {
+    background: var(--card-bg);
+    border-radius: 8px;
+    padding: 24px;
+    margin-bottom: 20px;
+}
+
+/* Markdown Formatting in Feedback */
+.feedback-content h1,
+.feedback-content h2,
+.feedback-content h3,
+.feedback-content h4 {
+    color: var(--text-main);
+    font-weight: 600;
+    margin-top: 24px;
+    margin-bottom: 12px;
+    line-height: 1.3;
+}
+
+.feedback-content h1:first-child,
+.feedback-content h2:first-child,
+.feedback-content h3:first-child,
+.feedback-content h4:first-child {
+    margin-top: 0;
+}
+
+.feedback-content h1 {
+    font-size: 20px;
+    border-bottom: 2px solid var(--border-color);
+    padding-bottom: 8px;
+}
+
+.feedback-content h2 {
+    font-size: 18px;
+    color: var(--primary);
+}
+
+.feedback-content h3 {
+    font-size: 16px;
+}
+
+.feedback-content h4 {
+    font-size: 15px;
+}
+
+.feedback-content p {
+    font-size: 14px;
+    color: var(--text-main);
+    line-height: 1.7;
+    margin-bottom: 14px;
+}
+
+.feedback-content p:last-child {
+    margin-bottom: 0;
+}
+
+.feedback-content strong {
+    font-weight: 600;
+    color: var(--text-main);
+}
+
+.feedback-content em {
+    font-style: italic;
+    color: var(--text-muted);
+}
+
+.feedback-content ul,
+.feedback-content ol {
+    margin: 12px 0;
+    padding-left: 24px;
+}
+
+.feedback-content li {
+    font-size: 14px;
+    color: var(--text-main);
+    line-height: 1.7;
+    margin-bottom: 8px;
+}
+
+.feedback-content li:last-child {
+    margin-bottom: 0;
+}
+
+.feedback-content ul li {
+    list-style-type: disc;
+}
+
+.feedback-content ol li {
+    list-style-type: decimal;
+}
+
+.feedback-content code {
+    background: rgba(59, 130, 246, 0.1);
+    color: #3b82f6;
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-size: 13px;
+    font-family: 'Monaco', 'Menlo', 'Courier New', monospace;
+}
+
+.feedback-content pre {
+    background: var(--bg-main);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    padding: 16px;
+    margin: 16px 0;
+    overflow-x: auto;
+}
+
+.feedback-content pre code {
+    background: none;
+    padding: 0;
+    color: var(--text-main);
+    font-size: 13px;
+}
+
+.feedback-content hr {
+    border: none;
+    border-top: 2px solid var(--border-color);
+    margin: 24px 0;
+}
+
+.feedback-content blockquote {
+    border-left: 4px solid var(--primary);
+    padding-left: 16px;
+    margin: 16px 0;
+    color: var(--text-muted);
+    font-style: italic;
+}
+
+.feedback-content a {
+    color: var(--primary);
+    text-decoration: none;
+    border-bottom: 1px solid transparent;
+    transition: border-color 0.2s ease;
+}
+
+.feedback-content a:hover {
+    border-bottom-color: var(--primary);
+}
+
+.feedback-actions {
+    display: flex;
+    gap: 12px;
+}
+
+/* Dark Mode Specific Styles */
+[data-theme="dark"] .role-card {
+    background: var(--card-bg);
+    border-color: rgba(255, 255, 255, 0.1);
+}
+
+[data-theme="dark"] .role-card:hover {
+    border-color: var(--primary);
+    box-shadow: 0 12px 24px rgba(0, 0, 0, 0.3);
+}
+
+[data-theme="dark"] .question-item {
+    background: var(--card-bg);
+    border-color: rgba(255, 255, 255, 0.1);
+}
+
+[data-theme="dark"] .question-item:hover {
+    border-color: var(--primary);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+[data-theme="dark"] .answer-section textarea {
+    background: rgba(255, 255, 255, 0.05);
+}
+
+[data-theme="dark"] .btn-primary {
+    background: #ffffff;
+    color: #000000;
+}
+
+[data-theme="dark"] .btn-primary:hover:not(:disabled) {
+    box-shadow: 0 8px 16px rgba(255, 255, 255, 0.3);
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .interview-container {
+        padding: 24px 16px;
+    }
+
+    .role-selection h2 {
+        font-size: 24px;
+        margin-bottom: 32px;
+    }
+
+    .roles-grid {
+        grid-template-columns: 1fr;
+        gap: 16px;
+    }
+
+    .role-card {
+        padding: 24px 20px;
+    }
+
+    .question-content {
+        padding: 24px 20px;
+    }
+
+    .question-content h3 {
+        font-size: 20px;
+    }
+
+    .practice-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 16px;
+    }
+
+    .btn-back {
+        position: static;
+        margin-bottom: 16px;
+    }
+
+    .selection-header {
+        padding-top: 60px;
+    }
+
+    .btn-reset {
+        bottom: 16px;
+        right: 16px;
+        padding: 12px 24px;
+        font-size: 13px;
+    }
+
+    .feedback-actions {
+        flex-direction: column;
+    }
+
+    .feedback-actions button {
+        width: 100%;
+    }
+}
+
+@media (max-width: 480px) {
+    .role-card h3 {
+        font-size: 18px;
+    }
+
+    .question-content h3 {
+        font-size: 18px;
+    }
+
+    .difficulty-badge,
+    .category-tag {
+        font-size: 11px;
+        padding: 3px 10px;
+    }
+}

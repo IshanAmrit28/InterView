@@ -1,0 +1,307 @@
+/* Premium Topic Detail Styles */
+:root {
+    --glass-bg: rgba(255, 255, 255, 0.7);
+    --glass-border: rgba(255, 255, 255, 0.5);
+    --glass-shadow: 0 8px 32px rgba(0, 0, 0, 0.08);
+    --gradient-primary: linear-gradient(135deg, #6366f1 0%, #3b82f6 100%);
+    --gradient-surface: linear-gradient(180deg, rgba(255, 255, 255, 0.8) 0%, rgba(240, 245, 255, 0.5) 100%);
+    --text-gradient: linear-gradient(135deg, #1e293b 0%, #334155 100%);
+}
+
+.topic-detail-container {
+    min-height: 100vh;
+    background: radial-gradient(circle at top right, rgba(99, 102, 241, 0.15), transparent 40%),
+        radial-gradient(circle at bottom left, rgba(59, 130, 246, 0.15), transparent 40%),
+        var(--bg-app);
+    padding-bottom: 60px;
+}
+
+.topic-header {
+    /* Removed background causing conflict on Home page */
+    border-bottom: 1px solid var(--glass-border);
+    padding: 30px 0;
+    margin-bottom: 40px;
+}
+
+.max-w-wrapper {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 24px;
+}
+
+.back-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 16px;
+    background: rgba(255, 255, 255, 0.8);
+    border: 1px solid var(--border-subtle);
+    border-radius: 20px;
+    color: var(--text-muted);
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    margin-bottom: 24px;
+}
+
+.back-btn:hover {
+    background: white;
+    color: var(--primary);
+    transform: translateX(-4px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+}
+
+.topic-title {
+    font-size: 42px;
+    font-weight: 800;
+    background: var(--gradient-primary);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    margin: 0 0 16px 0;
+    letter-spacing: -1px;
+    line-height: 1.2;
+}
+
+.topic-description {
+    font-size: 18px;
+    color: var(--text-secondary);
+    max-width: 800px;
+    line-height: 1.6;
+}
+
+.topic-meta {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+    flex-wrap: wrap;
+    margin-top: 24px;
+}
+
+.meta-badge {
+    padding: 6px 14px;
+    border-radius: 20px;
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+}
+
+/* Glass Cards */
+.glass-card {
+    background: var(--glass-bg);
+    backdrop-filter: blur(12px);
+    border: 1px solid var(--glass-border);
+    border-radius: 24px;
+    box-shadow: var(--glass-shadow);
+    padding: 32px;
+    margin-bottom: 32px;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.content-section {
+    position: relative;
+    overflow: hidden;
+}
+
+.content-section h2 {
+    font-size: 24px;
+    font-weight: 700;
+    color: var(--text-main);
+    margin: 0 0 24px 0;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.section-content {
+    font-size: 16px;
+    line-height: 1.8;
+    color: var(--text-secondary);
+}
+
+/* Modern Code Blocks */
+.section-content pre {
+    background: #1e293b;
+    border-radius: 12px;
+    padding: 24px;
+    margin: 24px 0;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+    position: relative;
+    overflow: hidden;
+}
+
+.section-content code {
+    font-family: 'JetBrains Mono', 'Fira Code', monospace;
+    color: #e2e8f0;
+    font-size: 14px;
+}
+
+/* Practice & Resources Sidebar */
+.sidebar-section h3 {
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--text-main);
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.practice-card-item,
+.resource-card-item {
+    background: white;
+    border: 1px solid var(--border-subtle);
+    border-radius: 16px;
+    padding: 20px;
+    margin-bottom: 16px;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+    cursor: pointer;
+    display: block;
+    text-decoration: none;
+    color: inherit;
+}
+
+.practice-card-item:hover,
+.resource-card-item:hover {
+    transform: translateY(-4px) scale(1.02);
+    box-shadow: 0 12px 24px rgba(99, 102, 241, 0.15);
+    border-color: var(--primary);
+}
+
+.resource-icon-wrapper {
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(99, 102, 241, 0.1);
+    border-radius: 12px;
+    color: var(--primary);
+}
+
+/* Complete Button */
+.complete-btn {
+    width: 100%;
+    padding: 18px;
+    background: var(--gradient-primary);
+    color: white;
+    border: none;
+    border-radius: 16px;
+    font-size: 16px;
+    font-weight: 700;
+    cursor: pointer;
+    box-shadow: 0 10px 20px rgba(79, 70, 229, 0.3);
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+}
+
+.complete-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 15px 30px rgba(79, 70, 229, 0.4);
+    filter: brightness(1.1);
+}
+
+/* List Styling */
+.section-content ul {
+    list-style: none;
+    padding: 0;
+}
+
+.section-content li {
+    position: relative;
+    padding-left: 24px;
+    margin-bottom: 12px;
+}
+
+.section-content li::before {
+    content: "→";
+    position: absolute;
+    left: 0;
+    color: var(--primary);
+    font-weight: bold;
+}
+
+@media (max-width: 1024px) {
+    .topic-sidebar-layout {
+        grid-template-columns: 1fr;
+    }
+
+    .topic-title {
+        font-size: 36px;
+    }
+
+    .topic-description {
+        font-size: 16px;
+    }
+}
+
+@media (max-width: 768px) {
+    .topic-detail-container {
+        padding-bottom: 40px;
+    }
+
+    .topic-header {
+        padding: 20px 0;
+        margin-bottom: 30px;
+    }
+
+    .max-w-wrapper {
+        padding: 0 16px;
+    }
+
+    .topic-title {
+        font-size: 28px;
+        margin-bottom: 12px;
+    }
+
+    .topic-description {
+        font-size: 15px;
+    }
+
+    .topic-meta {
+        gap: 8px;
+        margin-top: 16px;
+    }
+
+    .meta-badge {
+        padding: 5px 12px;
+        font-size: 12px;
+    }
+
+    .glass-card {
+        border-radius: 16px;
+        padding: 20px;
+    }
+}
+
+@media (max-width: 480px) {
+    .topic-title {
+        font-size: 24px;
+        letter-spacing: -0.5px;
+    }
+
+    .topic-description {
+        font-size: 14px;
+    }
+
+    .back-btn {
+        padding: 6px 12px;
+        font-size: 13px;
+    }
+
+    .glass-card {
+        padding: 16px;
+        border-radius: 12px;
+    }
+
+    .section-content li {
+        padding-left: 20px;
+        font-size: 13px;
+    }
+}
