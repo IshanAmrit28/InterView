@@ -21,7 +21,7 @@ import CodingPractice from "./pages/CodingPractice";
 import VideoFeed from "./pages/VideoFeed";
 import "./App.css";
 import PracticeSetup from "./components/PracticeSetup";
-import InterviewRoom from "./pages/InterviewAdvance";
+import InterviewRoom from "./pages/Interview";
 import Report from "./pages/Report";
 function AppContent({ theme, toggleTheme }) {
   const location = useLocation();

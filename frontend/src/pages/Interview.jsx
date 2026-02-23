@@ -1,452 +1,1204 @@
-import { useState, useRef } from 'react'
-import { Mic, Volume2, CheckCircle2, XCircle, Lightbulb, Target, Briefcase } from 'lucide-react'
-import ReactMarkdown from 'react-markdown'
-import PageHeader from '../components/PageHeader'
-import Button from '../components/Button'
-import AnimatedBackground from '../components/AnimatedBackground'
-import { FRONTEND_API_BASE_URL } from '../constants'
-import './Interview.css'
+// frontend/src/pages/InterviewRoom.jsx
+import React, { useState, useEffect, useRef } from "react";
+import { useLocation, useNavigate } from "react-router-dom";
+import SpeechRecognition, {
+  useSpeechRecognition,
+} from "react-speech-recognition"; // NEW IMPORT
+import {
+  Mic,
+  MicOff,
+  PhoneOff,
+  Play,
+  Volume2,
+  Video,
+  VideoOff,
+  Loader2,
+  FileText,
+  Briefcase,
+} from "lucide-react";
+import PageHeader from "../components/PageHeader";
+import { endInterview } from "../services/interviewService";
 
-// Predefined Interview Questions by Role
-const interviewQuestions = {
-    'Frontend Developer': [
-        {
-            id: 'fe-1',
-            question: "Explain the Virtual DOM in React and how it improves performance.",
-            difficulty: "Medium",
-            category: "Technical",
-            hints: ["Mention diffing algorithm", "Compare with real DOM", "Explain reconciliation"]
-        },
-        {
-            id: 'fe-2',
-            question: "What is the difference between useEffect and useLayoutEffect?",
-            difficulty: "Medium",
-            category: "Technical",
-            hints: ["Timing of execution", "When to use each", "Visual changes"]
-        },
-        {
-            id: 'fe-3',
-            question: "Describe a challenging UI problem you solved and your approach.",
-            difficulty: "Medium",
-            category: "Behavioral",
-            hints: ["Use STAR method", "Mention specific technologies", "Explain impact"]
-        },
-        {
-            id: 'fe-4',
-            question: "How would you optimize a React application with performance issues?",
-            difficulty: "Hard",
-            category: "Technical",
-            hints: ["React.memo", "Code splitting", "Lazy loading", "useMemo/useCallback"]
-        },
-        {
-            id: 'fe-5',
-            question: "Explain CSS specificity and how to manage it in large applications.",
-            difficulty: "Easy",
-            category: "Technical",
-            hints: ["Specificity hierarchy", "BEM methodology", "CSS-in-JS solutions"]
-        }
-    ],
-    'Backend Developer': [
-        {
-            id: 'be-1',
-            question: "Explain the difference between SQL and NoSQL databases. When would you use each?",
-            difficulty: "Medium",
-            category: "Technical",
-            hints: ["Data structure", "Scalability", "ACID vs BASE", "Use cases"]
-        },
-        {
-            id: 'be-2',
-            question: "What is the N+1 query problem and how do you solve it?",
-            difficulty: "Hard",
-            category: "Technical",
-            hints: ["Database queries", "Eager loading", "JOIN operations", "ORM optimization"]
-        },
-        {
-            id: 'be-3',
-            question: "Describe your experience with API design and RESTful principles.",
-            difficulty: "Medium",
-            category: "Technical",
-            hints: ["HTTP methods", "Status codes", "Resource naming", "Versioning"]
-        },
-        {
-            id: 'be-4',
-            question: "How would you handle a production database outage?",
-            difficulty: "Hard",
-            category: "Behavioral",
-            hints: ["Incident response", "Communication", "Recovery plan", "Post-mortem"]
-        },
-        {
-            id: 'be-5',
-            question: "Explain authentication vs authorization. Implement JWT-based auth.",
-            difficulty: "Medium",
-            category: "Technical",
-            hints: ["Auth vs Authz", "Token structure", "Refresh tokens", "Security"]
-        }
-    ],
-    'Full Stack Developer': [
-        {
-            id: 'fs-1',
-            question: "Walk me through building a scalable web application from scratch.",
-            difficulty: "Hard",
-            category: "Technical",
-            hints: ["Architecture", "Tech stack", "Database design", "Deployment"]
-        },
-        {
-            id: 'fs-2',
-            question: "Explain how you would implement real-time features in a web app.",
-            difficulty: "Medium",
-            category: "Technical",
-            hints: ["WebSockets", "Server-Sent Events", "Polling", "Trade-offs"]
-        },
-        {
-            id: 'fs-3',
-            question: "Describe a time you had to debug a complex full-stack issue.",
-            difficulty: "Medium",
-            category: "Behavioral",
-            hints: ["Debugging process", "Tools used", "Root cause", "Prevention"]
-        },
-        {
-            id: 'fs-4',
-            question: "How do you ensure API security in a production application?",
-            difficulty: "Hard",
-            category: "Technical",
-            hints: ["Authentication", "Rate limiting", "CORS", "Input validation", "HTTPS"]
-        },
-        {
-            id: 'fs-5',
-            question: "Explain your approach to state management in modern web apps.",
-            difficulty: "Medium",
-            category: "Technical",
-            hints: ["Redux vs Context", "Server state", "Local state", "Trade-offs"]
-        }
-    ],
-    'Data Analyst': [
-        {
-            id: 'da-1',
-            question: "Explain the difference between WHERE and HAVING clauses in SQL.",
-            difficulty: "Easy",
-            category: "Technical",
-            hints: ["Filtering rows vs groups", "Execution order", "Aggregate functions"]
-        },
-        {
-            id: 'da-2',
-            question: "How would you analyze user churn for a subscription service?",
-            difficulty: "Medium",
-            category: "Technical",
-            hints: ["Metrics", "Cohort analysis", "Visualization", "Recommendations"]
-        },
-        {
-            id: 'da-3',
-            question: "Describe your experience with data visualization tools.",
-            difficulty: "Easy",
-            category: "Behavioral",
-            hints: ["Tools used", "Dashboard design", "Stakeholder communication"]
-        },
-        {
-            id: 'da-4',
-            question: "What is A/B testing and how do you measure its success?",
-            difficulty: "Medium",
-            category: "Technical",
-            hints: ["Hypothesis", "Sample size", "Statistical significance", "Metrics"]
-        },
-        {
-            id: 'da-5',
-            question: "How do you handle missing or inconsistent data in analysis?",
-            difficulty: "Medium",
-            category: "Technical",
-            hints: ["Data cleaning", "Imputation methods", "Impact assessment", "Documentation"]
-        }
-    ],
-    'DevOps Engineer': [
-        {
-            id: 'do-1',
-            question: "Explain CI/CD and describe a pipeline you've implemented.",
-            difficulty: "Medium",
-            category: "Technical",
-            hints: ["Build", "Test", "Deploy stages", "Tools", "Automation"]
-        },
-        {
-            id: 'do-2',
-            question: "What is containerization and how does Docker work?",
-            difficulty: "Easy",
-            category: "Technical",
-            hints: ["Containers vs VMs", "Images", "Dockerfile", "Benefits"]
-        },
-        {
-            id: 'do-3',
-            question: "Describe how you would handle a production incident.",
-            difficulty: "Hard",
-            category: "Behavioral",
-            hints: ["Detection", "Mitigation", "Communication", "Post-mortem"]
-        },
-        {
-            id: 'do-4',
-            question: "Explain Infrastructure as Code and your experience with it.",
-            difficulty: "Medium",
-            category: "Technical",
-            hints: ["Terraform/CloudFormation", "Version control", "Benefits", "Best practices"]
-        },
-        {
-            id: 'do-5',
-            question: "How do you monitor and ensure application reliability?",
-            difficulty: "Hard",
-            category: "Technical",
-            hints: ["Monitoring tools", "Metrics", "Alerting", "SLAs/SLOs"]
-        }
-    ]
-}
+// HARDCODED CANDIDATE ID (FOR DEMO ONLY)
+const CANDIDATE_ID = "6912c711cabf1fe8c3bd941c";
+const CANDIDATE_NAME = "Candidate Demo";
 
-function Interview() {
-    const [selectedRole, setSelectedRole] = useState(null)
-    const [currentQuestion, setCurrentQuestion] = useState(null)
-    const [userAnswer, setUserAnswer] = useState('')
-    const [feedback, setFeedback] = useState(null)
-    const [isAnalyzing, setIsAnalyzing] = useState(false)
-    const [completedQuestions, setCompletedQuestions] = useState([])
-    const textareaRef = useRef(null)
+// --- Components (Inline for single-file mandate context) ---
 
-    const selectQuestion = (question) => {
-        setCurrentQuestion(question)
-        setUserAnswer('')
-        setFeedback(null)
-    }
+const ControlButton = ({ onClick, className, children, disabled = false }) => (
+  <button
+    onClick={onClick}
+    className={`p-3 rounded-full text-white transition-all duration-200 shadow-xl ${className} ${
+      disabled ? "bg-gray-500 cursor-not-allowed opacity-70" : ""
+    }`}
+    disabled={disabled}
+  >
+    {children}
+  </button>
+);
 
-    const analyzeAnswer = async () => {
-        if (!userAnswer.trim()) return
-
-        setIsAnalyzing(true)
-        try {
-            // Call backend API instead of Gemini directly
-            const response = await fetch(`${FRONTEND_API_BASE_URL}/api/interview/analyze`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
-                    question: currentQuestion.question,
-                    answer: userAnswer,
-                    difficulty: currentQuestion.difficulty,
-                    category: currentQuestion.category
-                })
-            })
-
-            if (!response.ok) {
-                throw new Error(`Backend error: ${response.status}`)
-            }
-
-            const data = await response.json()
-            setFeedback(data.feedback)
-
-            // Mark question as completed
-            if (!completedQuestions.includes(currentQuestion.id)) {
-                setCompletedQuestions(prev => [...prev, currentQuestion.id])
-            }
-        } catch (error) {
-            console.error('Analysis error:', error)
-            setFeedback('Error analyzing answer. Please make sure the backend server is running.')
-        } finally {
-            setIsAnalyzing(false)
-        }
-    }
-
-    const resetPractice = () => {
-        setSelectedRole(null)
-        setCurrentQuestion(null)
-        setUserAnswer('')
-        setFeedback(null)
-        setCompletedQuestions([])
-    }
-
-    const getDifficultyColor = (difficulty) => {
-        switch (difficulty) {
-            case 'Easy': return '#10b981'
-            case 'Medium': return '#f59e0b'
-            case 'Hard': return '#ef4444'
-            default: return '#6b7280'
-        }
-    }
-
-    return (
-        <div className="interview-page">
-            <AnimatedBackground />
-            <PageHeader
-                title="Interview Practice"
-                subtitle="Practice interview questions by role and get AI-powered feedback"
-            />
-
-            <div className="interview-container">
-                {!selectedRole ? (
-                    // Role Selection Screen
-                    <div className="role-selection">
-                        <h2>Select Your Interview Role</h2>
-                        <div className="roles-grid">
-                            {Object.keys(interviewQuestions).map((role) => (
-                                <div
-                                    key={role}
-                                    className="role-card"
-                                    onClick={() => setSelectedRole(role)}
-                                >
-                                    <div className="role-icon">
-                                        <Target size={32} />
-                                    </div>
-                                    <h3>{role}</h3>
-                                    <p>{interviewQuestions[role].length} questions</p>
-                                    <div className="role-progress">
-                                        {completedQuestions.filter(id =>
-                                            interviewQuestions[role].some(q => q.id === id)
-                                        ).length} / {interviewQuestions[role].length} completed
-                                    </div>
-                                </div>
-                            ))}
-                        </div>
-                    </div>
-                ) : !currentQuestion ? (
-                    // Question Selection Screen
-                    <div className="question-selection">
-                        <div className="selection-header">
-                            <button className="btn-back" onClick={() => setSelectedRole(null)}>
-                                ← Back to Roles
-                            </button>
-                            <h2>{selectedRole}</h2>
-                            <p>Select a question to practice</p>
-                        </div>
-
-                        <div className="questions-list">
-                            {interviewQuestions[selectedRole].map((question) => (
-                                <div
-                                    key={question.id}
-                                    className={`question-item ${completedQuestions.includes(question.id) ? 'completed' : ''}`}
-                                    onClick={() => selectQuestion(question)}
-                                >
-                                    <div className="question-header">
-                                        <span
-                                            className="difficulty-badge"
-                                            style={{ backgroundColor: getDifficultyColor(question.difficulty) }}
-                                        >
-                                            {question.difficulty}
-                                        </span>
-                                        <span className="category-tag">{question.category}</span>
-                                        {completedQuestions.includes(question.id) && (
-                                            <CheckCircle2 size={20} className="completed-icon" />
-                                        )}
-                                    </div>
-                                    <p className="question-text">{question.question}</p>
-                                </div>
-                            ))}
-                        </div>
-                    </div>
-                ) : (
-                    // Question Practice Screen
-                    <div className="question-practice">
-                        <div className="practice-header">
-                            <button className="btn-back" onClick={() => setCurrentQuestion(null)}>
-                                ← Back to Questions
-                            </button>
-                            <div className="practice-meta">
-                                <span
-                                    className="difficulty-badge"
-                                    style={{ backgroundColor: getDifficultyColor(currentQuestion.difficulty) }}
-                                >
-                                    {currentQuestion.difficulty}
-                                </span>
-                                <span className="category-tag">{currentQuestion.category}</span>
-                            </div>
-                        </div>
-
-                        <div className="question-content">
-                            <h3>{currentQuestion.question}</h3>
-
-                            {/* Hints Section */}
-                            <details className="hints-section">
-                                <summary>
-                                    <Lightbulb size={18} />
-                                    View Hints ({currentQuestion.hints.length})
-                                </summary>
-                                <ul>
-                                    {currentQuestion.hints.map((hint, index) => (
-                                        <li key={index}>{hint}</li>
-                                    ))}
-                                </ul>
-                            </details>
-
-                            {/* Answer Input */}
-                            <div className="answer-section">
-                                <label>Your Answer:</label>
-                                <textarea
-                                    ref={textareaRef}
-                                    value={userAnswer}
-                                    onChange={(e) => setUserAnswer(e.target.value)}
-                                    placeholder="Type your detailed answer here... Be as thorough as possible."
-                                    rows={12}
-                                    disabled={isAnalyzing}
-                                />
-                                <div className="answer-meta">
-                                    <span className="char-count">
-                                        {userAnswer.length} characters
-                                    </span>
-                                    <button
-                                        className="btn-primary"
-                                        onClick={analyzeAnswer}
-                                        disabled={!userAnswer.trim() || isAnalyzing}
-                                    >
-                                        {isAnalyzing ? (
-                                            <>Analyzing...</>
-                                        ) : (
-                                            <>
-                                                <Target size={18} />
-                                                Get AI Feedback
-                                            </>
-                                        )}
-                                    </button>
-                                </div>
-                            </div>
-
-                            {/* Feedback Section */}
-                            {feedback && (
-                                <div className="feedback-section">
-                                    <h4>
-                                        <CheckCircle2 size={20} />
-                                        AI Feedback
-                                    </h4>
-                                    <div className="feedback-content">
-                                        <ReactMarkdown>{feedback}</ReactMarkdown>
-                                    </div>
-                                    <div className="feedback-actions">
-                                        <button
-                                            className="btn-secondary"
-                                            onClick={() => {
-                                                setCurrentQuestion(null)
-                                                setUserAnswer('')
-                                                setFeedback(null)
-                                            }}
-                                        >
-                                            Next Question
-                                        </button>
-                                        <button
-                                            className="btn-secondary"
-                                            onClick={() => {
-                                                setUserAnswer('')
-                                                setFeedback(null)
-                                            }}
-                                        >
-                                            Try Again
-                                        </button>
-                                    </div>
-                                </div>
-                            )}
-                        </div>
-                    </div>
-                )}
-
-                {/* Reset Button */}
-                {selectedRole && (
-                    <button className="btn-reset" onClick={resetPractice}>
-                        Start Over
-                    </button>
-                )}
-            </div>
+const ParticipantTile = ({
+  name,
+  isMuted,
+  isCameraOff,
+  isSpeaking,
+  avatarUrl,
+}) => (
+  <div className={`relative w-full h-full rounded-2xl flex items-center justify-center overflow-hidden border border-gray-700/50 backdrop-blur-md transition-all duration-300 ${isSpeaking ? 'bg-gray-800/80 shadow-[0_0_30px_-5px_rgba(59,130,246,0.3)]' : 'bg-gray-900/60'}`}>
+    {isSpeaking && (
+      <div className="absolute inset-0 border-2 border-blue-500/50 rounded-2xl ring-4 ring-blue-500/20 animate-pulse transition-all duration-300" />
+    )}
+    <div className="flex flex-col items-center justify-center relative z-10">
+      {isCameraOff ? (
+        <div className={`w-36 h-36 rounded-full flex items-center justify-center shadow-2xl transition-all duration-300 ${isSpeaking ? 'bg-gradient-to-br from-blue-600 to-indigo-600 scale-105' : 'bg-gray-800 border-2 border-gray-700'}`}>
+          <span className="text-6xl font-bold text-white tracking-wider">
+            {name.charAt(0)}
+          </span>
         </div>
-    )
-}
+      ) : (
+        <img
+          src={avatarUrl}
+          alt={`${name} avatar`}
+          className={`w-48 h-48 object-cover rounded-full shadow-2xl transition-all duration-300 ${isSpeaking ? 'border-4 border-blue-500 scale-105' : 'border-4 border-gray-700'}`}
+          onError={(e) => {
+            e.currentTarget.onerror = null;
+            e.currentTarget.src = "https://placehold.co/192x192/4b5563/ffffff?text=AI";
+          }}
+        />
+      )}
+      {isSpeaking && (
+        <div className="absolute -bottom-10 flex items-center justify-center bg-blue-500/20 px-4 py-1.5 rounded-full backdrop-blur-sm border border-blue-500/30 animate-bounce">
+           <Volume2 className="w-5 h-5 text-blue-400 mr-2" />
+           <span className="text-blue-300 text-sm font-medium">Speaking...</span>
+        </div>
+      )}
+    </div>
+    <div className="absolute bottom-6 left-6 flex items-center gap-3 p-2.5 px-5 bg-gray-950/80 backdrop-blur-md rounded-xl shadow-lg border border-gray-800">
+      <span className="text-lg font-semibold text-gray-200">{name}</span>
+      {isMuted && <div className="bg-red-500/20 p-1.5 rounded-lg"><MicOff className="w-5 h-5 text-red-500" /></div>}
+    </div>
+  </div>
+);
 
-export default Interview
+// --- Main Interview Component ---
+
+const InterviewRoom = () => {
+  const location = useLocation();
+  const navigate = useNavigate();
+
+  // Initial data passed from PracticeSetup
+  const initialReportData = location.state?.reportStructure || {
+    DBMS: [],
+    OS: [],
+    CN: [],
+    OOP: [],
+    "Resume based question": [],
+    // Included to ensure robust object structure check
+    ALGORITHM: [],
+  };
+  const initialReportId = location.state?.reportId;
+
+  // --- Speech Recognition Hook Setup (Replaced native API) ---
+  const {
+    transcript, // Live/Final captured text from speech
+    resetTranscript,
+    browserSupportsSpeechRecognition,
+    listening, // boolean: true if the microphone is actively listening
+  } = useSpeechRecognition();
+
+  // --- State Management ---
+  const [reportData, setReportData] = useState(initialReportData);
+  const [reportId, setReportId] = useState(initialReportId);
+  const [isMicOn, setIsMicOn] = useState(false); // Controls button visual state
+  const [isInterviewerSpeaking, setIsInterviewerSpeaking] = useState(false);
+  // Removed isListening, transcript states
+  const [interviewStatus, setInterviewStatus] = useState("idle"); // idle, running, submitting, finished
+  const [questionIndex, setQuestionIndex] = useState(-1);
+  const [statusMessage, setStatusMessage] = useState("Click Start to begin.");
+  const [error, setError] = useState(null);
+  const [elapsedTime, setElapsedTime] = useState(0);
+  // STATE for Text Area answer (for ALGORITHMS)
+  const [textAreaAnswer, setTextAreaAnswer] = useState("");
+
+  // --- Refs ---
+  // Removed recognitionRef and transcriptRef
+  const voicesRef = useRef([]);
+  const questionIndexRef = useRef(questionIndex);
+  const timerRef = useRef(null);
+
+  const questionKeys = Object.keys(reportData).filter((key) =>
+    Array.isArray(reportData[key]),
+  );
+  const allQuestions = questionKeys.flatMap((key) =>
+    reportData[key].map((q) => ({ ...q, category: key })),
+  );
+  const totalQuestions = allQuestions.length;
+  const currentQuestion = allQuestions[questionIndex];
+
+  // CONSTANT: Check if the current question requires a text box answer
+  const isAlgoQuestion = currentQuestion?.category === "ALGORITHM";
+
+  // Sync Refs
+  useEffect(() => {
+    questionIndexRef.current = questionIndex;
+  }, [questionIndex]);
+
+  // Timer Logic
+  useEffect(() => {
+    if (interviewStatus === "running") {
+      timerRef.current = setInterval(() => {
+        setElapsedTime((prevTime) => prevTime + 1);
+      }, 1000);
+    } else {
+      clearInterval(timerRef.current);
+    }
+    return () => clearInterval(timerRef.current);
+  }, [interviewStatus]);
+
+  // Format time (MM:SS)
+  const formatTime = (seconds) => {
+    const minutes = Math.floor(seconds / 60);
+    const remainingSeconds = seconds % 60;
+    return `${minutes < 10 ? "0" : ""}${minutes}:${
+      remainingSeconds < 10 ? "0" : ""
+    }${remainingSeconds}`;
+  };
+
+  // --- Speech Helper Functions ---
+  const speakQuestion = (text) => {
+    return new Promise((resolve) => {
+      if (!window.speechSynthesis) {
+        console.warn("TTS not supported.");
+        resolve();
+        return;
+      }
+      window.speechSynthesis.cancel();
+      const utter = new SpeechSynthesisUtterance(text);
+
+      const loadVoices = () => {
+        voicesRef.current = window.speechSynthesis.getVoices();
+      };
+      loadVoices();
+      const voices = voicesRef.current;
+
+      const chosenVoice =
+        voices.find(
+          (v) => v.lang.includes("en-US") && v.name.includes("Google"),
+        ) || voices.find((v) => v.lang.includes("en-US"));
+
+      if (chosenVoice) utter.voice = chosenVoice;
+      utter.rate = 0.95;
+
+      utter.onstart = () => setIsInterviewerSpeaking(true);
+      utter.onend = () => {
+        setIsInterviewerSpeaking(false);
+        resolve();
+      };
+      utter.onerror = (e) => {
+        console.error("TTS Error:", e);
+        setIsInterviewerSpeaking(false);
+        resolve();
+      };
+      window.speechSynthesis.speak(utter);
+    });
+  };
+
+  // NEW startListening function using hook methods
+  const startListening = () => {
+    // Disabled if it's an ALGORITHMS question
+    if (isAlgoQuestion || listening) return;
+    try {
+      SpeechRecognition.startListening({ continuous: true, language: "en-US" });
+      resetTranscript(); // Clear any previous transcript
+      setIsMicOn(true);
+      setStatusMessage("Listening... Speak now.");
+      setError(null);
+    } catch (e) {
+      console.error("Error starting recognition:", e);
+      setError(`Failed to start mic: ${e.message}`);
+    }
+  };
+
+  // NEW stopListening function using hook methods
+  const stopListening = () => {
+    SpeechRecognition.stopListening();
+    setIsMicOn(false);
+    setStatusMessage("Recording stopped.");
+  };
+
+  // --- Cleanup useEffect (Removed recognition setup) ---
+  useEffect(() => {
+    if (!browserSupportsSpeechRecognition) {
+      setError("Web Speech API not supported. Voice features unavailable.");
+    }
+
+    // Only cleanup TTS
+    return () => {
+      if (window.speechSynthesis) window.speechSynthesis.cancel();
+      SpeechRecognition.abortListening(); // Use library's abort method on unmount
+    };
+  }, [browserSupportsSpeechRecognition]);
+
+  // --- Answer Submission & Next Question Logic ---
+
+  const updateReportWithAnswer = (answerText) => {
+    if (!currentQuestion) return;
+    const { category, questionId } = currentQuestion;
+
+    setReportData((prevData) => {
+      const newReportData = { ...prevData };
+      const categoryArray = newReportData[category];
+
+      const qIndex = categoryArray.findIndex(
+        (q) => q.questionId === questionId,
+      );
+
+      if (qIndex !== -1) {
+        categoryArray[qIndex] = {
+          ...categoryArray[qIndex],
+          answer: answerText,
+        };
+      }
+      return newReportData;
+    });
+  };
+
+  const handleAnswerSubmit = (finalAnswer) => {
+    stopListening(); // Ensure mic is off
+
+    const answerText = finalAnswer.trim() || "(No response recorded)";
+    updateReportWithAnswer(answerText);
+
+    setStatusMessage(`Answer recorded: ${answerText.substring(0, 50)}...`);
+    resetTranscript(); // Clear hook's internal transcript
+    setTextAreaAnswer(""); // Clear text area after submission
+
+    setTimeout(askNextQuestion, 2000);
+  };
+
+  // HANDLER for submitting text area answers
+  const handleTextAnswerSubmit = () => {
+    if (isAlgoQuestion && interviewStatus === "running") {
+      handleAnswerSubmit(textAreaAnswer);
+    }
+  };
+
+  const askNextQuestion = () => {
+    if (questionIndexRef.current + 1 >= totalQuestions) {
+      handleEndInterview(false);
+      return;
+    }
+
+    const nextIndex = questionIndexRef.current + 1;
+    const nextQuestion = allQuestions[nextIndex];
+    const nextQuestionText = nextQuestion.question;
+    const isNextAlgo = nextQuestion.category === "ALGORITHM";
+
+    setStatusMessage("Interviewer is speaking...");
+
+    speakQuestion(nextQuestionText)
+      .then(() => {
+        setQuestionIndex(nextIndex);
+
+        if (isNextAlgo) {
+          // Disable Mic, clear refs for text questions
+          stopListening(); // Ensures mic is off
+          setStatusMessage(
+            "Ready for your code/answer. Type and click Submit.",
+          );
+        } else {
+          // Enable Mic prompt for verbal questions
+          setStatusMessage("Ready for your answer. Click the mic button.");
+        }
+      })
+      .catch((err) => {
+        setError("Failed to speak question.");
+        console.error(err);
+      });
+  };
+
+  // --- Control Handlers ---
+
+  const handleStartInterview = async () => {
+    if (interviewStatus === "running" || totalQuestions === 0) return;
+
+    setInterviewStatus("running");
+    setElapsedTime(0);
+    setError(null);
+    setQuestionIndex(-1);
+    setTextAreaAnswer("");
+
+    const greeting =
+      "Hello, and welcome to the interview simulator. We will have a rapid fire round. for fundamental questions answer duration is 30 seconds maximum, for coding and project or resume based question there will be no time limit. So now as the rules are clear. lets start.";
+    setStatusMessage("Interviewer is speaking...");
+
+    await speakQuestion(greeting);
+
+    askNextQuestion();
+  };
+
+  const handleMicToggle = () => {
+    // Disabled if interview is not running, interviewer is speaking, OR if it's an Algo question
+    if (
+      interviewStatus !== "running" ||
+      isInterviewerSpeaking ||
+      isAlgoQuestion
+    )
+      return;
+
+    // If Mic is currently ON, user is turning it OFF (End of answer)
+    if (isMicOn) {
+      // Stop listening and process the final captured transcript
+      stopListening();
+      handleAnswerSubmit(transcript);
+    } else {
+      // If Mic is currently OFF, user is turning it ON (Start of answer)
+      startListening();
+    }
+  };
+
+  // Final submission and redirect
+  const handleEndInterview = async (isManualStop) => {
+    setInterviewStatus("submitting");
+    stopListening();
+    window.speechSynthesis.cancel();
+
+    setStatusMessage("Submitting answers for AI grading...");
+
+    const finalReportPayload = {
+      reportId: reportId,
+      candidateId: CANDIDATE_ID,
+      reportStructure: reportData,
+    };
+
+    try {
+      await endInterview(finalReportPayload);
+
+      navigate(`/report/${reportId}`, { replace: true });
+    } catch (err) {
+      setError(err.message || "Submission failed. Check network.");
+      setInterviewStatus("idle");
+      setStatusMessage("Submission failed. You can try submitting again.");
+    }
+  };
+
+  // Initial check for required data
+  if (!initialReportId || totalQuestions === 0) {
+    return (
+      <div className="min-h-screen flex flex-col items-center justify-center bg-gray-900 text-white min-w-[1280px]">
+        <div className="text-center p-8 bg-gray-800 rounded-xl shadow-2xl border border-red-500/30">
+          <h1 className="text-3xl font-bold text-red-400 mb-4">
+            Interview Setup Error
+          </h1>
+          <p className="text-gray-300 mb-6">
+            Missing vital interview data. Please start a session from the
+            Practice page.
+          </p>
+          <button
+            onClick={() => navigate("/practice")}
+            className="bg-blue-600 hover:bg-blue-500 text-white px-6 py-3 rounded-lg font-semibold transition"
+          >
+            Go to Practice Setup
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="flex h-screen w-screen bg-gray-950 text-white font-sans min-w-[1280px] bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-blue-900/10 via-gray-950 to-gray-950">
+      
+      {/* Left Panel: Video Tiles */}
+      <div className="w-2/3 h-full p-8 flex flex-col gap-8 relative">
+        <div className="absolute top-0 left-0 w-full h-32 bg-gradient-to-b from-gray-950 to-transparent z-10 pointer-events-none"></div>
+        <div className="relative z-20 mb-[-1rem]">
+          <PageHeader
+            title="Interview Simulator"
+            subtitle="AI-powered roleplay with real-time feedback"
+          />
+        </div>
+        
+        <div className="h-[45%] z-20 relative">
+          <ParticipantTile
+            name={CANDIDATE_NAME}
+            // Mic is Muted when the toggle is OFF OR if it's an Algo Question (no mic needed)
+            isMuted={!isMicOn || isAlgoQuestion}
+            isCameraOff={true}
+            // Candidate is Speaking/Active when recognition is ON (only for verbal Qs)
+            isSpeaking={listening && !isAlgoQuestion} // Use 'listening' from hook
+            avatarUrl="https://placehold.co/500x500/27272a/ffffff?text=CANDIDATE"
+          />
+        </div>
+        <div className="h-[45%] z-20 relative">
+          <ParticipantTile
+            name="AI Interviewer"
+            isMuted={false}
+            isCameraOff={true}
+            isSpeaking={isInterviewerSpeaking}
+            avatarUrl="https://placehold.co/500x500/27272a/ffffff?text=AI+INTERVIEWER"
+          />
+        </div>
+      </div>
+
+      {/* Right Panel: Controls and Transcript */}
+      <div className="w-1/3 h-full bg-gray-900/80 backdrop-blur-xl border-l border-gray-800 p-8 flex flex-col justify-between shadow-2xl relative">
+        {/* Top Info */}
+        <div className="flex justify-between items-center pb-8 border-b border-gray-800">
+          <div className="flex flex-col">
+            <span className="text-sm font-bold text-gray-400 uppercase tracking-widest mb-1">Progress</span>
+            <div className="text-3xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-cyan-300">
+              {currentQuestion
+                ? `Q ${questionIndex + 1} / ${totalQuestions}`
+                : "Ready"}
+            </div>
+          </div>
+          <div className="flex flex-col items-end">
+            <p className="text-sm font-bold text-gray-400 uppercase tracking-widest mb-1">Time Elapsed</p>
+            <span className="text-3xl font-mono font-bold text-white tracking-tight">
+              {formatTime(elapsedTime)}
+            </span>
+          </div>
+        </div>
+
+        {/* Question & Answer Area */}
+        <div className="flex-1 py-8 overflow-y-auto space-y-8 no-scrollbar">
+          <div className="p-6 bg-gradient-to-br from-gray-800/80 to-gray-900/80 rounded-2xl border border-gray-700/50 shadow-lg relative overflow-hidden">
+            <div className="absolute top-0 left-0 w-1 h-full bg-blue-500"></div>
+            <h3 className="font-bold text-sm uppercase tracking-wider text-blue-400 mb-3 flex items-center">
+              <span className="w-2 h-2 rounded-full bg-blue-500 mr-2 animate-pulse"></span>
+              Interviewer
+            </h3>
+            <p className="text-xl text-gray-100 leading-relaxed font-medium">
+              {currentQuestion?.question || statusMessage}
+            </p>
+          </div>
+
+          {/* Conditional Text Box for ALGORITHMS questions */}
+          {isAlgoQuestion && interviewStatus === "running" && (
+            <div className="p-6 bg-gray-950/80 rounded-2xl border border-blue-500/30 shadow-[0_0_30px_-10px_rgba(59,130,246,0.2)] transition-all">
+              <h3 className="font-bold text-sm uppercase tracking-wider text-blue-300 mb-4 flex items-center">
+                <FileText className="w-4 h-4 mr-2" />
+                Your Code / Algorithm Answer
+              </h3>
+              <textarea
+                className="w-full h-64 p-4 bg-gray-900 text-green-400 border border-gray-700/80 rounded-xl font-mono text-sm leading-relaxed focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500/50 resize-none transition-all placeholder-gray-600"
+                placeholder="// Type your algorithm, pseudo-code, or detailed explanation here..."
+                value={textAreaAnswer}
+                onChange={(e) => setTextAreaAnswer(e.target.value)}
+              />
+              <ControlButton
+                onClick={handleTextAnswerSubmit}
+                className="bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-500 hover:to-cyan-500 w-full mt-4 font-bold rounded-xl"
+                disabled={!textAreaAnswer.trim()}
+              >
+                <FileText size={20} className="mr-2 inline" /> Submit Code Answer
+              </ControlButton>
+            </div>
+          )}
+
+          {error && (
+            <div className="p-4 bg-red-900/30 border border-red-500/30 text-red-300 rounded-xl text-sm font-medium flex items-center">
+              <span className="mr-3 text-xl">⚠️</span> {error}
+            </div>
+          )}
+        </div>
+
+        {/* Control Bar */}
+        <div className="flex flex-col items-center pt-8 border-t border-gray-800">
+          {interviewStatus === "idle" && (
+            <ControlButton
+              onClick={handleStartInterview}
+              className="bg-gradient-to-r from-green-600 to-emerald-500 hover:scale-105 w-full h-16 text-lg font-bold rounded-xl shadow-[0_0_30px_-5px_rgba(16,185,129,0.4)]"
+              disabled={
+                totalQuestions === 0 || !browserSupportsSpeechRecognition
+              }
+            >
+              <Play size={24} className="mr-3 inline fill-white" /> Begin Session
+            </ControlButton>
+          )}
+
+          {interviewStatus === "running" || interviewStatus === "submitting" ? (
+            <div className="w-full flex flex-col gap-4">
+              {/* Mic controls shown ONLY for non-algorithm questions */}
+              {!isAlgoQuestion && (
+                <div className="flex gap-4 mb-2">
+                  <ControlButton
+                    onClick={handleMicToggle}
+                    className={`flex-1 flex justify-center items-center h-16 rounded-xl border transition-all ${
+                      isMicOn
+                        ? "bg-red-500/10 border-red-500/50 hover:bg-red-500/20 text-red-400 shadow-[0_0_20px_-5px_rgba(239,68,68,0.3)]" // Mic is ON, press to stop
+                        : "bg-gray-800 border-gray-700 hover:bg-gray-700 text-gray-300" // Mic is OFF, press to start
+                    }`}
+                    disabled={
+                      isInterviewerSpeaking ||
+                      interviewStatus === "submitting" ||
+                      !browserSupportsSpeechRecognition
+                    }
+                  >
+                    {isMicOn ? (
+                      <><Mic size={24} className="mr-2 animate-pulse" /> Stop Recording</>
+                    ) : (
+                      <><MicOff size={24} className="mr-2" /> Start Recording</>
+                    )}
+                  </ControlButton>
+
+                  <ControlButton
+                    onClick={() => {}}
+                    className="w-16 h-16 flex justify-center items-center bg-gray-800 border border-gray-700 hover:bg-gray-700 text-gray-500 rounded-xl cursor-not-allowed"
+                    disabled={true} 
+                  >
+                    <VideoOff size={24} />
+                  </ControlButton>
+                </div>
+              )}
+
+              <ControlButton
+                onClick={() => handleEndInterview(true)}
+                className="bg-red-900/40 border border-red-800 hover:bg-red-900/60 text-red-300 w-full h-14 rounded-xl font-semibold transition-all"
+                disabled={interviewStatus === "submitting"}
+              >
+                {interviewStatus === "submitting" ? (
+                  <div className="flex justify-center items-center">
+                    <Loader2 className="animate-spin w-5 h-5 mr-3" /> Evaluating responses...
+                  </div>
+                ) : (
+                  <div className="flex justify-center items-center">
+                    <PhoneOff size={20} className="mr-3" /> End Simulation Early
+                  </div>
+                )}
+              </ControlButton>
+            </div>
+          ) : null}
+
+          {interviewStatus === "finished" && (
+            <div className="w-full space-y-4">
+              <div className="p-4 bg-green-900/20 border border-green-500/30 rounded-xl text-center">
+                <p className="text-lg font-bold text-green-400 flex items-center justify-center gap-2">
+                  <span className="w-2 h-2 rounded-full bg-green-400 animate-pulse"></span>
+                  Session Complete
+                </p>
+                <p className="text-gray-400 text-sm mt-1">Your AI evaluation is ready</p>
+              </div>
+              <ControlButton
+                onClick={() => navigate(`/report/${reportId}`)}
+                className="bg-gradient-to-r from-blue-600 to-indigo-600 hover:scale-105 w-full h-16 text-lg font-bold rounded-xl shadow-[0_0_30px_-5px_rgba(79,70,229,0.4)] transition-all"
+              >
+                <Briefcase size={24} className="mr-3 inline" /> View Final Report
+              </ControlButton>
+            </div>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default InterviewRoom;
+
+// // frontend/src/pages/InterviewRoom.jsx
+// import React, { useState, useEffect, useRef } from "react";
+// import { useLocation, useNavigate } from "react-router-dom";
+// import SpeechRecognition, {
+//   useSpeechRecognition,
+// } from "react-speech-recognition";
+// import {
+//   Mic,
+//   MicOff,
+//   PhoneOff,
+//   Play,
+//   Volume2,
+//   Video,
+//   VideoOff,
+//   Loader2,
+//   FileText,
+// } from "lucide-react";
+// // RESTORED: Importing real service function from your platform
+// import { endInterview } from "../services/interviewService";
+
+// // HARDCODED CANDIDATE ID (FOR DEMO ONLY)
+// const CANDIDATE_ID = "6912c711cabf1fe8c3bd941c";
+// const CANDIDATE_NAME = "Candidate Demo";
+
+// // --- Components (Inline) ---
+// const ControlButton = ({ onClick, className, children, disabled = false }) => (
+//   <button
+//     onClick={onClick}
+//     className={`p-3 rounded-full text-white transition-all duration-200 shadow-xl ${className} ${
+//       disabled ? "bg-gray-500 cursor-not-allowed opacity-70" : ""
+//     }`}
+//     disabled={disabled}
+//   >
+//     {children}
+//   </button>
+// );
+
+// const ParticipantTile = ({
+//   name,
+//   isMuted,
+//   isCameraOff,
+//   isSpeaking,
+//   avatarUrl,
+// }) => (
+//   <div className="relative w-full h-full bg-gray-900 rounded-xl flex items-center justify-center overflow-hidden border-2 border-gray-700">
+//     {isSpeaking && (
+//       <div className="absolute inset-0 border-4 border-blue-500 rounded-xl ring-4 ring-blue-500 ring-opacity-50 animate-pulse transition-all duration-100" />
+//     )}
+//     <div className="flex flex-col items-center justify-center">
+//       {isCameraOff ? (
+//         <div className="w-32 h-32 bg-gray-700 rounded-full flex items-center justify-center">
+//           <span className="text-5xl font-bold text-white">
+//             {name.charAt(0)}
+//           </span>
+//         </div>
+//       ) : (
+//         <img
+//           src={avatarUrl}
+//           alt={`${name} avatar`}
+//           className="w-48 h-48 object-cover rounded-full shadow-lg border-4 border-gray-600"
+//           onError={(e) => {
+//             // FIX: Added image fallback handler
+//             e.target.onerror = null;
+//             e.target.src =
+//               "https://placehold.co/192x192/4b5563/ffffff?text=AVATAR";
+//           }}
+//         />
+//       )}
+//       {isSpeaking && (
+//         <Volume2 className="w-8 h-8 text-blue-400 mt-6 animate-pulse" />
+//       )}
+//     </div>
+//     <div className="absolute bottom-5 left-6 p-2 px-4 bg-black bg-opacity-70 rounded-lg shadow-md">
+//       <span className="text-lg font-medium text-white">{name}</span>
+//       {isMuted && <MicOff className="w-5 h-5 text-red-500 ml-2 inline-block" />}
+//     </div>
+//   </div>
+// );
+
+// // --- Time Limit Helper ---
+// const getCategoryTimeLimit = (category) => {
+//   const rapidFire = ["DBMS", "OS", "CN", "OOP"];
+//   // Time limit set to 45 seconds
+//   return rapidFire.includes(category) ? 20 : 0;
+// };
+
+// // ================================
+// // MAIN INTERVIEW COMPONENT
+// // ================================
+// const InterviewRoom = () => {
+//   const location = useLocation();
+//   const navigate = useNavigate();
+
+//   const initialReportData = location.state?.reportStructure || {
+//     DBMS: [],
+//     OS: [],
+//     CN: [],
+//     OOP: [],
+//     "Resume based question": [],
+//     ALGORITHM: [],
+//   };
+//   const initialReportId = location.state?.reportId;
+
+//   // Speech Recognition Hook
+//   const {
+//     transcript,
+//     resetTranscript,
+//     browserSupportsSpeechRecognition,
+//     listening,
+//   } = useSpeechRecognition();
+
+//   // States
+//   const [reportData, setReportData] = useState(initialReportData);
+//   const [reportId, setReportId] = useState(initialReportId);
+//   const [isMicOn, setIsMicOn] = useState(false);
+//   const [isInterviewerSpeaking, setIsInterviewerSpeaking] = useState(false);
+//   const [interviewStatus, setInterviewStatus] = useState("idle");
+//   const [questionIndex, setQuestionIndex] = useState(-1);
+//   const [statusMessage, setStatusMessage] = useState("Click Start to begin.");
+//   const [error, setError] = useState(null);
+//   const [elapsedTime, setElapsedTime] = useState(0);
+
+//   // TIMER STATES
+//   const [questionTimeLimit, setQuestionTimeLimit] = useState(0);
+//   const [currentQuestionTime, setCurrentQuestionTime] = useState(0);
+
+//   // FIX: State to force timer reset/restart when question changes
+//   const [timerTrigger, setTimerTrigger] = useState(0);
+
+//   const questionTimerRef = useRef(null);
+//   const [textAreaAnswer, setTextAreaAnswer] = useState("");
+
+//   const voicesRef = useRef([]);
+//   const questionIndexRef = useRef(questionIndex);
+//   const timerRef = useRef(null);
+
+//   // Build question list
+//   const questionKeys = Object.keys(reportData).filter((key) =>
+//     Array.isArray(reportData[key])
+//   );
+//   const allQuestions = questionKeys.flatMap((key) =>
+//     reportData[key].map((q) => ({ ...q, category: key }))
+//   );
+//   const totalQuestions = allQuestions.length;
+//   const currentQuestion = allQuestions[questionIndex];
+
+//   const isAlgoQuestion = currentQuestion?.category === "ALGORITHM";
+
+//   useEffect(() => {
+//     questionIndexRef.current = questionIndex;
+//   }, [questionIndex]);
+
+//   // Total Interview Timer
+//   useEffect(() => {
+//     if (interviewStatus === "running") {
+//       timerRef.current = setInterval(() => setElapsedTime((t) => t + 1), 1000);
+//     } else {
+//       clearInterval(timerRef.current);
+//     }
+//     return () => clearInterval(timerRef.current);
+//   }, [interviewStatus]);
+
+//   // ================================
+//   // CORE: QUESTION TIMER useEffect (Guarantees Reset via timerTrigger)
+//   // ================================
+//   useEffect(() => {
+//     // 1. Always clear the old timer first (the reset mechanism)
+//     clearInterval(questionTimerRef.current);
+
+//     if (questionTimeLimit > 0 && interviewStatus === "running") {
+//       setCurrentQuestionTime(questionTimeLimit);
+
+//       // 2. Start recording immediately
+//       startListening(true);
+
+//       questionTimerRef.current = setInterval(() => {
+//         setCurrentQuestionTime((prev) => {
+//           if (prev <= 1) {
+//             clearInterval(questionTimerRef.current);
+//             // 3. Auto-submit and move to next question
+//             setTimeout(() => handleTimeUpSubmit(), 600);
+//             return 0;
+//           }
+//           return prev - 1;
+//         });
+//       }, 1000);
+//     } else {
+//       // 4. Ensure display shows 0 when there's no limit
+//       setCurrentQuestionTime(0);
+//     }
+
+//     return () => clearInterval(questionTimerRef.current);
+//   }, [timerTrigger, interviewStatus]); // DEPENDS ON timerTrigger
+
+//   const formatTime = (s) =>
+//     `${String(Math.floor(s / 60)).padStart(2, "0")}:${String(s % 60).padStart(
+//       2,
+//       "0"
+//     )}`;
+
+//   // ================================
+//   // TTS Helpers
+//   // ================================
+//   const speakQuestion = (text) =>
+//     new Promise((resolve) => {
+//       if (!window.speechSynthesis) return resolve();
+
+//       window.speechSynthesis.cancel();
+//       const utter = new SpeechSynthesisUtterance(text);
+
+//       voicesRef.current = window.speechSynthesis.getVoices();
+//       utter.voice =
+//         voicesRef.current.find(
+//           (v) => v.lang.includes("en-US") && v.name.includes("Google")
+//         ) || voicesRef.current.find((v) => v.lang.includes("en-US"));
+
+//       utter.rate = 0.95;
+
+//       utter.onstart = () => setIsInterviewerSpeaking(true);
+//       utter.onend = () => {
+//         setIsInterviewerSpeaking(false);
+//         resolve();
+//       };
+//       utter.onerror = (e) => {
+//         if (e.error !== "interrupted") console.error("TTS Error:", e);
+//         setIsInterviewerSpeaking(false);
+//         resolve();
+//       };
+
+//       window.speechSynthesis.speak(utter);
+//     });
+
+//   // ========== MIC FUNCTIONS ==========
+//   const startListening = (auto = false) => {
+//     if (isAlgoQuestion || listening) return;
+//     if (!auto && questionTimeLimit > 0) return;
+
+//     try {
+//       SpeechRecognition.startListening({
+//         continuous: true,
+//         language: "en-US",
+//       });
+//       resetTranscript();
+//       setIsMicOn(true);
+//       setStatusMessage("Listening...");
+//       setError(null);
+//     } catch (err) {
+//       setError("Microphone failed to start.");
+//     }
+//   };
+
+//   const stopListening = () => {
+//     if (listening) SpeechRecognition.stopListening();
+//     setIsMicOn(false);
+//     clearInterval(questionTimerRef.current);
+//   };
+
+//   // Cleanup
+//   useEffect(() => {
+//     return () => {
+//       window.speechSynthesis.cancel();
+//       SpeechRecognition.abortListening();
+//       clearInterval(timerRef.current);
+//       clearInterval(questionTimerRef.current);
+//     };
+//   }, []);
+
+//   // ========== Answer Logic ==========
+
+//   const updateReportWithAnswer = (text) => {
+//     if (!currentQuestion) return;
+//     const { category, questionId } = currentQuestion;
+
+//     setReportData((prev) => {
+//       const clone = { ...prev };
+//       const arr = clone[category];
+//       const idx = arr.findIndex((q) => q.questionId === questionId);
+//       if (idx !== -1) arr[idx] = { ...arr[idx], answer: text };
+//       return clone;
+//     });
+//   };
+
+//   const handleAnswerSubmit = (finalAnswer) => {
+//     stopListening();
+
+//     const answerText = finalAnswer.trim() || "(No response)";
+//     updateReportWithAnswer(answerText);
+
+//     setStatusMessage("Answer recorded.");
+//     resetTranscript();
+//     setTextAreaAnswer("");
+
+//     setTimeout(askNextQuestion, 2000);
+//   };
+
+//   const handleTimeUpSubmit = () => {
+//     handleAnswerSubmit(transcript);
+//     setStatusMessage("Time's up! Answer submitted.");
+//   };
+
+//   const handleTextAnswerSubmit = () => {
+//     if (isAlgoQuestion) handleAnswerSubmit(textAreaAnswer);
+//   };
+
+//   // ========== Ask Next Question (Triggers Timer Reset) ==========
+//   const askNextQuestion = () => {
+//     if (questionIndexRef.current + 1 >= totalQuestions) {
+//       handleEndInterview(false);
+//       return;
+//     }
+
+//     const nextIndex = questionIndexRef.current + 1;
+//     const nextQ = allQuestions[nextIndex];
+//     const timeLimit = getCategoryTimeLimit(nextQ.category);
+
+//     // 1. Force timer cleanup/restart by changing the trigger state
+//     setTimerTrigger((t) => t + 1);
+//     // 2. Set the new time limit (used by the timer useEffect)
+//     setQuestionTimeLimit(timeLimit);
+
+//     setStatusMessage("Interviewer is speaking...");
+
+//     speakQuestion(nextQ.question).then(() => {
+//       // 3. Update the question index AFTER speaking finishes
+//       setQuestionIndex(nextIndex);
+
+//       if (nextQ.category === "ALGORITHM") {
+//         stopListening();
+//         setStatusMessage("Type your algorithm answer.");
+//       } else if (timeLimit > 0) {
+//         // Timed: Timer/Mic started by the dedicated useEffect
+//         setStatusMessage(
+//           `You have ${timeLimit} seconds. Recording has started.`
+//         );
+//       } else {
+//         // Untimed Verbal (Resume): Manual mic control
+//         stopListening();
+//         setStatusMessage("Click mic to answer.");
+//       }
+//     });
+//   };
+
+//   // ========== Start Interview ==========
+//   const handleStartInterview = async () => {
+//     if (interviewStatus === "running") return;
+
+//     setInterviewStatus("running");
+//     setElapsedTime(0);
+//     setQuestionIndex(-1);
+//     setQuestionTimeLimit(0); // Initial reset
+
+//     const greeting =
+//       "Welcome to the interview. Fundamental questions will have 45-second time limits. Coding questions require typed answers. Let's begin.";
+
+//     setStatusMessage("Interviewer speaking...");
+//     await speakQuestion(greeting);
+
+//     askNextQuestion();
+//   };
+
+//   // ========== Mic Toggle (Only for Untimed Questions) ==========
+//   const handleMicToggle = () => {
+//     if (
+//       interviewStatus !== "running" ||
+//       isInterviewerSpeaking ||
+//       isAlgoQuestion ||
+//       questionTimeLimit > 0 // Disabled for timed questions
+//     )
+//       return;
+
+//     if (isMicOn) {
+//       stopListening();
+//       handleAnswerSubmit(transcript);
+//     } else {
+//       startListening();
+//     }
+//   };
+
+//   // ========== End Interview ==========
+//   const handleEndInterview = async () => {
+//     setInterviewStatus("submitting");
+//     stopListening();
+//     window.speechSynthesis.cancel();
+
+//     const payload = {
+//       reportId,
+//       candidateId: CANDIDATE_ID,
+//       reportStructure: reportData,
+//     };
+
+//     try {
+//       // Use the actual endInterview function
+//       await endInterview(payload);
+//       console.log("Interview submitted successfully.", payload);
+//       navigate(`/report/${reportId}`, { replace: true });
+//     } catch (err) {
+//       setError("Submission failed.");
+//       setInterviewStatus("idle");
+//     }
+//   };
+
+//   if (!initialReportId || totalQuestions === 0) {
+//     return (
+//       <div className="min-h-screen flex items-center justify-center text-white">
+//         <p>Error: Missing interview data.</p>
+//       </div>
+//     );
+//   }
+
+//   // ===================================
+//   // UI RENDER
+//   // ===================================
+//   return (
+//     <div className="flex h-screen w-screen bg-gray-900 text-white font-sans min-w-[1280px]">
+//       {/* Left Panel: Video Tiles */}
+//       <div className="w-2/3 h-full p-6 flex flex-col gap-6">
+//         <div className="h-1/2">
+//           <ParticipantTile
+//             name={CANDIDATE_NAME}
+//             isMuted={!isMicOn || isAlgoQuestion}
+//             isCameraOff={true}
+//             isSpeaking={listening && !isAlgoQuestion}
+//             avatarUrl="https://placehold.co/500x500/27272a/ffffff?text=CANDIDATE"
+//           />
+//         </div>
+//         <div className="h-1/2">
+//           <ParticipantTile
+//             name="AI Interviewer"
+//             isMuted={false}
+//             isCameraOff={true}
+//             isSpeaking={isInterviewerSpeaking}
+//             avatarUrl="https://placehold.co/500x500/27272a/ffffff?text=AI+INTERVIEWER"
+//           />
+//         </div>
+//       </div>
+
+//       {/* Right Panel: Controls and Transcript */}
+//       <div className="w-1/3 h-full bg-gray-800 border-l border-gray-700 p-6 flex flex-col justify-between">
+//         {/* Top Info */}
+//         <div className="flex justify-between items-center pb-6 border-b border-gray-700">
+//           <div className="text-2xl font-bold text-blue-400">
+//             {currentQuestion
+//               ? `Q ${questionIndex + 1} of ${totalQuestions}`
+//               : "Ready"}
+//           </div>
+//           {/* TIMER DISPLAY BLOCK */}
+//           <div className="flex flex-col items-end">
+//             <p className="text-lg text-gray-400">
+//               {questionTimeLimit > 0 ? "Time Remaining" : "Total Time"}
+//             </p>
+//             <span
+//               className={`text-2xl font-mono font-bold ${
+//                 questionTimeLimit > 0 && currentQuestionTime <= 10
+//                   ? "text-red-400 animate-pulse"
+//                   : "text-white"
+//               }`}
+//             >
+//               {questionTimeLimit > 0
+//                 ? formatTime(currentQuestionTime) // Show remaining time
+//                 : formatTime(elapsedTime)}
+//             </span>
+//           </div>
+//         </div>
+
+//         {/* Question & Answer Area */}
+//         <div className="flex-1 py-6 overflow-y-auto space-y-6">
+//           <div className="p-4 bg-gray-700/50 rounded-lg border border-gray-600">
+//             <h3 className="font-bold text-lg text-blue-300 mb-2">
+//               Interviewer:
+//             </h3>
+//             <p className="text-xl text-white">
+//               {currentQuestion?.question || statusMessage}
+//             </p>
+//           </div>
+
+//           {/* Conditional Text Box for ALGORITHMS questions */}
+//           {isAlgoQuestion && interviewStatus === "running" && (
+//             <div className="p-4 bg-gray-900/50 rounded-lg border border-blue-500">
+//               <h3 className="font-bold text-lg text-blue-300 mb-2">
+//                 Your Code/Psudo Code/ Algorithm Answer:
+//               </h3>
+//               <textarea
+//                 className="w-full h-190 p-3 bg-gray-800 text-green-300 border border-gray-700 rounded-lg font-mono focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
+//                 placeholder="Type your algorithm or detailed answer here..."
+//                 value={textAreaAnswer}
+//                 onChange={(e) => setTextAreaAnswer(e.target.value)}
+//               />
+//               <ControlButton
+//                 onClick={handleTextAnswerSubmit}
+//                 className="bg-blue-600 hover:bg-blue-500 w-full mt-3"
+//                 disabled={!textAreaAnswer.trim()}
+//               >
+//                 <FileText size={20} className="mr-2" /> Submit Answer
+//               </ControlButton>
+//             </div>
+//           )}
+
+//           {/* Live Transcript area (Visible only for verbal questions) */}
+//           {!isAlgoQuestion && (
+//             <div className="p-4 bg-gray-900/50 rounded-lg border border-gray-700 max-h-[300px] overflow-y-auto font-mono text-sm">
+//               <h3 className="font-bold text-lg text-gray-300 mb-2">
+//                 Live Transcript:
+//               </h3>
+//               <p
+//                 className={`text-gray-200 ${
+//                   listening ? "animate-pulse text-green-400" : "text-gray-400"
+//                 }`}
+//               >
+//                 {transcript ||
+//                   (listening ? "Listening..." : "Speak by toggling the mic.")}
+//               </p>
+//             </div>
+//           )}
+
+//           {error && (
+//             <div className="p-3 bg-red-600/20 text-red-300 rounded-lg text-sm font-medium">
+//               {error}
+//             </div>
+//           )}
+//         </div>
+
+//         {/* Control Bar */}
+//         <div className="flex flex-col items-center pt-6 border-t border-gray-700">
+//           {interviewStatus === "idle" && (
+//             <ControlButton
+//               onClick={handleStartInterview}
+//               className="bg-green-600 hover:bg-green-500 w-full"
+//               disabled={
+//                 totalQuestions === 0 || !browserSupportsSpeechRecognition
+//               }
+//             >
+//               <Play size={20} className="mr-2" /> Start Interview
+//             </ControlButton>
+//           )}
+
+//           {interviewStatus === "running" || interviewStatus === "submitting" ? (
+//             <>
+//               {/* Mic controls shown ONLY for non-algorithm questions */}
+//               {!isAlgoQuestion && (
+//                 <div className="flex space-x-6 mb-4">
+//                   <ControlButton
+//                     onClick={handleMicToggle}
+//                     className={
+//                       isMicOn
+//                         ? "bg-red-600 hover:bg-red-500"
+//                         : "bg-gray-600 hover:bg-gray-700"
+//                     }
+//                     disabled={
+//                       isInterviewerSpeaking ||
+//                       interviewStatus === "submitting" ||
+//                       !browserSupportsSpeechRecognition ||
+//                       questionTimeLimit > 0 // Disabled for timed questions
+//                     }
+//                   >
+//                     {isMicOn ? <Mic size={24} /> : <MicOff size={24} />}
+//                   </ControlButton>
+
+//                   <ControlButton
+//                     className="bg-gray-600 hover:bg-gray-700"
+//                     disabled={true}
+//                   >
+//                     <VideoOff size={24} />
+//                   </ControlButton>
+//                 </div>
+//               )}
+
+//               {isAlgoQuestion && <div className="mb-4" />}
+
+//               <ControlButton
+//                 onClick={() => handleEndInterview()}
+//                 className="bg-red-600 hover:bg-red-500 w-full"
+//                 disabled={interviewStatus === "submitting"}
+//               >
+//                 {interviewStatus === "submitting" ? (
+//                   <>
+//                     <Loader2 className="animate-spin w-5 h-5 mr-2" /> Submitting
+//                     Report...
+//                   </>
+//                 ) : (
+//                   <>
+//                     <PhoneOff size={20} className="mr-2" /> End Interview
+//                   </>
+//                 )}
+//               </ControlButton>
+//             </>
+//           ) : null}
+
+//           {interviewStatus === "finished" && (
+//             <div className="text-center w-full">
+//               <p className="text-xl font-bold text-green-400 mb-4">
+//                 Interview Ended.
+//               </p>
+//               <ControlButton
+//                 onClick={() => navigate(`/report/${reportId}`)}
+//                 className="bg-blue-600 hover:bg-blue-500 w-full"
+//               >
+//                 <FileText size={20} className="mr-2" /> View Final Report
+//               </ControlButton>
+//             </div>
+//           )}
+//         </div>
+//       </div>
+//     </div>
+//   );
+// };
+
+// export default InterviewRoom;
