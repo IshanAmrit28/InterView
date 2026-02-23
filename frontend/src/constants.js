@@ -1,5 +1,6 @@
 // frontend/src/constants.js
-export const API_BASE_URL = "";
+
+export const API_BASE_URL = import.meta.env.API_BASE_URL;
 
 export const API_ENDPOINTS = {
   AUTH: {
