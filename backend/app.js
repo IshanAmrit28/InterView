@@ -13,6 +13,7 @@ const errorsController = require("./controllers/errors");
 
 const userRouter = require("./routes/userRoutes");
 const reportRouter = require("./routes/reportRoutes");
+const youtubeRouter = require("./routes/youtubeRoutes");
 
 const app = express();
 
@@ -23,8 +24,8 @@ app.use(cors()); // CORS should also run before the routers
 
 app.use("/api/questions", questionRouter);
 app.use("/api/interview", reportRouter);
-
 app.use("/api/auth", userRouter);
+app.use("/api/youtube", youtubeRouter);
 
 app.use(errorsController.pageNotFound);
 
