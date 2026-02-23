@@ -14,7 +14,9 @@ import {
   VideoOff,
   Loader2,
   FileText,
+  Briefcase,
 } from "lucide-react";
+import PageHeader from "../components/PageHeader";
 import { endInterview } from "../services/interviewService";
 
 // HARDCODED CANDIDATE ID (FOR DEMO ONLY)
@@ -59,8 +61,8 @@ const ParticipantTile = ({
           alt={`${name} avatar`}
           className="w-48 h-48 object-cover rounded-full shadow-lg border-4 border-gray-600"
           onError={(e) => {
-            e.target.onerror = null;
-            e.target.src = "https://placehold.co/192x192/4b5563/ffffff?text=AI";
+            e.currentTarget.onerror = null;
+            e.currentTarget.src = "https://placehold.co/192x192/4b5563/ffffff?text=AI";
           }}
         />
       )}
@@ -405,8 +407,7 @@ const InterviewRoom = () => {
     <div className="flex h-screen w-screen bg-gray-900 text-white font-sans min-w-[1280px]">
       <PageHeader
         title="Interview Practice"
-        description="Practice interview questions by role and get AI-powered feedback"
-        icon={<Briefcase size={40} />}
+        subtitle="Practice interview questions by role and get AI-powered feedback"
       />
       {/* Left Panel: Video Tiles */}
       <div className="w-2/3 h-full p-6 flex flex-col gap-6">
@@ -543,6 +544,7 @@ const InterviewRoom = () => {
                   </ControlButton>
 
                   <ControlButton
+                    onClick={() => {}}
                     className="bg-gray-600 hover:bg-gray-700"
                     disabled={true} // Camera always off for this phase
                   >

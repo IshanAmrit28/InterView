@@ -251,10 +251,6 @@ export const quizzes = {
         {
             id: 35,
             question: "What is the worst-case lookup time in a perfect Hash Table?",
-            options: ["O(1)", "O(n)", "O(log n)", "O(n log n)"],
-            answer: 0, // Wait, worst case can be O(n) but perfect hash table implies O(1). Let's stick to standard "worst case for hash table is O(n), perfect is O(1)". 
-            // Actually, generic hash table worst case is O(n). Question says "perfect Hash Table".
-            // Perfect hashing provides O(1) worst case.
             answer: 0,
             explanation: "A perfect hash function maps each key to a distinct integer, ensuring no collisions and O(1) access."
         }

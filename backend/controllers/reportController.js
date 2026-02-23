@@ -214,7 +214,6 @@ exports.endInterview = async (req, res) => {
     res
       .status(500)
       .json({ message: "Error ending interview", error: err.message });
-    ind;
   }
 };
 
@@ -250,19 +249,22 @@ exports.viewReport = async (req, res) => {
       return populatedQs;
     }; // Build the response structure
 
+    // Build the response structure
+    const reportStructureObj = report.toObject().reportStructure;
+
     const responseStructure = {
-      ...report.reportStructure._doc, // _doc gets the raw object
-      DBMS: await populateQuestions(report.reportStructure.DBMS),
-      OS: await populateQuestions(report.reportStructure.OS),
-      CN: await populateQuestions(report.reportStructure.CN),
-      OOP: await populateQuestions(report.reportStructure.OOP),
-      ALGORITHM: await populateQuestions(report.reportStructure.ALGORITHM),
-      "Resume based question": report.reportStructure.resumeBasedQuestions.map(
-        (q) => ({
-          question: q.question,
-          aiScore: q.aiScore,
-        })
-      ),
+      ...reportStructureObj, 
+      DBMS: await populateQuestions(reportStructureObj.DBMS),
+      OS: await populateQuestions(reportStructureObj.OS),
+      CN: await populateQuestions(reportStructureObj.CN),
+      OOP: await populateQuestions(reportStructureObj.OOP),
+      ALGORITHM: await populateQuestions(reportStructureObj.ALGORITHM),
+      "Resume based question": Array.isArray(reportStructureObj?.resumeBasedQuestions)
+        ? reportStructureObj.resumeBasedQuestions.map((q) => ({
+            question: q.question,
+            aiScore: q.aiScore,
+          }))
+        : [],
       resumeBasedQuestions: undefined, // Remove the original key
     };
     res.json({

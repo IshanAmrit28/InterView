@@ -10,6 +10,7 @@ import {
   FileText,
   CheckCircle,
   XCircle,
+  Briefcase,
 } from "lucide-react";
 
 const Report = () => {
@@ -284,8 +285,7 @@ const QuestionBreakdown = ({ questions, getScoreColor }) => {
     <div>
       <PageHeader
         title="Interview Practice"
-        description="Practice interview questions by role and get AI-powered feedback"
-        icon={<Briefcase size={40} />}
+        subtitle="Practice interview questions by role and get AI-powered feedback"
       />
 
       <div className="bg-gray-800 rounded-xl border border-gray-700 overflow-hidden shadow-2xl">
