@@ -1,134 +1,145 @@
 import { Link } from 'react-router-dom'
-import { ArrowRight, Sparkles, Target, Zap, Award, Users, TrendingUp } from 'lucide-react'
+import { ArrowRight, Sparkles, Target, Zap, Award, BookOpen, Code, BrainCircuit, PlayCircle } from 'lucide-react'
 import './Landing.css'
 
 function Landing() {
-    const stats = [
-        { number: '175+', label: 'Interview Questions' },
-        { number: '50+', label: 'Study Resources' },
-        { number: '5', label: 'Career Paths' },
-        { number: '∞', label: 'AI-Powered Practice' }
-    ]
-
-    const features = [
-        {
-            icon: <Target size={28} />,
-            title: 'Role-Based Preparation',
-            description: 'Tailored content for Frontend, Backend, Full Stack, Data Analyst, and DevOps roles.',
-            color: '#3b82f6'
-        },
-        {
-            icon: <Zap size={28} />,
-            title: 'Interactive Learning',
-            description: 'Engaging quizzes, coding challenges, and scenario-based problems to master concepts.',
-            color: '#f59e0b'
-        },
-        {
-            icon: <Award size={28} />,
-            title: 'Structured Roadmaps',
-            description: 'Step-by-step learning paths designed by industry experts to guide your journey.',
-            color: '#10b981'
-        }
-    ]
-
     return (
         <div className="landing-page">
-            {/* Hero Section */}
+            {/* Ultra Premium Hero Section */}
             <section className="landing-hero">
-                <div className="hero-background">
-                    <div className="gradient-orb orb-1"></div>
-                    <div className="gradient-orb orb-2"></div>
-                    <div className="gradient-orb orb-3"></div>
-                    <div className="grid-overlay"></div>
-
-                    {/* Glassy Bubbles Animation */}
-                    <div className="bubbles-container">
-                        {[...Array(100)].map((_, i) => (
-                            <div
-                                key={i}
-                                className="glassy-bubble"
-                                style={{
-                                    left: `${Math.random() * 100}%`,
-                                    top: `${Math.random() * 100}%`,
-                                    width: `${Math.random() * 50 + 10}px`,
-                                    height: `${Math.random() * 50 + 10}px`,
-                                    animationDelay: `${Math.random() * 10}s`,
-                                    animationDuration: `${Math.random() * 10 + 10}s`,
-                                    opacity: Math.random() * 0.4 + 0.1 // Brighter: 0.1 to 0.5 opacity
-                                }}
-                            ></div>
-                        ))}
-                    </div>
+                <div className="hero-background-modern">
+                    <div className="mesh-gradient"></div>
+                    <div className="noise-overlay"></div>
+                    
+                    {/* Floating Orbs for depth */}
+                    <div className="ambient-orb orb-primary"></div>
+                    <div className="ambient-orb orb-secondary"></div>
+                    <div className="ambient-orb orb-accent"></div>
                 </div>
 
-                <div className="hero-content">
-                    <h1 className="hero-title">
-                        Master Your Skills.<br />
-                        <span className="gradient-text">Level Up Your Placement.</span>
+                <div className="hero-content-wrapper">
+                    <div className="hero-badge-container">
+                        <div className="hero-badge">
+                            <Sparkles size={16} className="badge-icon" />
+                            <span>The Next Generation Interview Platform</span>
+                        </div>
+                    </div>
+
+                    <h1 className="hero-title-modern">
+                        Hack Your Career.<br />
+                        <span className="text-reveal-gradient">Master the Interview.</span>
                     </h1>
 
-                    <p className="hero-subtitle">
-                        Transform your preparation journey with our comprehensive resources,
-                        and expert-curated content. Everything you need to land your dream tech job.
+                    <p className="hero-description-modern">
+                        Stop guessing what they'll ask. InterVerse provides AI-driven mock interviews, role-specific roadmaps, and curated coding challenges to land your dream role in tech.
                     </p>
 
-                    <div className="hero-cta-group">
-                        <Link to="/dashboard" className="hero-cta primary">
-                            Start Preparing Free <ArrowRight size={20} />
+                    <div className="hero-actions">
+                        <Link to="/dashboard" className="btn-modern btn-primary-glow">
+                            Start Practicing Free
+                            <ArrowRight size={20} className="btn-icon-right" />
                         </Link>
-                        <Link to="/roadmap" className="hero-cta secondary">
-                            View Roadmaps
+                        <Link to="/roadmap" className="btn-modern btn-outline-glass">
+                            <Target size={20} className="btn-icon-left" />
+                            Explore Roadmaps
                         </Link>
                     </div>
 
-                    {/* Stats Bar */}
-                    <div className="hero-stats">
-                        {stats.map((stat, index) => (
-                            <div key={index} className="stat-item">
-                                <div className="stat-number">{stat.number}</div>
-                                <div className="stat-label">{stat.label}</div>
-                            </div>
-                        ))}
+                    <div className="hero-social-proof">
+                        <div className="avatars-group">
+                            <div className="avatar"></div>
+                            <div className="avatar"></div>
+                            <div className="avatar"></div>
+                            <div className="avatar"></div>
+                            <div className="avatar-more">+2k</div>
+                        </div>
+                        <span className="proof-text">Developers landed jobs this year</span>
                     </div>
                 </div>
-
-                {/* Floating Elements */}
-                {/* Floating Elements Removed */}
+                
+                {/* Decorative Bottom Fade */}
+                <div className="hero-bottom-fade"></div>
             </section>
 
-            {/* Features Section */}
-            <section className="landing-features">
-                <div className="features-container">
-                    <div className="features-header">
-                        <div className="section-badge">Why Choose Us</div>
-                        <h2>Everything You Need to Succeed</h2>
-                        <p>Comprehensive preparation platform designed for modern tech interviews</p>
+            {/* Bento Grid Features Section */}
+            <section className="landing-bento">
+                <div className="bento-container">
+                    <div className="section-header-modern">
+                        <h2 className="section-title">Everything essential, <br/><span className="text-highlight">beautifully integrated.</span></h2>
+                        <p className="section-subtitle">A central hub for all your preparation needs, intelligently tied together.</p>
                     </div>
 
-                    <div className="features-grid">
-                        {features.map((feature, index) => (
-                            <div key={index} className="feature-card" style={{ '--feature-color': feature.color }}>
-                                <div className="feature-icon-wrapper" style={{ background: `linear-gradient(135deg, ${feature.color}22, ${feature.color}11)` }}>
-                                    <div className="feature-icon" style={{ color: feature.color }}>
-                                        {feature.icon}
-                                    </div>
+                    <div className="bento-grid">
+                        {/* Large Tile - AI Mock Interview */}
+                        <div className="bento-card bento-large bento-ai">
+                            <div className="bento-content">
+                                <div className="bento-icon-wrapper" style={{background: 'var(--bento-ai-color)'}}>
+                                    <BrainCircuit size={28} />
                                 </div>
-                                <h3>{feature.title}</h3>
-                                <p>{feature.description}</p>
-                                <div className="feature-shine"></div>
+                                <h3>AI-Powered Mock Interviews</h3>
+                                <p>Experience realistic technical and behavioral interviews with real-time feedback and dynamic follow-up questions tailored to your target role.</p>
                             </div>
-                        ))}
+                            <div className="bento-visual visual-ai"></div>
+                        </div>
+
+                        {/* Medium Tile 1 - Coding Practice */}
+                        <div className="bento-card bento-medium bento-code">
+                            <div className="bento-content">
+                                <div className="bento-icon-wrapper" style={{background: 'var(--bento-code-color)'}}>
+                                    <Code size={24} />
+                                </div>
+                                <h3>Coding Challenges</h3>
+                                <p>Curated problems by role and difficulty.</p>
+                            </div>
+                            <div className="bento-visual visual-code"></div>
+                        </div>
+
+                        {/* Medium Tile 2 - Roadmaps */}
+                        <div className="bento-card bento-medium bento-path">
+                            <div className="bento-content">
+                                <div className="bento-icon-wrapper" style={{background: 'var(--bento-path-color)'}}>
+                                    <Target size={24} />
+                                </div>
+                                <h3>Role Roadmaps</h3>
+                                <p>Step-by-step guides from beginner to expert.</p>
+                            </div>
+                            <div className="bento-visual visual-path"></div>
+                        </div>
+
+                        {/* Small Tile 1 - Video Feed */}
+                        <div className="bento-card bento-small bento-video">
+                            <div className="bento-content">
+                                <div className="bento-icon-wrapper mini" style={{color: 'var(--bento-video-color)'}}>
+                                    <PlayCircle size={24} />
+                                </div>
+                                <h4>Tech Video Feed</h4>
+                                <p>Short-form learning clips.</p>
+                            </div>
+                        </div>
+
+                        {/* Small Tile 2 - Notes */}
+                        <div className="bento-card bento-small bento-notes">
+                            <div className="bento-content">
+                                <div className="bento-icon-wrapper mini" style={{color: 'var(--bento-notes-color)'}}>
+                                    <BookOpen size={24} />
+                                </div>
+                                <h4>Smart Notes</h4>
+                                <p>Auto-generated from practice.</p>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </section>
 
-            {/* CTA Section */}
-            <section className="landing-cta">
-                <div className="cta-content">
-                    <h2>Ready to Ace Your Interviews?</h2>
-                    <p>Join the platform trusted by thousands of aspiring developers</p>
-                    <Link to="/dashboard" className="cta-button">
-                        Get Started Now <ArrowRight size={20} />
+            {/* Modern CTA Section */}
+            <section className="landing-cta-modern">
+                <div className="cta-glow-bg"></div>
+                <div className="cta-content-wrapper">
+                    <h2 className="cta-headline">Stop Preparing. Start Acing.</h2>
+                    <p className="cta-subheadline">Join the platform designed to mirror real-world tech interviews.</p>
+                    <Link to="/dashboard" className="btn-modern btn-cta-massive">
+                        Get Started Now
+                        <Zap size={20} className="btn-icon-right" />
                     </Link>
                 </div>
             </section>

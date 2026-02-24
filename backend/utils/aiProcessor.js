@@ -93,11 +93,11 @@ const generateQuestions = async (resumeText, jobRole) => {
   try {
     const prompt = `
 You are a technical interviewer hiring for the role of "${jobRole}".
-Generate 1 short, technical questions based *only* on the candidate's resume projects and skills.
+Generate 6 short, technical questions based *only* on the candidate's resume projects and skills.
 Do NOT ask generic questions IT WOULD BE BETTER TO ASK THEORITICAL QUESTION ,  QUESTIONS ON TECHNOLOGY USED IN PROJECTS or ON IMPLEMENTATION , STRUCTURE , ARCHETECTURE.
 Return STRICT JSON in this format:
 {
-  "questions": ["Q1"]
+	"questions": ["Q1","Q2","Q3","Q4","Q5","Q6"]
 }
 RESUME:
 ${resumeText}
