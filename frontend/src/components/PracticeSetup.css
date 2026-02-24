@@ -1,47 +1,13 @@
-/* frontend/src/components/PracticeSetup.css */
 .setup-container {
   min-height: 100vh;
   width: 100%;
   display: flex;
   align-items: center;
   justify-content: center;
-  background-color: #030712; /* gray-950 */
-  background-image: radial-gradient(ellipse at top, rgba(30, 58, 138, 0.2), #030712, #030712);
   position: relative;
   overflow: hidden;
   font-family: 'Inter', system-ui, sans-serif;
   color: #f3f4f6; /* gray-100 */
-}
-
-/* Floating orbs for background effect */
-.orb-1, .orb-2 {
-  position: absolute;
-  width: 45vw;
-  height: 45vw;
-  border-radius: 50%;
-  filter: blur(120px);
-  mix-blend-mode: screen;
-  pointer-events: none;
-  animation: float 12s infinite alternate ease-in-out;
-}
-
-.orb-1 {
-  top: -15%;
-  left: -15%;
-  background: rgba(37, 99, 235, 0.12); /* blue-600 */
-  animation-delay: 0s;
-}
-
-.orb-2 {
-  bottom: -15%;
-  right: -15%;
-  background: rgba(147, 51, 234, 0.12); /* purple-600 */
-  animation-delay: -6s;
-}
-
-@keyframes float {
-  0% { transform: translateY(0) scale(1); }
-  100% { transform: translateY(-40px) scale(1.05); }
 }
 
 /* Glassmorphism Card */

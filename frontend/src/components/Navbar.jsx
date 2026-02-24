@@ -16,7 +16,7 @@ import {
 } from "lucide-react";
 import "./Navbar.css";
 
-function Navbar({ theme, toggleTheme }) {
+function Navbar() {
   const location = useLocation();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 

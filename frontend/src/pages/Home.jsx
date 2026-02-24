@@ -6,7 +6,6 @@ import {
   Clock, ArrowRight
 } from 'lucide-react'
 
-import AnimatedBackground from '../components/AnimatedBackground'
 import './Home.css'
 
 function Home() {
@@ -93,7 +92,6 @@ function Home() {
 
   return (
     <div className="app-container">
-      <AnimatedBackground />
       {/* Enhanced Header */}
       <div className="dashboard-header">
         <div className="header-content">

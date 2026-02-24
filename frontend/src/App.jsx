@@ -6,6 +6,7 @@ import {
 } from "react-router-dom";
 import { useState, useEffect } from "react";
 import Navbar from "./components/Navbar";
+import AnimatedBackground from "./components/AnimatedBackground"; // NEW IMPORT
 import Landing from "./pages/Landing";
 import Home from "./pages/Home";
 import Notes from "./pages/Notes";
@@ -23,7 +24,7 @@ import "./Appmain.css";
 import PracticeSetup from "./components/PracticeSetup";
 import InterviewRoom from "./pages/Interview";
 import Report from "./pages/Report";
-function AppContent({ theme, toggleTheme }) {
+function AppContent() {
   const location = useLocation();
   const isLanding = location.pathname === "/";
   const isInterview = location.pathname.startsWith("/interview");
@@ -31,7 +32,8 @@ function AppContent({ theme, toggleTheme }) {
 
   return (
     <div className="app">
-      {!hideNavbar && <Navbar theme={theme} toggleTheme={toggleTheme} />}
+      <AnimatedBackground />
+      {!hideNavbar && <Navbar />}
       <main className={!hideNavbar ? "main-content" : ""}>
         <Routes>
           <Route path="/" element={<Landing />} />
@@ -57,21 +59,13 @@ function AppContent({ theme, toggleTheme }) {
 }
 
 function App() {
-  // Theme State
-  const [theme, setTheme] = useState(localStorage.getItem("theme") || "dark");
-
   useEffect(() => {
-    document.documentElement.setAttribute("data-theme", theme);
-    localStorage.setItem("theme", theme);
-  }, [theme]);
-
-  const toggleTheme = () => {
-    setTheme((prev) => (prev === "light" ? "dark" : "light"));
-  };
+    document.documentElement.setAttribute("data-theme", "dark");
+  }, []);
 
   return (
     <Router future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
-      <AppContent theme={theme} toggleTheme={toggleTheme} />
+      <AppContent />
     </Router>
   );
 }

@@ -1,7 +1,7 @@
 /* App-wide styles */
 .app {
     min-height: 100vh;
-    background: var(--bg-subtle);
+    background: var(--bg-main);
     display: flex;
     flex-direction: column;
     width: 100%;

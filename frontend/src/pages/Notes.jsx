@@ -3,7 +3,6 @@ import { Link } from 'react-router-dom'
 import { Folder, Search, FileText, Download, ExternalLink } from 'lucide-react'
 import { pdfNotes, categories, searchNotes, getNotesByCategory } from '../data/notesData'
 
-import AnimatedBackground from '../components/AnimatedBackground'
 import './Notes.css'
 
 function Notes() {
@@ -16,8 +15,6 @@ function Notes() {
 
     return (
         <div className="app-container">
-            <AnimatedBackground />
-
 
             <div className="notes-layout">
 
