@@ -26,11 +26,13 @@ import Report from "./pages/Report";
 function AppContent({ theme, toggleTheme }) {
   const location = useLocation();
   const isLanding = location.pathname === "/";
+  const isInterview = location.pathname.startsWith("/interview");
+  const hideNavbar = isLanding || isInterview;
 
   return (
     <div className="app">
-      {!isLanding && <Navbar theme={theme} toggleTheme={toggleTheme} />}
-      <main className={!isLanding ? "main-content" : ""}>
+      {!hideNavbar && <Navbar theme={theme} toggleTheme={toggleTheme} />}
+      <main className={!hideNavbar ? "main-content" : ""}>
         <Routes>
           <Route path="/" element={<Landing />} />
           <Route path="/dashboard" element={<Home />} />

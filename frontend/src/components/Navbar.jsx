@@ -69,7 +69,7 @@ function Navbar({ theme, toggleTheme }) {
           ))}
 
           {/* Theme Toggle */}
-          <li>
+          {/* <li>
             <button
               className="theme-toggle"
               onClick={toggleTheme}
@@ -77,7 +77,7 @@ function Navbar({ theme, toggleTheme }) {
             >
               {theme === "light" ? <Moon size={20} /> : <Sun size={20} />}
             </button>
-          </li>
+          </li> */}
         </ul>
 
         {/* Mobile Hamburger Button */}
@@ -123,12 +123,12 @@ function Navbar({ theme, toggleTheme }) {
           ))}
         </ul>
 
-        <div className="mobile-menu-footer">
+        {/* <div className="mobile-menu-footer">
           <button className="mobile-theme-toggle" onClick={toggleTheme}>
             {theme === "light" ? <Moon size={20} /> : <Sun size={20} />}
             <span>{theme === "light" ? "Dark Mode" : "Light Mode"}</span>
           </button>
-        </div>
+        </div> */}
       </div>
     </nav>
   );
