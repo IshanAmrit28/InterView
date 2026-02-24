@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { Upload, FileText, CheckCircle2, AlertCircle, Loader2, Download } from 'lucide-react'
 import { GoogleGenerativeAI } from '@google/generative-ai'
-import PageHeader from '../components/PageHeader'
+
 import Button from '../components/Button'
 import './ResumeAnalyzer.css'
 
@@ -69,11 +69,7 @@ Format your response in markdown.`
 
     return (
         <div className="app-container">
-            <PageHeader
-                title="Resume Analyzer"
-                subtitle="Get AI-powered feedback on your resume"
-                showBack={true}
-            />
+
 
             {showSettings && (
                 <div className="settings-modal-overlay">

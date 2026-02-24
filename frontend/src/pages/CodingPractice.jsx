@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { Code, Briefcase, CheckCircle2, ChevronRight, Target, BookOpen, AlertCircle } from 'lucide-react'
-import PageHeader from '../components/PageHeader'
+
 import Button from '../components/Button'
 import './CodingPractice.css'
 
@@ -205,11 +205,7 @@ function CodingPractice() {
 
     return (
         <div className="app-container">
-            <PageHeader
-                title="Interview Question Bank"
-                subtitle="Comprehensive interview questions organized by role and category"
-                showBack={true}
-            />
+
 
             {!selectedRole ? (
                 /* Role Selection */

@@ -16,7 +16,7 @@ import {
   FileText,
   Briefcase,
 } from "lucide-react";
-import PageHeader from "../components/PageHeader";
+
 import { endInterview } from "../services/interviewService";
 
 // HARDCODED CANDIDATE ID (FOR DEMO ONLY)
@@ -412,10 +412,7 @@ const InterviewRoom = () => {
       <div className="w-2/3 h-full p-8 flex flex-col gap-8 relative">
         <div className="absolute top-0 left-0 w-full h-32 bg-gradient-to-b from-gray-950 to-transparent z-10 pointer-events-none"></div>
         <div className="relative z-20 mb-[-1rem]">
-          <PageHeader
-            title="Interview Simulator"
-            subtitle="AI-powered roleplay with real-time feedback"
-          />
+
         </div>
         
         <div className="h-[45%] z-20 relative">

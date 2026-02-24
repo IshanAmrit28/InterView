@@ -24,9 +24,9 @@ const safeDecode = (str) => {
 };
 
 // ====================== EXTRACT TEXT FROM PDF ======================
-const extractResumeText = async (filePath) => {
-  const pdfBuffer = fs.readFileSync(filePath);
+const extractResumeText = async (fileBuffer) => {
   return new Promise((resolve, reject) => {
+    // @ts-ignore: TS definition exports default but CommonJS returns the class
     const pdfParser = new PDFParser();
     pdfParser.on("pdfParser_dataError", (err) => reject(err.parserError));
     pdfParser.on("pdfParser_dataReady", (pdfData) => {
@@ -44,7 +44,7 @@ const extractResumeText = async (filePath) => {
         .trim();
       resolve(text);
     });
-    pdfParser.parseBuffer(pdfBuffer);
+    pdfParser.parseBuffer(fileBuffer);
   });
 };
 
@@ -116,9 +116,9 @@ ${resumeText}
 };
 
 // ====================== MAIN RESUME PROCESSOR (FROM PREVIOUS STEP) ======================
-exports.processResume = async (resumeFilePath, jobDescription, jobRole) => {
+exports.processResume = async (fileBuffer, jobDescription, jobRole) => {
   try {
-    const resumeText = await extractResumeText(resumeFilePath); // Run resume scoring and question generation concurrently
+    const resumeText = await extractResumeText(fileBuffer); // Run resume scoring and question generation concurrently
 
     const [scoreData, questionsData] = await Promise.all([
       scoreResume(resumeText, jobDescription),

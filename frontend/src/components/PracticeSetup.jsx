@@ -3,7 +3,7 @@ import React, { useState, useRef } from "react";
 import { X, Upload, Play, Loader2 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { startInterview } from "../services/interviewService";
-import PageHeader from "../components/PageHeader";
+
 import "./PracticeSetup.css"; // Import the custom GUI styles
 
 // HARDCODED CANDIDATE ID (FOR DEMO ONLY)

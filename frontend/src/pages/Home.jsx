@@ -5,7 +5,7 @@ import {
   Target, Zap,
   Clock, ArrowRight
 } from 'lucide-react'
-import PageHeader from '../components/PageHeader'
+
 import AnimatedBackground from '../components/AnimatedBackground'
 import './Home.css'
 

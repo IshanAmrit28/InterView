@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { Calendar, Download, ArrowRight, CheckCircle } from 'lucide-react'
 import Button from '../components/Button'
-import PageHeader from '../components/PageHeader'
+
 import './StudyPlan.css'
 
 // Expanded mock data for different roles
@@ -53,10 +53,7 @@ function StudyPlan() {
 
     return (
         <div className="app-container">
-            <PageHeader
-                title="Personalized Study Roadmap"
-                subtitle="Generate a structured 6-week plan tailored to your target role"
-            />
+
 
             {/* Input Section */}
             {!generated ? (

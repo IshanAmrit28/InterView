@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import { Folder, Search, FileText, Download, ExternalLink } from 'lucide-react'
 import { pdfNotes, categories, searchNotes, getNotesByCategory } from '../data/notesData'
-import PageHeader from '../components/PageHeader'
+
 import AnimatedBackground from '../components/AnimatedBackground'
 import './Notes.css'
 
@@ -17,10 +17,7 @@ function Notes() {
     return (
         <div className="app-container">
             <AnimatedBackground />
-            <PageHeader
-                title="Knowledge Base"
-                subtitle={`${pdfNotes.length} PDF resources from your PLACEMENT NOTES folder`}
-            />
+
 
             <div className="notes-layout">
 

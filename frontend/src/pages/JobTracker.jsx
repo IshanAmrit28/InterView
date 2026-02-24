@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import { Plus, Briefcase, Calendar, MapPin, DollarSign, Trash2, Edit2, Filter } from 'lucide-react'
-import PageHeader from '../components/PageHeader'
+
 import Button from '../components/Button'
 import './JobTracker.css'
 
@@ -88,11 +88,7 @@ function JobTracker() {
 
     return (
         <div className="app-container">
-            <PageHeader
-                title="Job Application Tracker"
-                subtitle="Track your job applications and interview progress"
-                showBack={true}
-            />
+
 
             {/* Stats */}
             <div className="job-stats">

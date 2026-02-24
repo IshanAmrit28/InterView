@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { BrainCircuit, CheckCircle, AlertCircle, ArrowRight, RotateCw, BookOpen, Server, Globe, Network, Calculator } from 'lucide-react'
 import Button from '../components/Button'
-import PageHeader from '../components/PageHeader'
+
 import { quizTopics, getQuizByTopic } from '../data/quizData'
 import './Home.css' // Reusing grid styles
 
@@ -65,10 +65,7 @@ function Quiz() {
 
     return (
         <div className="app-container">
-            <PageHeader
-                title="Interactive Quizzes"
-                subtitle="Test your knowledge across core engineering domains."
-            />
+
 
             {/* Topic Selection */}
             {!activeTopic && (

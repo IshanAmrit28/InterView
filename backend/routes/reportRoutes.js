@@ -14,21 +14,8 @@ const {
 
 const reportRouter = express.Router();
 
-// FIX: Define the 'storage' object for Multer before using it
-const storage = multer.diskStorage({
-  destination: (req, file, cb) => {
-    // IMPORTANT: Ensure 'uploads/resumes/' directory exists
-    cb(null, "uploads/resumes/");
-  },
-  filename: (req, file, cb) => {
-    const uniqueName =
-      Date.now() +
-      "-" +
-      Math.round(Math.random() * 1e9) +
-      path.extname(file.originalname);
-    cb(null, uniqueName);
-  },
-});
+// Use memory storage to avoid disk writes
+const storage = multer.memoryStorage();
 
 // Define upload object using the storage configuration
 const upload = multer({ storage });

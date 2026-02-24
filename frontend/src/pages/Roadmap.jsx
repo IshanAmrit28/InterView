@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import { CheckCircle2, Circle, Clock, BookOpen, TrendingUp, ExternalLink, Star, ChevronDown, ChevronUp, PlayCircle, FileText, Check } from 'lucide-react'
-import PageHeader from '../components/PageHeader'
+
 import roadmapData from '../data/roadmapData'
 import { getRoadmapIcon } from '../utils/roadmapIcons'
 import './Roadmap.css'
@@ -155,11 +155,7 @@ function Roadmap() {
                     />
                 ))}
             </div>
-            <PageHeader
-                title="Learning Roadmaps"
-                subtitle="Structured technical paths for every role"
-                showBack={false}
-            />
+
 
             {/* Tab Navigation */}
             <div className="roadmap-tabs-nav">

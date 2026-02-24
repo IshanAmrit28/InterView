@@ -2,7 +2,7 @@
 import React, { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { fetchReport } from "../services/interviewService";
-import PageHeader from "../components/PageHeader";
+
 import {
   Loader2,
   AlertCircle,
@@ -283,10 +283,7 @@ const QuestionBreakdown = ({ questions, getScoreColor }) => {
 
   return (
     <div>
-      <PageHeader
-        title="Interview Practice"
-        subtitle="Practice interview questions by role and get AI-powered feedback"
-      />
+
 
       <div className="bg-gray-800 rounded-xl border border-gray-700 overflow-hidden shadow-2xl">
         <h2 className="text-2xl font-bold text-white p-8">

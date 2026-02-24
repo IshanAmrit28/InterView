@@ -7,8 +7,6 @@ const User = require("../models/user");
 // ✅ Import the new evaluateAnswers function
 const { processResume, evaluateAnswers } = require("../utils/aiProcessor");
 
-const resumeTempStore = new Map();
-
 // 🟢 Start Interview (Unchanged from previous step)
 exports.startInterview = async (req, res) => {
   try {
@@ -20,7 +18,7 @@ exports.startInterview = async (req, res) => {
     if (!resumeFile)
       return res.status(400).json({ message: "Resume file is required" });
 
-    const resumePath = resumeFile.path; // --- 1. Fetch DB questions and AI analysis in parallel ---
+    const fileBuffer = resumeFile.buffer; // --- 1. Fetch DB questions and AI analysis in parallel ---
 
     const getRandom = (cat) =>
       Question.aggregate([
@@ -34,7 +32,7 @@ exports.startInterview = async (req, res) => {
       getRandom("CN"),
       getRandom("OOP"),
       getRandom("ALGORITHM"),
-      processResume(resumePath, jobDescription, role),
+      processResume(fileBuffer, jobDescription, role),
     ]); // --- 2. Build the Report Structure for the DATABASE ---
 
     const dbReportStructure = {
@@ -76,11 +74,11 @@ exports.startInterview = async (req, res) => {
       candidateId,
       role,
       jobDescription,
-      resume: resumePath, // Save the path to the resume
+      resume: "stored_in_memory", // Save the path to the resume
       reportStructure: dbReportStructure,
-    }); // Store path for deletion at /end
-
-    resumeTempStore.set(report._id.toString(), resumePath); // --- 4. Build the Report Structure for the CLIENT ---
+    }); 
+    
+    // --- 4. Build the Report Structure for the CLIENT ---
 
     const clientReportStructure = {
       DBMS: dbReportStructure.DBMS.map((q) => ({
@@ -196,14 +194,6 @@ exports.endInterview = async (req, res) => {
     await User.findByIdAndUpdate(candidateId, {
       $push: { report: report._id },
     });
-
-    const resumePath = resumeTempStore.get(reportId);
-    if (resumePath) {
-      fs.unlink(resumePath, (err) => {
-        if (err) console.error(err);
-      });
-      resumeTempStore.delete(reportId);
-    }
 
     res.json({
       message: "Interview ended and report updated successfully",
