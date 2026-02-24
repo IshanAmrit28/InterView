@@ -23,7 +23,7 @@ exports.startInterview = async (req, res) => {
     const getRandom = (cat) =>
       Question.aggregate([
         { $match: { category: cat } },
-        { $sample: { size: 5 } }, // Using 3 as an example
+        { $sample: { size: 3 } }, // Using 3 as an example
       ]);
 
     const [dbmsQ, osQ, cnQ, oopQ, codeQ, aiOutput] = await Promise.all([
