@@ -226,7 +226,7 @@ function CodingPractice() {
                                     key={role}
                                     className="role-card"
                                     onClick={() => handleRoleSelect(role)}
-                                    style={{ '--role-color': roleData.color }}
+                                    style={/** @type {any} */ ({ '--role-color': roleData.color })}
                                 >
                                     <div className="role-icon" style={{ background: roleData.color }}>
                                         {roleData.icon}

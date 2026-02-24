@@ -19,7 +19,7 @@ import ResumeAnalyzer from "./pages/ResumeAnalyzer";
 import JobTracker from "./pages/JobTracker";
 import CodingPractice from "./pages/CodingPractice";
 import VideoFeed from "./pages/VideoFeed";
-import "./App.css";
+import "./Appmain.css";
 import PracticeSetup from "./components/PracticeSetup";
 import InterviewRoom from "./pages/Interview";
 import Report from "./pages/Report";
