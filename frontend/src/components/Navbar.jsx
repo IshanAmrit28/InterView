@@ -29,7 +29,7 @@ function Navbar({ theme, toggleTheme }) {
       icon: <LayoutDashboard size={18} />,
     },
     { name: "AI Chat", path: "/chat", icon: <MessageSquare size={18} /> },
-    { name: "Interview", path: "/interview", icon: <Video size={18} /> },
+    { name: "Interview", path: "/practice", icon: <Video size={18} /> },
     { name: "Roadmap", path: "/roadmap", icon: <Map size={18} /> },
     { name: "Video Feed", path: "/video-feed", icon: <Youtube size={18} /> },
     { name: "Notes", path: "/notes", icon: <FileText size={18} /> },
