@@ -1,6 +1,5 @@
 @import "tailwindcss";
 
-
 :root {
   /* 
     MODERN DATA-RICH THEME (Notion-esque)
@@ -8,7 +7,8 @@
   */
 
   /* Font */
-  --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  --font-sans:
+    "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
 
   /* Sizing */
   --max-width: 1400px;
@@ -39,42 +39,46 @@
   /* Backgrounds */
   --bg-main: #030712; /* gray-950 - Main background */
   --bg-surface: #111827; /* gray-900 - Card backgrounds */
-  --bg-secondary: #1F2937; /* gray-800 - Subtle backgrounds */
-  --bg-subtle: #1F2937; /* gray-800 */
+  --bg-secondary: #1f2937; /* gray-800 - Subtle backgrounds */
+  --bg-subtle: #1f2937; /* gray-800 */
   --bg-inset: #374151; /* gray-700 */
 
   /* Borders */
   --border-main: #374151; /* gray-700 */
-  --border-subtle: #1F2937; /* gray-800 */
+  --border-subtle: #1f2937; /* gray-800 */
   --border-color: #374151; /* gray-700 */
 
   /* Text */
-  --text-main: #F9FAFB; /* gray-50 - Primary text */
-  --text-primary: #F9FAFB; /* gray-50 */
-  --text-secondary: #9CA3AF; /* gray-400 - Secondary text */
-  --text-muted: #9CA3AF; /* gray-400 */
-  --text-faint: #6B7280; /* gray-500 */
+  --text-main: #f9fafb; /* gray-50 - Primary text */
+  --text-primary: #f9fafb; /* gray-50 */
+  --text-secondary: #9ca3af; /* gray-400 - Secondary text */
+  --text-muted: #9ca3af; /* gray-400 */
+  --text-faint: #6b7280; /* gray-500 */
 
   /* Primary/Accents */
-  --primary: #E5E7EB; /* gray-200 */
-  --primary-dark: #F9FAFB; /* gray-50 */
-  --primary-light: #4B5563; /* gray-600 */
+  --primary: #e5e7eb; /* gray-200 */
+  --primary-dark: #f9fafb; /* gray-50 */
+  --primary-light: #4b5563; /* gray-600 */
 
   /* Accent colors - Grayscale */
-  --accent-orange: #9CA3AF; /* gray-400 */
-  --accent-green: #D1D5DB; /* gray-300 */
-  --accent-purple: #9CA3AF; /* gray-400 */
+  --accent-orange: #9ca3af; /* gray-400 */
+  --accent-green: #d1d5db; /* gray-300 */
+  --accent-purple: #9ca3af; /* gray-400 */
 
   /* Shadows */
-  --shadow-card: 0 4px 6px -1px rgba(0, 0, 0, 0.3), 0 2px 4px -1px rgba(0, 0, 0, 0.2);
-  --shadow-md: 0 10px 15px -3px rgba(0, 0, 0, 0.4), 0 4px 6px -2px rgba(0, 0, 0, 0.3);
-  --shadow-lg: 0 20px 25px -5px rgba(0, 0, 0, 0.5), 0 10px 10px -5px rgba(0, 0, 0, 0.4);
+  --shadow-card:
+    0 4px 6px -1px rgba(0, 0, 0, 0.3), 0 2px 4px -1px rgba(0, 0, 0, 0.2);
+  --shadow-md:
+    0 10px 15px -3px rgba(0, 0, 0, 0.4), 0 4px 6px -2px rgba(0, 0, 0, 0.3);
+  --shadow-lg:
+    0 20px 25px -5px rgba(0, 0, 0, 0.5), 0 10px 10px -5px rgba(0, 0, 0, 0.4);
 
   /* Legacy support */
   --card-bg: #111827; /* gray-900 */
 }
 
-html, body {
+html,
+body {
   overflow-x: hidden;
 }
 
@@ -87,12 +91,15 @@ body {
   font-size: 14px;
   /* Slightly denser text */
   -webkit-font-smoothing: antialiased;
-  transition: background-color 300ms ease, color 300ms ease;
+  transition:
+    background-color 300ms ease,
+    color 300ms ease;
 }
 
 /* Smooth transitions for all theme-aware elements */
 * {
-  transition: background-color 300ms ease,
+  transition:
+    background-color 300ms ease,
     border-color 300ms ease,
     color 300ms ease,
     box-shadow 300ms ease;

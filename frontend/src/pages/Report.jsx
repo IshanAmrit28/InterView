@@ -81,7 +81,7 @@ const Report = () => {
   // Error State
   if (error) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-900 w-full overflow-x-auto">
+      <div className="min-h-screen flex items-center justify-center bg-gray-900 min-w-[1280px]">
         <div className="bg-red-900/30 border border-red-500 rounded-xl p-10 max-w-lg shadow-2xl text-center">
           <AlertCircle size={48} className="text-red-500 mx-auto mb-4" />
           <h2 className="text-2xl font-bold text-red-400 mb-3">
@@ -101,7 +101,7 @@ const Report = () => {
 
   if (!reportData || !reportData.reportStructure) {
     return (
-      <div className="min-h-screen text-white flex items-center justify-center bg-gray-900 w-full overflow-x-auto">
+      <div className="min-h-screen text-white flex items-center justify-center bg-gray-900 min-w-[1280px]">
         No complete report data found.
       </div>
     );
@@ -120,7 +120,7 @@ const Report = () => {
     allQuestions.length > 0 ? totalScoreSum / allQuestions.length : 0;
 
   return (
-    <div className="min-h-screen bg-gray-900 font-sans text-gray-100 p-10 w-full overflow-x-auto">
+    <div className="min-h-screen bg-gray-900 font-sans text-gray-100 p-10 min-w-[1280px]">
       <div className="max-w-7xl mx-auto">
         <div className="flex justify-between items-center mb-10 border-b border-gray-700 pb-6">
           <div>
