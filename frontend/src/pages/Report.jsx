@@ -101,7 +101,7 @@ const Report = () => {
 
   if (!reportData || !reportData.reportStructure) {
     return (
-      <div className="min-h-screen text-white flex items-center justify-center bg-gray-900 min-w-[1280px]">
+      <div className="min-h-screen bg-gray-900 w-full overflow-x-auto">
         No complete report data found.
       </div>
     );
