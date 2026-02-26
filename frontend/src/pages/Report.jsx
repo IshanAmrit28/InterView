@@ -64,7 +64,7 @@ const Report = () => {
   // Loading State
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-900 w-full overflow-x-auto">
+      <div className="min-h-screen flex items-center justify-center bg-gray-900 min-w-[1280px]">
         <div className="text-center">
           <Loader2
             size={48}
@@ -101,7 +101,7 @@ const Report = () => {
 
   if (!reportData || !reportData.reportStructure) {
     return (
-      <div className="min-h-screen bg-gray-900 w-full overflow-x-auto">
+      <div className="min-h-screen text-white flex items-center justify-center bg-gray-900 w-full overflow-x-auto">
         No complete report data found.
       </div>
     );
@@ -120,7 +120,7 @@ const Report = () => {
     allQuestions.length > 0 ? totalScoreSum / allQuestions.length : 0;
 
   return (
-    <div className="min-h-screen bg-gray-900 w-full overflow-x-auto">
+    <div className="min-h-screen bg-gray-900 font-sans text-gray-100 p-10 w-full overflow-x-auto">
       <div className="max-w-7xl mx-auto">
         <div className="flex justify-between items-center mb-10 border-b border-gray-700 pb-6">
           <div>
