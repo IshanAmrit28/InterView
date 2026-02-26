@@ -3,7 +3,7 @@ import React, { useState, useEffect, useRef } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import SpeechRecognition, {
   useSpeechRecognition,
-} from "react-speech-recognition"; // NEW IMPORT
+} from "react-speech-recognition";
 import {
   Mic,
   MicOff,
@@ -19,11 +19,8 @@ import {
 
 import { endInterview } from "../services/interviewService";
 
-// HARDCODED CANDIDATE ID (FOR DEMO ONLY)
 const CANDIDATE_ID = "6912c711cabf1fe8c3bd941c";
 const CANDIDATE_NAME = "Candidate Demo";
-
-// --- Components (Inline for single-file mandate context) ---
 
 const ControlButton = ({ onClick, className, children, disabled = false }) => (
   <button
@@ -44,13 +41,17 @@ const ParticipantTile = ({
   isSpeaking,
   avatarUrl,
 }) => (
-  <div className={`relative w-full h-full rounded-2xl flex items-center justify-center overflow-hidden border border-gray-700/50 backdrop-blur-md transition-all duration-300 ${isSpeaking ? 'bg-gray-800/80 shadow-[0_0_30px_-5px_rgba(59,130,246,0.3)]' : 'bg-gray-900/60'}`}>
+  <div
+    className={`relative w-full h-full rounded-2xl flex items-center justify-center overflow-hidden border border-gray-700/50 backdrop-blur-md transition-all duration-300 ${isSpeaking ? "bg-gray-800/80 shadow-[0_0_30px_-5px_rgba(59,130,246,0.3)]" : "bg-gray-900/60"}`}
+  >
     {isSpeaking && (
       <div className="absolute inset-0 border-2 border-blue-500/50 rounded-2xl ring-4 ring-blue-500/20 animate-pulse transition-all duration-300" />
     )}
     <div className="flex flex-col items-center justify-center relative z-10">
       {isCameraOff ? (
-        <div className={`w-36 h-36 rounded-full flex items-center justify-center shadow-2xl transition-all duration-300 ${isSpeaking ? 'bg-gradient-to-br from-blue-600 to-indigo-600 scale-105' : 'bg-gray-800 border-2 border-gray-700'}`}>
+        <div
+          className={`w-36 h-36 rounded-full flex items-center justify-center shadow-2xl transition-all duration-300 ${isSpeaking ? "bg-gradient-to-br from-blue-600 to-indigo-600 scale-105" : "bg-gray-800 border-2 border-gray-700"}`}
+        >
           <span className="text-6xl font-bold text-white tracking-wider">
             {name.charAt(0)}
           </span>
@@ -59,69 +60,64 @@ const ParticipantTile = ({
         <img
           src={avatarUrl}
           alt={`${name} avatar`}
-          className={`w-48 h-48 object-cover rounded-full shadow-2xl transition-all duration-300 ${isSpeaking ? 'border-4 border-blue-500 scale-105' : 'border-4 border-gray-700'}`}
+          className={`w-48 h-48 object-cover rounded-full shadow-2xl transition-all duration-300 ${isSpeaking ? "border-4 border-blue-500 scale-105" : "border-4 border-gray-700"}`}
           onError={(e) => {
             e.currentTarget.onerror = null;
-            e.currentTarget.src = "https://placehold.co/192x192/4b5563/ffffff?text=AI";
+            e.currentTarget.src =
+              "https://placehold.co/192x192/4b5563/ffffff?text=AI";
           }}
         />
       )}
       {isSpeaking && (
         <div className="absolute -bottom-10 flex items-center justify-center bg-blue-500/20 px-4 py-1.5 rounded-full backdrop-blur-sm border border-blue-500/30 animate-bounce">
-           <Volume2 className="w-5 h-5 text-blue-400 mr-2" />
-           <span className="text-blue-300 text-sm font-medium">Speaking...</span>
+          <Volume2 className="w-5 h-5 text-blue-400 mr-2" />
+          <span className="text-blue-300 text-sm font-medium">Speaking...</span>
         </div>
       )}
     </div>
     <div className="absolute bottom-6 left-6 flex items-center gap-3 p-2.5 px-5 bg-gray-950/80 backdrop-blur-md rounded-xl shadow-lg border border-gray-800">
       <span className="text-lg font-semibold text-gray-200">{name}</span>
-      {isMuted && <div className="bg-red-500/20 p-1.5 rounded-lg"><MicOff className="w-5 h-5 text-red-500" /></div>}
+      {isMuted && (
+        <div className="bg-red-500/20 p-1.5 rounded-lg">
+          <MicOff className="w-5 h-5 text-red-500" />
+        </div>
+      )}
     </div>
   </div>
 );
-
-// --- Main Interview Component ---
 
 const InterviewRoom = () => {
   const location = useLocation();
   const navigate = useNavigate();
 
-  // Initial data passed from PracticeSetup
   const initialReportData = location.state?.reportStructure || {
     DBMS: [],
     OS: [],
     CN: [],
     OOP: [],
     "Resume based question": [],
-    // Included to ensure robust object structure check
     ALGORITHM: [],
   };
   const initialReportId = location.state?.reportId;
 
-  // --- Speech Recognition Hook Setup (Replaced native API) ---
   const {
-    transcript, // Live/Final captured text from speech
+    transcript,
     resetTranscript,
     browserSupportsSpeechRecognition,
-    listening, // boolean: true if the microphone is actively listening
+    listening,
   } = useSpeechRecognition();
 
-  // --- State Management ---
   const [reportData, setReportData] = useState(initialReportData);
   const [reportId, setReportId] = useState(initialReportId);
-  const [isMicOn, setIsMicOn] = useState(false); // Controls button visual state
+  const [isMicOn, setIsMicOn] = useState(false);
   const [isInterviewerSpeaking, setIsInterviewerSpeaking] = useState(false);
-  // Removed isListening, transcript states
-  const [interviewStatus, setInterviewStatus] = useState("idle"); // idle, running, submitting, finished
+  const [interviewStatus, setInterviewStatus] = useState("idle");
   const [questionIndex, setQuestionIndex] = useState(-1);
   const [statusMessage, setStatusMessage] = useState("Click Start to begin.");
   const [error, setError] = useState(null);
   const [elapsedTime, setElapsedTime] = useState(0);
-  // STATE for Text Area answer (for ALGORITHMS)
   const [textAreaAnswer, setTextAreaAnswer] = useState("");
 
-  // --- Refs ---
-  // Removed recognitionRef and transcriptRef
   const voicesRef = useRef([]);
   const questionIndexRef = useRef(questionIndex);
   const timerRef = useRef(null);
@@ -135,15 +131,12 @@ const InterviewRoom = () => {
   const totalQuestions = allQuestions.length;
   const currentQuestion = allQuestions[questionIndex];
 
-  // CONSTANT: Check if the current question requires a text box answer
   const isAlgoQuestion = currentQuestion?.category === "ALGORITHM";
 
-  // Sync Refs
   useEffect(() => {
     questionIndexRef.current = questionIndex;
   }, [questionIndex]);
 
-  // Timer Logic
   useEffect(() => {
     if (interviewStatus === "running") {
       timerRef.current = setInterval(() => {
@@ -155,7 +148,6 @@ const InterviewRoom = () => {
     return () => clearInterval(timerRef.current);
   }, [interviewStatus]);
 
-  // Format time (MM:SS)
   const formatTime = (seconds) => {
     const minutes = Math.floor(seconds / 60);
     const remainingSeconds = seconds % 60;
@@ -164,7 +156,6 @@ const InterviewRoom = () => {
     }${remainingSeconds}`;
   };
 
-  // --- Speech Helper Functions ---
   const speakQuestion = (text) => {
     return new Promise((resolve) => {
       if (!window.speechSynthesis) {
@@ -203,13 +194,12 @@ const InterviewRoom = () => {
     });
   };
 
-  // NEW startListening function using hook methods
   const startListening = () => {
-    // Disabled if it's an ALGORITHMS question
-    if (isAlgoQuestion || listening) return;
+    if (isAlgoQuestion || listening || !browserSupportsSpeechRecognition)
+      return;
     try {
+      resetTranscript();
       SpeechRecognition.startListening({ continuous: true, language: "en-US" });
-      resetTranscript(); // Clear any previous transcript
       setIsMicOn(true);
       setStatusMessage("Listening... Speak now.");
       setError(null);
@@ -219,27 +209,29 @@ const InterviewRoom = () => {
     }
   };
 
-  // NEW stopListening function using hook methods
   const stopListening = () => {
-    SpeechRecognition.stopListening();
-    setIsMicOn(false);
-    setStatusMessage("Recording stopped.");
+    if (!browserSupportsSpeechRecognition) return;
+    try {
+      SpeechRecognition.stopListening();
+      setIsMicOn(false);
+      setStatusMessage("Recording stopped.");
+    } catch (e) {
+      console.error("Error stopping recognition:", e);
+    }
   };
 
-  // --- Cleanup useEffect (Removed recognition setup) ---
   useEffect(() => {
     if (!browserSupportsSpeechRecognition) {
       setError("Web Speech API not supported. Voice features unavailable.");
     }
 
-    // Only cleanup TTS
     return () => {
       if (window.speechSynthesis) window.speechSynthesis.cancel();
-      SpeechRecognition.abortListening(); // Use library's abort method on unmount
+      if (browserSupportsSpeechRecognition) {
+        SpeechRecognition.abortListening();
+      }
     };
   }, [browserSupportsSpeechRecognition]);
-
-  // --- Answer Submission & Next Question Logic ---
 
   const updateReportWithAnswer = (answerText) => {
     if (!currentQuestion) return;
@@ -247,7 +239,7 @@ const InterviewRoom = () => {
 
     setReportData((prevData) => {
       const newReportData = { ...prevData };
-      const categoryArray = newReportData[category];
+      const categoryArray = [...(newReportData[category] || [])];
 
       const qIndex = categoryArray.findIndex(
         (q) => q.questionId === questionId,
@@ -259,24 +251,24 @@ const InterviewRoom = () => {
           answer: answerText,
         };
       }
+      newReportData[category] = categoryArray;
       return newReportData;
     });
   };
 
   const handleAnswerSubmit = (finalAnswer) => {
-    stopListening(); // Ensure mic is off
+    stopListening();
 
-    const answerText = finalAnswer.trim() || "(No response recorded)";
+    const answerText = finalAnswer?.trim() || "(No response recorded)";
     updateReportWithAnswer(answerText);
 
     setStatusMessage(`Answer recorded: ${answerText.substring(0, 50)}...`);
-    resetTranscript(); // Clear hook's internal transcript
-    setTextAreaAnswer(""); // Clear text area after submission
+    resetTranscript();
+    setTextAreaAnswer("");
 
     setTimeout(askNextQuestion, 2000);
   };
 
-  // HANDLER for submitting text area answers
   const handleTextAnswerSubmit = () => {
     if (isAlgoQuestion && interviewStatus === "running") {
       handleAnswerSubmit(textAreaAnswer);
@@ -301,13 +293,11 @@ const InterviewRoom = () => {
         setQuestionIndex(nextIndex);
 
         if (isNextAlgo) {
-          // Disable Mic, clear refs for text questions
-          stopListening(); // Ensures mic is off
+          stopListening();
           setStatusMessage(
             "Ready for your code/answer. Type and click Submit.",
           );
         } else {
-          // Enable Mic prompt for verbal questions
           setStatusMessage("Ready for your answer. Click the mic button.");
         }
       })
@@ -316,8 +306,6 @@ const InterviewRoom = () => {
         console.error(err);
       });
   };
-
-  // --- Control Handlers ---
 
   const handleStartInterview = async () => {
     if (interviewStatus === "running" || totalQuestions === 0) return;
@@ -338,30 +326,26 @@ const InterviewRoom = () => {
   };
 
   const handleMicToggle = () => {
-    // Disabled if interview is not running, interviewer is speaking, OR if it's an Algo question
     if (
       interviewStatus !== "running" ||
       isInterviewerSpeaking ||
-      isAlgoQuestion
+      isAlgoQuestion ||
+      !browserSupportsSpeechRecognition
     )
       return;
 
-    // If Mic is currently ON, user is turning it OFF (End of answer)
     if (isMicOn) {
-      // Stop listening and process the final captured transcript
       stopListening();
       handleAnswerSubmit(transcript);
     } else {
-      // If Mic is currently OFF, user is turning it ON (Start of answer)
       startListening();
     }
   };
 
-  // Final submission and redirect
   const handleEndInterview = async (isManualStop) => {
     setInterviewStatus("submitting");
     stopListening();
-    window.speechSynthesis.cancel();
+    if (window.speechSynthesis) window.speechSynthesis.cancel();
 
     setStatusMessage("Submitting answers for AI grading...");
 
@@ -382,7 +366,6 @@ const InterviewRoom = () => {
     }
   };
 
-  // Initial check for required data
   if (!initialReportId || totalQuestions === 0) {
     return (
       <div className="min-h-screen flex flex-col items-center justify-center bg-gray-900 text-white min-w-[1280px]">
@@ -407,22 +390,16 @@ const InterviewRoom = () => {
 
   return (
     <div className="flex h-screen w-screen bg-gray-950 text-white font-sans min-w-[1280px] bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-blue-900/10 via-gray-950 to-gray-950">
-      
-      {/* Left Panel: Video Tiles */}
       <div className="w-2/3 h-full p-8 flex flex-col gap-8 relative">
         <div className="absolute top-0 left-0 w-full h-32 bg-gradient-to-b from-gray-950 to-transparent z-10 pointer-events-none"></div>
-        <div className="relative z-20 mb-[-1rem]">
+        <div className="relative z-20 mb-[-1rem]"></div>
 
-        </div>
-        
         <div className="h-[45%] z-20 relative">
           <ParticipantTile
             name={CANDIDATE_NAME}
-            // Mic is Muted when the toggle is OFF OR if it's an Algo Question (no mic needed)
             isMuted={!isMicOn || isAlgoQuestion}
             isCameraOff={true}
-            // Candidate is Speaking/Active when recognition is ON (only for verbal Qs)
-            isSpeaking={listening && !isAlgoQuestion} // Use 'listening' from hook
+            isSpeaking={listening && !isAlgoQuestion}
             avatarUrl="https://placehold.co/500x500/27272a/ffffff?text=CANDIDATE"
           />
         </div>
@@ -437,12 +414,12 @@ const InterviewRoom = () => {
         </div>
       </div>
 
-      {/* Right Panel: Controls and Transcript */}
       <div className="w-1/3 h-full bg-gray-900/80 backdrop-blur-xl border-l border-gray-800 p-8 flex flex-col justify-between shadow-2xl relative">
-        {/* Top Info */}
         <div className="flex justify-between items-center pb-8 border-b border-gray-800">
           <div className="flex flex-col">
-            <span className="text-sm font-bold text-gray-400 uppercase tracking-widest mb-1">Progress</span>
+            <span className="text-sm font-bold text-gray-400 uppercase tracking-widest mb-1">
+              Progress
+            </span>
             <div className="text-3xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-cyan-300">
               {currentQuestion
                 ? `Q ${questionIndex + 1} / ${totalQuestions}`
@@ -450,14 +427,15 @@ const InterviewRoom = () => {
             </div>
           </div>
           <div className="flex flex-col items-end">
-            <p className="text-sm font-bold text-gray-400 uppercase tracking-widest mb-1">Time Elapsed</p>
+            <p className="text-sm font-bold text-gray-400 uppercase tracking-widest mb-1">
+              Time Elapsed
+            </p>
             <span className="text-3xl font-mono font-bold text-white tracking-tight">
               {formatTime(elapsedTime)}
             </span>
           </div>
         </div>
 
-        {/* Question & Answer Area */}
         <div className="flex-1 py-8 overflow-y-auto space-y-8 no-scrollbar">
           <div className="p-6 bg-gradient-to-br from-gray-800/80 to-gray-900/80 rounded-2xl border border-gray-700/50 shadow-lg relative overflow-hidden">
             <div className="absolute top-0 left-0 w-1 h-full bg-blue-500"></div>
@@ -470,7 +448,6 @@ const InterviewRoom = () => {
             </p>
           </div>
 
-          {/* Conditional Text Box for ALGORITHMS questions */}
           {isAlgoQuestion && interviewStatus === "running" && (
             <div className="p-6 bg-gray-950/80 rounded-2xl border border-blue-500/30 shadow-[0_0_30px_-10px_rgba(59,130,246,0.2)] transition-all">
               <h3 className="font-bold text-sm uppercase tracking-wider text-blue-300 mb-4 flex items-center">
@@ -488,7 +465,8 @@ const InterviewRoom = () => {
                 className="bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-500 hover:to-cyan-500 w-full mt-4 font-bold rounded-xl"
                 disabled={!textAreaAnswer.trim()}
               >
-                <FileText size={20} className="mr-2 inline" /> Submit Code Answer
+                <FileText size={20} className="mr-2 inline" /> Submit Code
+                Answer
               </ControlButton>
             </div>
           )}
@@ -500,7 +478,6 @@ const InterviewRoom = () => {
           )}
         </div>
 
-        {/* Control Bar */}
         <div className="flex flex-col items-center pt-8 border-t border-gray-800">
           {interviewStatus === "idle" && (
             <ControlButton
@@ -510,21 +487,21 @@ const InterviewRoom = () => {
                 totalQuestions === 0 || !browserSupportsSpeechRecognition
               }
             >
-              <Play size={24} className="mr-3 inline fill-white" /> Begin Session
+              <Play size={24} className="mr-3 inline fill-white" /> Begin
+              Session
             </ControlButton>
           )}
 
           {interviewStatus === "running" || interviewStatus === "submitting" ? (
             <div className="w-full flex flex-col gap-4">
-              {/* Mic controls shown ONLY for non-algorithm questions */}
               {!isAlgoQuestion && (
                 <div className="flex gap-4 mb-2">
                   <ControlButton
                     onClick={handleMicToggle}
                     className={`flex-1 flex justify-center items-center h-16 rounded-xl border transition-all ${
                       isMicOn
-                        ? "bg-red-500/10 border-red-500/50 hover:bg-red-500/20 text-red-400 shadow-[0_0_20px_-5px_rgba(239,68,68,0.3)]" // Mic is ON, press to stop
-                        : "bg-gray-800 border-gray-700 hover:bg-gray-700 text-gray-300" // Mic is OFF, press to start
+                        ? "bg-red-500/10 border-red-500/50 hover:bg-red-500/20 text-red-400 shadow-[0_0_20px_-5px_rgba(239,68,68,0.3)]"
+                        : "bg-gray-800 border-gray-700 hover:bg-gray-700 text-gray-300"
                     }`}
                     disabled={
                       isInterviewerSpeaking ||
@@ -533,16 +510,21 @@ const InterviewRoom = () => {
                     }
                   >
                     {isMicOn ? (
-                      <><Mic size={24} className="mr-2 animate-pulse" /> Stop Recording</>
+                      <>
+                        <Mic size={24} className="mr-2 animate-pulse" /> Stop
+                        Recording
+                      </>
                     ) : (
-                      <><MicOff size={24} className="mr-2" /> Start Recording</>
+                      <>
+                        <MicOff size={24} className="mr-2" /> Start Recording
+                      </>
                     )}
                   </ControlButton>
 
                   <ControlButton
                     onClick={() => {}}
                     className="w-16 h-16 flex justify-center items-center bg-gray-800 border border-gray-700 hover:bg-gray-700 text-gray-500 rounded-xl cursor-not-allowed"
-                    disabled={true} 
+                    disabled={true}
                   >
                     <VideoOff size={24} />
                   </ControlButton>
@@ -556,7 +538,8 @@ const InterviewRoom = () => {
               >
                 {interviewStatus === "submitting" ? (
                   <div className="flex justify-center items-center">
-                    <Loader2 className="animate-spin w-5 h-5 mr-3" /> Evaluating responses...
+                    <Loader2 className="animate-spin w-5 h-5 mr-3" /> Evaluating
+                    responses...
                   </div>
                 ) : (
                   <div className="flex justify-center items-center">
@@ -574,13 +557,16 @@ const InterviewRoom = () => {
                   <span className="w-2 h-2 rounded-full bg-green-400 animate-pulse"></span>
                   Session Complete
                 </p>
-                <p className="text-gray-400 text-sm mt-1">Your AI evaluation is ready</p>
+                <p className="text-gray-400 text-sm mt-1">
+                  Your AI evaluation is ready
+                </p>
               </div>
               <ControlButton
                 onClick={() => navigate(`/report/${reportId}`)}
                 className="bg-gradient-to-r from-blue-600 to-indigo-600 hover:scale-105 w-full h-16 text-lg font-bold rounded-xl shadow-[0_0_30px_-5px_rgba(79,70,229,0.4)] transition-all"
               >
-                <Briefcase size={24} className="mr-3 inline" /> View Final Report
+                <Briefcase size={24} className="mr-3 inline" /> View Final
+                Report
               </ControlButton>
             </div>
           )}
