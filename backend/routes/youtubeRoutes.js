@@ -1,8 +1,8 @@
-const express = require('express');
+const express = require("express");
 const router = express.Router();
-const youtubeController = require('../controllers/youtubeController');
+const youtubeController = require("../controllers/youtubeController");
 
 // Search videos route
-router.get('/search', youtubeController.searchVideos);
+router.get("/search", youtubeController.searchVideos);
 
 module.exports = router;
