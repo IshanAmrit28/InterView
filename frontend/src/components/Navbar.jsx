@@ -1,5 +1,6 @@
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useState } from "react";
+import { useAuth } from "../context/AuthContext";
 import {
   Bot,
   LayoutDashboard,
@@ -18,6 +19,8 @@ import "./Navbar.css";
 
 function Navbar() {
   const location = useLocation();
+  const navigate = useNavigate();
+  const { logoutUser } = useAuth();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   const isActive = (path) => (location.pathname === path ? "active" : "");
@@ -67,6 +70,20 @@ function Navbar() {
               </Link>
             </li>
           ))}
+
+          <li>
+            <button 
+              className="nav-link" 
+              onClick={() => {
+                logoutUser();
+                navigate("/login");
+              }}
+              style={{ background: 'none', border: 'none', cursor: 'pointer', fontFamily: 'inherit', fontSize: 'inherit', color: 'red' }}
+            >
+              <X size={18} />
+              <span>Logout</span>
+            </button>
+          </li>
 
           {/* Theme Toggle */}
           {/* <li>
@@ -121,6 +138,20 @@ function Navbar() {
               </Link>
             </li>
           ))}
+          <li>
+            <button 
+              className="mobile-nav-link" 
+              onClick={() => {
+                logoutUser();
+                closeMobileMenu();
+                navigate("/login");
+              }}
+              style={{ background: 'none', border: 'none', cursor: 'pointer', width: '100%', textAlign: 'left', color: 'red' }}
+            >
+              <X size={18} />
+              <span>Logout</span>
+            </button>
+          </li>
         </ul>
 
         {/* <div className="mobile-menu-footer">

@@ -9,7 +9,12 @@ import { useEffect } from "react";
 import Navbar from "./components/Navbar";
 import AnimatedBackground from "./components/AnimatedBackground";
 
+import { AuthProvider } from "./context/AuthContext";
+import ProtectedRoute from "./components/ProtectedRoute";
+
 import Landing from "./pages/Landing";
+import Login from "./pages/Login";
+import Signup from "./pages/Signup";
 import Home from "./pages/Home";
 import Notes from "./pages/Notes";
 import Chat from "./pages/Chat";
@@ -31,8 +36,9 @@ function AppContent() {
   const location = useLocation();
 
   const isLanding = location.pathname === "/";
+  const isAuthPage = location.pathname === "/login" || location.pathname === "/signup";
   const isInterview = location.pathname.startsWith("/interview");
-  const hideNavbar = isLanding || isInterview;
+  const hideNavbar = isLanding || isInterview || isAuthPage;
 
   return (
     <div
@@ -68,20 +74,22 @@ function AppContent() {
         <main className={!hideNavbar ? "main-content" : ""}>
           <Routes>
             <Route path="/" element={<Landing />} />
-            <Route path="/dashboard" element={<Home />} />
-            <Route path="/notes" element={<Notes />} />
-            <Route path="/chat" element={<Chat />} />
-            <Route path="/quiz" element={<Quiz />} />
-            <Route path="/study-plan" element={<StudyPlan />} />
-            <Route path="/topic/:topicId" element={<TopicDetail />} />
-            <Route path="/practice" element={<PracticeSetup />} />
-            <Route path="/interview" element={<InterviewRoom />} />
-            <Route path="/report/:reportId" element={<Report />} />
-            <Route path="/roadmap" element={<Roadmap />} />
-            <Route path="/resume-analyzer" element={<ResumeAnalyzer />} />
-            <Route path="/job-tracker" element={<JobTracker />} />
-            <Route path="/coding-practice" element={<CodingPractice />} />
-            <Route path="/video-feed" element={<VideoFeed />} />
+            <Route path="/login" element={<Login />} />
+            <Route path="/signup" element={<Signup />} />
+            <Route path="/dashboard" element={<ProtectedRoute><Home /></ProtectedRoute>} />
+            <Route path="/notes" element={<ProtectedRoute><Notes /></ProtectedRoute>} />
+            <Route path="/chat" element={<ProtectedRoute><Chat /></ProtectedRoute>} />
+            <Route path="/quiz" element={<ProtectedRoute><Quiz /></ProtectedRoute>} />
+            <Route path="/study-plan" element={<ProtectedRoute><StudyPlan /></ProtectedRoute>} />
+            <Route path="/topic/:topicId" element={<ProtectedRoute><TopicDetail /></ProtectedRoute>} />
+            <Route path="/practice" element={<ProtectedRoute><PracticeSetup /></ProtectedRoute>} />
+            <Route path="/interview" element={<ProtectedRoute><InterviewRoom /></ProtectedRoute>} />
+            <Route path="/report/:reportId" element={<ProtectedRoute><Report /></ProtectedRoute>} />
+            <Route path="/roadmap" element={<ProtectedRoute><Roadmap /></ProtectedRoute>} />
+            <Route path="/resume-analyzer" element={<ProtectedRoute><ResumeAnalyzer /></ProtectedRoute>} />
+            <Route path="/job-tracker" element={<ProtectedRoute><JobTracker /></ProtectedRoute>} />
+            <Route path="/coding-practice" element={<ProtectedRoute><CodingPractice /></ProtectedRoute>} />
+            <Route path="/video-feed" element={<ProtectedRoute><VideoFeed /></ProtectedRoute>} />
           </Routes>
         </main>
       </div>
@@ -101,7 +109,9 @@ function App() {
         v7_relativeSplatPath: true,
       }}
     >
-      <AppContent />
+      <AuthProvider>
+        <AppContent />
+      </AuthProvider>
     </Router>
   );
 }

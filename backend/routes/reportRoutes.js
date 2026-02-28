@@ -24,13 +24,11 @@ const upload = multer({ storage });
 // All core interview functionality is protected by 'protect' middleware
 reportRouter.post(
   "/start",
-  // protect, // Ensures user is logged in
+  protect, // Ensures user is logged in
   upload.single("resumeFile"), // Handles the file upload (file name must match client FormData key)
   startInterview
 );
-// reportRouter.post("/end", protect, endInterview); // Ensures user is logged in
-reportRouter.post("/end", endInterview); // Ensures user is logged in
-// reportRouter.get("/:reportId", protect, viewReport); // Ensures user is logged in to view report
-reportRouter.get("/:reportId", viewReport); // Ensures user is logged in to view report
+reportRouter.post("/end", protect, endInterview); // Ensures user is logged in
+reportRouter.get("/:reportId", protect, viewReport); // Ensures user is logged in to view report
 
 module.exports = reportRouter;
