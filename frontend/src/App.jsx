@@ -27,6 +27,7 @@ import JobTracker from "./pages/JobTracker";
 import CodingPractice from "./pages/CodingPractice";
 import VideoFeed from "./pages/VideoFeed";
 import PracticeSetup from "./components/PracticeSetup";
+import InterviewDashboard from "./pages/InterviewDashboard";
 import InterviewRoom from "./pages/Interview";
 import Report from "./pages/Report";
 
@@ -82,7 +83,8 @@ function AppContent() {
             <Route path="/quiz" element={<ProtectedRoute><Quiz /></ProtectedRoute>} />
             <Route path="/study-plan" element={<ProtectedRoute><StudyPlan /></ProtectedRoute>} />
             <Route path="/topic/:topicId" element={<ProtectedRoute><TopicDetail /></ProtectedRoute>} />
-            <Route path="/practice" element={<ProtectedRoute><PracticeSetup /></ProtectedRoute>} />
+            <Route path="/practice" element={<ProtectedRoute><InterviewDashboard /></ProtectedRoute>} />
+            <Route path="/practice-setup" element={<ProtectedRoute><PracticeSetup /></ProtectedRoute>} />
             <Route path="/interview" element={<ProtectedRoute><InterviewRoom /></ProtectedRoute>} />
             <Route path="/report/:reportId" element={<ProtectedRoute><Report /></ProtectedRoute>} />
             <Route path="/roadmap" element={<ProtectedRoute><Roadmap /></ProtectedRoute>} />

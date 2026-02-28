@@ -10,10 +10,11 @@ const { processResume, evaluateAnswers } = require("../utils/aiProcessor");
 // 🟢 Start Interview (Unchanged from previous step)
 exports.startInterview = async (req, res) => {
   try {
-    const { candidateId, role, jobDescription } = req.body;
+    const { role, jobDescription } = req.body;
+    const candidateId = req.user._id.toString();
     const resumeFile = req.file;
 
-    if (!candidateId || !role || !jobDescription)
+    if (!role || !jobDescription)
       return res.status(400).json({ message: "Missing required fields" });
     if (!resumeFile)
       return res.status(400).json({ message: "Resume file is required" });
@@ -137,7 +138,8 @@ exports.startInterview = async (req, res) => {
 // 🔵 End Interview (MODIFIED)
 exports.endInterview = async (req, res) => {
   try {
-    const { reportId, candidateId, reportStructure } = req.body; // --- 1. Find the Report in the DB ---
+    const { reportId, reportStructure } = req.body; // --- 1. Find the Report in the DB ---
+    const candidateId = req.user._id.toString();
 
     const report = await Report.findById(reportId);
     if (!report) return res.status(404).json({ message: "Report not found" }); // --- 2. Prepare QA data for AI Evaluation ---
@@ -267,5 +269,29 @@ exports.viewReport = async (req, res) => {
     res
       .status(500)
       .json({ message: "Error fetching report", error: err.message });
+  }
+};
+
+// 🟡 Get User Reports
+exports.getUserReports = async (req, res) => {
+  try {
+    const candidateId = req.user._id;
+    // Fetch all reports for the user, sort by most recent
+    const reports = await Report.find({ candidateId }).sort({ createdAt: -1 });
+    
+    // Map to a simplified structure for the dashboard table
+    const simplifiedReports = reports.map(report => ({
+      reportId: report._id,
+      role: report.role,
+      createdAt: report.createdAt,
+      overallScore: report.reportStructure?.overallScore || 0,
+    }));
+
+    res.json({ reports: simplifiedReports });
+  } catch (err) {
+    console.error("Error fetching user reports:", err);
+    res
+      .status(500)
+      .json({ message: "Error fetching user reports", error: err.message });
   }
 };

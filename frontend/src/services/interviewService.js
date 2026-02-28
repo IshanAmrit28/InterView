@@ -55,3 +55,22 @@ export async function fetchReport(reportId) {
 
   return response.json();
 }
+
+// Fetches all reports for the logged-in user
+export async function getUserReports() {
+  const url = `${BACKEND_API_BASE_URL}/api/reports/user`;
+
+  const response = await fetch(url, {
+    method: "GET",
+    headers: {
+      "Authorization": `Bearer ${localStorage.getItem('token')}`,
+      "Content-Type": "application/json",
+    },
+  });
+
+  if (!response.ok) {
+    throw new Error(`Failed to fetch user reports`);
+  }
+
+  return response.json();
+}

@@ -10,6 +10,7 @@ const {
   startInterview,
   endInterview,
   viewReport,
+  getUserReports
 } = require("../controllers/reportController"); // Assumes the controller path is correct
 
 const reportRouter = express.Router();
@@ -29,6 +30,7 @@ reportRouter.post(
   startInterview
 );
 reportRouter.post("/end", protect, endInterview); // Ensures user is logged in
+reportRouter.get("/user", protect, getUserReports); // Fetches all reports for the logged in user
 reportRouter.get("/:reportId", protect, viewReport); // Ensures user is logged in to view report
 
 module.exports = reportRouter;

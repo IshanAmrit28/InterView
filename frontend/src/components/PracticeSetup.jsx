@@ -6,9 +6,6 @@ import { startInterview } from "../services/interviewService";
 
 import "./PracticeSetup.css"; // Import the custom GUI styles
 
-// HARDCODED CANDIDATE ID (FOR DEMO ONLY)
-const CANDIDATE_ID = "6912c711cabf1fe8c3bd941c";
-
 const PracticeSetup = () => {
   const [role, setRole] = useState("Software Engineer");
   const [jobDescription, setJobDescription] = useState(
@@ -20,8 +17,8 @@ const PracticeSetup = () => {
   const navigate = useNavigate();
   const fileInputRef = useRef(null);
 
-  // Hardcoded navigation to mock the dashboard exit
-  const onClose = () => navigate("/interview");
+  // Navigate back to the mock dashboard
+  const onClose = () => navigate("/practice");
 
   const handleFileChange = (e) => {
     const file = e.target.files[0];
@@ -47,7 +44,6 @@ const PracticeSetup = () => {
 
     try {
       const formData = new FormData();
-      formData.append("candidateId", CANDIDATE_ID);
       formData.append("role", role);
       formData.append("jobDescription", jobDescription);
       formData.append("resumeFile", resumeFile);

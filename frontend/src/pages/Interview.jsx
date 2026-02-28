@@ -17,10 +17,8 @@ import {
   Briefcase,
 } from "lucide-react";
 
+import { useAuth } from "../context/AuthContext";
 import { endInterview } from "../services/interviewService";
-
-const CANDIDATE_ID = "6912c711cabf1fe8c3bd941c";
-const CANDIDATE_NAME = "Candidate Demo";
 
 const ControlButton = ({ onClick, className, children, disabled = false }) => (
   <button
@@ -89,6 +87,8 @@ const ParticipantTile = ({
 const InterviewRoom = () => {
   const location = useLocation();
   const navigate = useNavigate();
+  const { user } = useAuth();
+  const CANDIDATE_NAME = user?.userName || "Candidate";
 
   const initialReportData = location.state?.reportStructure || {
     DBMS: [],
@@ -351,7 +351,6 @@ const InterviewRoom = () => {
 
     const finalReportPayload = {
       reportId: reportId,
-      candidateId: CANDIDATE_ID,
       reportStructure: reportData,
     };
 
