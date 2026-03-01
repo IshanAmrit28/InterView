@@ -14,4 +14,8 @@ userRouter.post("/login", authController.login);
 // Logout route
 userRouter.post("/logout", authController.logout);
 
+// Update route (Private)
+const { protect } = require("../middleware/authMiddleware");
+userRouter.put("/update", protect, authController.updateProfile);
+
 module.exports = userRouter;

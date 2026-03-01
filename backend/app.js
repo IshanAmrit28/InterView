@@ -15,6 +15,8 @@ const userRouter = require("./routes/userRoutes");
 const reportRouter = require("./routes/reportRoutes");
 const youtubeRouter = require("./routes/youtubeRoutes");
 const adminRouter = require("./routes/adminRoutes");
+const dashboardRouter = require("./routes/dashboardRoutes");
+const leaderboardRoutes = require("./routes/leaderboardRoutes");
 
 const app = express();
 
@@ -34,6 +36,8 @@ app.use("/api/interview", reportRouter);
 app.use("/api/auth", userRouter);
 app.use("/api/youtube", youtubeRouter);
 app.use("/api/admin", adminRouter);
+app.use("/api/dashboard", dashboardRouter);
+app.use("/api/leaderboard", leaderboardRoutes);
 
 app.use(errorsController.pageNotFound);
 

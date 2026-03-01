@@ -1,0 +1,71 @@
+/* UserDashboard Heatmap Custom Styles */
+
+.heatmap-container text {
+  fill: #9ca3af;
+  font-size: 10px;
+}
+
+.heatmap-compact-wrapper text {
+  fill: #9ca3af;
+  font-size: 8px;
+}
+
+.heatmap-compact-wrapper .react-calendar-heatmap rect {
+   width: 8px !important;
+   height: 8px !important;
+   rx: 2px !important;
+   ry: 2px !important;
+}
+
+.react-calendar-heatmap .color-empty {
+  fill: rgba(30, 41, 59, 0.5); /* Deep slate */
+}
+
+/* Custom color scales mapping to indigo intensities */
+.react-calendar-heatmap .color-scale-1 {
+  fill: #312e81; /* indigo-900 */
+}
+
+.react-calendar-heatmap .color-scale-2 {
+  fill: #4338ca; /* indigo-700 */
+}
+
+.react-calendar-heatmap .color-scale-3 {
+  fill: #6366f1; /* indigo-500 */
+}
+
+.react-calendar-heatmap .color-scale-4 {
+  fill: #818cf8; /* indigo-400 */
+}
+
+/* Add a hover effect to heatmap rects */
+.react-calendar-heatmap rect:hover {
+  stroke: #c7d2fe;
+  stroke-width: 1px;
+  cursor: pointer;
+  opacity: 0.9;
+}
+
+/* Tooltip standardizations if using basic browser tooltips */
+[data-tooltip-id="heatmap-tooltip"] {
+  z-index: 1000 !important;
+}
+
+/* Custom scrollbar for horizontal scrolling on smaller screens */
+.heatmap-container::-webkit-scrollbar {
+  height: 6px;
+}
+
+.heatmap-container::-webkit-scrollbar-track {
+  background: rgba(30, 41, 59, 0.3);
+  border-radius: 4px;
+}
+
+.heatmap-container::-webkit-scrollbar-thumb {
+  background: rgba(99, 102, 241, 0.5);
+  border-radius: 4px;
+}
+
+.heatmap-container::-webkit-scrollbar-thumb:hover {
+  background: rgba(99, 102, 241, 0.8);
+}

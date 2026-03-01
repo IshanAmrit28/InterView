@@ -1,11 +1,26 @@
+import { useState, useRef, useEffect } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
+import { User, LogOut } from "lucide-react";
 import "./Navbar.css";
 
 function Navbar() {
   const location = useLocation();
   const navigate = useNavigate();
-  const { logoutUser } = useAuth();
+  const { user, logoutUser } = useAuth();
+  
+  const [isProfileOpen, setIsProfileOpen] = useState(false);
+  const dropdownRef = useRef(null);
+
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+        setIsProfileOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
 
   const isActive = (path) => (location.pathname === path ? "active" : "");
 
@@ -44,17 +59,47 @@ function Navbar() {
           </ul>
         </nav>
 
-        {/* Actions (Logout) */}
-        <div className="navbar-actions">
+        {/* Actions (Profile Dropdown) */}
+        <div className="navbar-actions relative" ref={dropdownRef}>
           <button 
-            className="logout-button" 
-            onClick={() => {
-              logoutUser();
-              navigate("/login");
-            }}
+            className="profile-icon-btn"
+            onClick={() => setIsProfileOpen(!isProfileOpen)}
           >
-            Logout
+            {user?.userName ? user.userName.substring(0, 2).toUpperCase() : <User className="w-5 h-5" />}
           </button>
+
+          {isProfileOpen && (
+            <div className="profile-dropdown">
+              <div className="profile-dropdown-header">
+                <span className="profile-dropdown-name">{user?.userName || "Guest"}</span>
+                <span className="profile-dropdown-email">{user?.email || ""}</span>
+              </div>
+              <div className="profile-dropdown-divider"></div>
+              
+              <button 
+                className="profile-dropdown-item"
+                onClick={() => {
+                  setIsProfileOpen(false);
+                  navigate("/profile");
+                }}
+              >
+                <User className="w-4 h-4" />
+                <span>Profile</span>
+              </button>
+              
+              <button 
+                className="profile-dropdown-item text-red-400 hover:text-red-300 hover:bg-red-500/10"
+                onClick={() => {
+                  setIsProfileOpen(false);
+                  logoutUser();
+                  navigate("/login");
+                }}
+              >
+                <LogOut className="w-4 h-4" />
+                <span>Logout</span>
+              </button>
+            </div>
+          )}
         </div>
 
       </div>

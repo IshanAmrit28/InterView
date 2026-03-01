@@ -108,3 +108,37 @@ exports.login = async (req, res) => {
 exports.logout = (req, res) => {
   res.status(200).json({ message: "Logged out successfully" });
 };
+
+// ==================== UPDATE PROFILE ====================
+exports.updateProfile = async (req, res) => {
+  const { userName } = req.body;
+  const userId = req.user.id; // Supplied by authMiddleware
+
+  if (!userName || userName.trim() === '') {
+     return res.status(400).json({ success: false, message: "Username cannot be empty" });
+  }
+
+  try {
+     const user = await User.findById(userId);
+     if (!user) {
+        return res.status(404).json({ success: false, message: "User not found" });
+     }
+
+     user.userName = userName.trim();
+     await user.save();
+
+     res.status(200).json({
+        success: true,
+        message: "Profile updated successfully",
+        user: {
+          id: user._id,
+          userName: user.userName,
+          email: user.email,
+          userType: user.userType
+        }
+     });
+  } catch(error) {
+     console.error("Profile update error:", error);
+     res.status(500).json({ success: false, message: "Internal server error" });
+  }
+};

@@ -30,7 +30,10 @@ import PracticeSetup from "./components/PracticeSetup";
 import InterviewDashboard from "./pages/InterviewDashboard";
 import InterviewRoom from "./pages/Interview";
 import Report from "./pages/Report";
-
+import UserDashboard from "./pages/UserDashboard";
+import PublicProfile from "./pages/PublicProfile";
+import ProfileEdit from "./pages/ProfileEdit";
+import Leaderboard from "./pages/Leaderboard";
 import AdminLogin from "./pages/AdminLogin";
 import AdminSignup from "./pages/AdminSignup";
 import AdminDashboard from "./pages/AdminDashboard";
@@ -96,7 +99,10 @@ function AppContent() {
             <Route path="/job-tracker" element={<ProtectedRoute allowedRoles={["candidate", "recruiter"]}><JobTracker /></ProtectedRoute>} />
             <Route path="/coding-practice" element={<ProtectedRoute allowedRoles={["candidate", "recruiter"]}><CodingPractice /></ProtectedRoute>} />
             <Route path="/video-feed" element={<ProtectedRoute allowedRoles={["candidate", "recruiter"]}><VideoFeed /></ProtectedRoute>} />
-            
+            <Route path="/profile" element={<ProtectedRoute allowedRoles={["candidate", "recruiter"]}><UserDashboard /></ProtectedRoute>} />
+            <Route path="/profile/edit" element={<ProtectedRoute allowedRoles={["candidate", "recruiter"]}><ProfileEdit /></ProtectedRoute>} />
+            <Route path="/profile/:id" element={<ProtectedRoute allowedRoles={["candidate", "recruiter"]}><PublicProfile /></ProtectedRoute>} />
+            <Route path="/leaderboard" element={<ProtectedRoute allowedRoles={["candidate", "recruiter"]}><Leaderboard /></ProtectedRoute>} />
             {/* Admin Routes */}
             <Route path="/admin/login" element={<AdminLogin />} />
             <Route path="/admin/signup" element={<AdminSignup />} />

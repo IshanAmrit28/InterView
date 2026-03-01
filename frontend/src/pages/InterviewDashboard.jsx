@@ -63,6 +63,8 @@ const InterviewDashboard = () => {
           </button>
         </div>
 
+        {/* Progress Graph Removed */}
+
         {/* History Section */}
         <div className="bg-gray-900/40 border border-gray-800/80 rounded-3xl overflow-hidden shadow-2xl backdrop-blur-md">
           <div className="p-8 border-b border-gray-800/80 flex items-center gap-3 bg-gray-900/80">
