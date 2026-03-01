@@ -3,7 +3,7 @@ const User = require("../models/user");
 
 // Compute a strictly Codeforces-style user rating based on chronological reports
 const computeUserRating = (reports) => {
-  let currentRating = 1200; // Base Elo for a new user
+  let currentRating = 0; // Base Elo for a new user
 
   if (!reports || reports.length === 0) return currentRating;
 
@@ -30,7 +30,7 @@ const computeUserRating = (reports) => {
     currentRating += Math.round(delta);
     
     // Floor the rating to never drop below 800 just to keep users engaged
-    if (currentRating < 800) currentRating = 800;
+    if (currentRating < 0) currentRating = 0;
   });
 
   return currentRating;
@@ -186,7 +186,7 @@ exports.getPublicProfile = async (req, res) => {
     // Find current user's rank
     const userRankIndex = allRankings.findIndex(r => r.userId.toString() === userId.toString());
     const rank = userRankIndex !== -1 ? userRankIndex + 1 : 0;
-    const rating = userRankIndex !== -1 ? allRankings[userRankIndex].rating : 1200;
+    const rating = userRankIndex !== -1 ? allRankings[userRankIndex].rating : 0;
     const percentile = totalRankedUsers > 1 && rank > 0
         ? Math.round(((totalRankedUsers - rank) / (totalRankedUsers - 1)) * 100) 
         : (rank === 1 ? 100 : 0);

@@ -25,7 +25,7 @@ const getLeaderboard = async (req, res) => {
         // Import computeUserRating logic from dashboardController
         // Due to circular dep constraints or structural limits, reproducing lightweight version here 
         // to avoid tight coupling. Ideally, this rating would be cached.
-        let currentRating = 1200;
+        let currentRating = 0;
            if (reports.length > 0) {
               const sortedReports = [...reports].sort((a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime());
               sortedReports.forEach((report) => {
@@ -36,7 +36,7 @@ const getLeaderboard = async (req, res) => {
                     delta += (report.reportStructure.ResumeScore - 50) / 10;
                  }
                  currentRating += Math.round(delta);
-                 if (currentRating < 800) currentRating = 800;
+                 if (currentRating < 0) currentRating = 0;
               });
            }
    
