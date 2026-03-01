@@ -46,4 +46,13 @@ const isRecruiter = (req, res, next) => {
   }
 };
 
-module.exports = { protect, isRecruiter }; // <-- Export both
+// NEW: Middleware to check if the authenticated user is a super_admin
+const isSuperAdmin = (req, res, next) => {
+  if (req.user && req.user.userType === "super_admin") {
+    next();
+  } else {
+    res.status(403).json({ message: "Access denied. Requires Super Admin privileges." });
+  }
+};
+
+module.exports = { protect, isRecruiter, isSuperAdmin };

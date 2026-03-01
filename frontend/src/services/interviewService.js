@@ -47,7 +47,13 @@ export async function endInterview(reportPayload) {
 export async function fetchReport(reportId) {
   const url = `${BACKEND_API_BASE_URL}${API_ENDPOINTS.INTERVIEW.GET_REPORT}/${reportId}`;
 
-  const response = await fetch(url);
+  const response = await fetch(url, {
+    method: "GET",
+    headers: {
+      "Authorization": `Bearer ${localStorage.getItem('token')}`,
+      "Content-Type": "application/json",
+    },
+  });
 
   if (!response.ok) {
     throw new Error(`Failed to fetch report ${reportId}`);
@@ -58,7 +64,7 @@ export async function fetchReport(reportId) {
 
 // Fetches all reports for the logged-in user
 export async function getUserReports() {
-  const url = `${BACKEND_API_BASE_URL}/api/reports/user`;
+  const url = `${BACKEND_API_BASE_URL}/api/interview/user`;
 
   const response = await fetch(url, {
     method: "GET",

@@ -19,10 +19,10 @@ const userSchema = new mongoose.Schema(
     },
     userType: {
       type: String,
-      enum: ["candidate", "recruiter"],
+      enum: ["candidate", "recruiter", "super_admin"],
       default: "candidate",
     },
-    report: [
+    report: [
       {
         type: mongoose.Schema.Types.ObjectId,
         // Fix: Must match the model name 'Report'
