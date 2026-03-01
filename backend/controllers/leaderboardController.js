@@ -20,7 +20,7 @@ const getLeaderboard = async (req, res) => {
     
     const candidateStats = await Promise.all(
       allCandidates.map(async (candidate) => {
-        const reports = await Report.find({ user: candidate._id });
+        const reports = await Report.find({ candidateId: candidate._id });
         
         // Import computeUserRating logic from dashboardController
         // Due to circular dep constraints or structural limits, reproducing lightweight version here 

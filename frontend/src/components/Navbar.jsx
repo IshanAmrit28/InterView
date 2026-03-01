@@ -24,15 +24,19 @@ function Navbar() {
 
   const isActive = (path) => (location.pathname === path ? "active" : "");
 
-  const navItems = [
-    { name: "Dashboard", path: "/dashboard" },
-    { name: "AI Chat", path: "/chat" },
-    { name: "Interview", path: "/practice" },
-    { name: "Roadmap", path: "/roadmap" },
-    { name: "Video Feed", path: "/video-feed" },
-    { name: "Notes", path: "/notes" },
-    { name: "Quiz", path: "/quiz" },
-  ];
+  const navItems = user?.userType === "super_admin" 
+    ? [
+        { name: "Admin Dashboard", path: "/admin/dashboard" },
+      ]
+    : [
+        { name: "Dashboard", path: "/dashboard" },
+        { name: "AI Chat", path: "/chat" },
+        { name: "Interview", path: "/practice" },
+        { name: "Roadmap", path: "/roadmap" },
+        { name: "Video Feed", path: "/video-feed" },
+        { name: "Notes", path: "/notes" },
+        { name: "Quiz", path: "/quiz" },
+      ];
 
   return (
     <header className="minimal-navbar">

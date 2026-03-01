@@ -44,7 +44,7 @@ function AppContent() {
   const location = useLocation();
 
   const isLanding = location.pathname === "/";
-  const isAuthPage = location.pathname === "/login" || location.pathname === "/signup";
+  const isAuthPage = ["/login", "/signup", "/admin/login", "/admin/signup"].includes(location.pathname);
   const isInterview = location.pathname.startsWith("/interview");
   const hideNavbar = isLanding || isInterview || isAuthPage;
 
