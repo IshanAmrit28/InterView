@@ -8,6 +8,9 @@ export async function startInterview(formData) {
   // Note: We use raw fetch here and DON'T set Content-Type for FormData
   const response = await fetch(url, {
     method: "POST",
+    headers: {
+      "Authorization": `Bearer ${localStorage.getItem('token')}`,
+    },
     body: formData,
   });
 
@@ -28,6 +31,7 @@ export async function endInterview(reportPayload) {
   const response = await fetch(url, {
     method: "POST",
     headers: {
+      "Authorization": `Bearer ${localStorage.getItem('token')}`,
       "Content-Type": "application/json",
     },
     body: JSON.stringify(reportPayload),
