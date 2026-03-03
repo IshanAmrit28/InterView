@@ -37,17 +37,37 @@ const computeUserRating = (reports) => {
 };
 
 const getGlobalRankings = async () => {
-    // Aggregate rankings by looking at all users and their latest reports
+    // Aggregate rankings by looking at all users
     const users = await User.find({ userType: "candidate" });
+    
+    // Group candidates by unique email ID
+    const emailGroupMap = {};
+    for (const cand of users) {
+      if (!cand.email) continue;
+      const emailLower = cand.email.toLowerCase();
+      if (!emailGroupMap[emailLower]) {
+        emailGroupMap[emailLower] = {
+           userId: cand._id,
+           userName: cand.userName,
+           email: emailLower,
+           candidateIds: []
+        };
+      }
+      emailGroupMap[emailLower].candidateIds.push(cand._id);
+    }
+    
+    const uniqueCandidates = Object.values(emailGroupMap);
     const rankings = [];
 
-    for (const user of users) {
-        const reports = await Report.find({ candidateId: user._id });
+    for (const group of uniqueCandidates) {
+        // Fetch reports matching any instance of this linked email
+        const reports = await Report.find({ candidateId: { $in: group.candidateIds } });
         if (reports && reports.length > 0) {
             const rating = computeUserRating(reports);
             rankings.push({
-                userId: user._id,
-                userName: user.userName,
+                userId: group.userId, // Return primary candidate ID
+                userName: group.userName,
+                email: group.email,    // Send email to match strictly on frontend
                 rating: rating
             });
         }
@@ -69,8 +89,11 @@ exports.getDashboardData = async (req, res) => {
     const allRankings = await getGlobalRankings();
     const totalRankedUsers = allRankings.length;
     
-    // Find current user's rank
-    const userRankIndex = allRankings.findIndex(r => r.userId.toString() === userId.toString());
+    const currentUser = await User.findById(userId);
+    const userEmailLower = currentUser.email ? currentUser.email.toLowerCase() : "";
+
+    // Find current user's rank by matching email
+    const userRankIndex = allRankings.findIndex(r => r.email === userEmailLower);
     const rank = userRankIndex !== -1 ? userRankIndex + 1 : 0;
     const rating = userRankIndex !== -1 ? allRankings[userRankIndex].rating : 0;
     const percentile = totalRankedUsers > 1 && rank > 0

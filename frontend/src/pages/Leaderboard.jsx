@@ -119,7 +119,7 @@ const Leaderboard = () => {
                      <tr 
                        key={u.id}
                        onClick={() => navigate(`/profile/${u.id}`)} 
-                       className={`border-b border-gray-800/50 hover:bg-gray-800/30 cursor-pointer transition-colors ${u.userName === user.userName ? 'bg-indigo-900/10 hover:bg-indigo-900/20' : ''}`}
+                       className={`border-b border-gray-800/50 hover:bg-gray-800/30 cursor-pointer transition-colors ${u.email === user.email ? 'bg-indigo-900/10 hover:bg-indigo-900/20' : ''}`}
                      >
                        <td className="px-6 py-4 font-medium text-gray-400">
                          {u.rank === 1 ? <span className="text-yellow-400 font-bold tracking-widest pl-1">1</span> : 
@@ -128,7 +128,7 @@ const Leaderboard = () => {
                        </td>
                        <td className="px-6 py-4 font-medium">
                           <span className={`${getRatingColor(u.rating)}`}>{u.userName}</span>
-                          {u.userName === user.userName && (
+                          {u.email === user.email && (
                              <span className="ml-3 text-xs bg-indigo-500/20 text-indigo-300 px-2 py-0.5 rounded-full border border-indigo-500/30">You</span>
                           )}
                        </td>

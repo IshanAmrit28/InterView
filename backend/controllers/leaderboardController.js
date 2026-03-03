@@ -11,16 +11,34 @@ const getLeaderboard = async (req, res) => {
     const limit = parseInt(req.query.limit) || 50;
     const skip = (page - 1) * limit;
 
-    // Fetch all candidates to rank them
-    const allCandidates = await User.find({ userType: "candidate" }).select("_id userName profile");
+    // Fetch all candidates to rank them. Select email to identify unique users.
+    const allCandidates = await User.find({ userType: "candidate" }).select("_id userName email profile");
+
+    // Group candidates by unique email ID to eliminate duplicate entries caused by identical names
+    const emailGroupMap = {};
+    for (const cand of allCandidates) {
+      if (!cand.email) continue;
+      const emailLower = cand.email.toLowerCase();
+      if (!emailGroupMap[emailLower]) {
+        emailGroupMap[emailLower] = {
+           id: cand._id,
+           userName: cand.userName,
+           email: emailLower,
+           candidateIds: []
+        };
+      }
+      emailGroupMap[emailLower].candidateIds.push(cand._id);
+    }
+    const uniqueCandidates = Object.values(emailGroupMap);
 
     // We need to fetch report data to compute total interviews and rating.
     // Since we aren't caching rating in the DB yet, we must compute it on the fly.
     // In a production app, the rating should ideally be a field on the User model updated per interview.
     
     const candidateStats = await Promise.all(
-      allCandidates.map(async (candidate) => {
-        const reports = await Report.find({ candidateId: candidate._id });
+      uniqueCandidates.map(async (candidateGroup) => {
+        // Fetch reports for all user instances sharing this email ID
+        const reports = await Report.find({ candidateId: { $in: candidateGroup.candidateIds } });
         
         // Import computeUserRating logic from dashboardController
         // Due to circular dep constraints or structural limits, reproducing lightweight version here 
@@ -41,8 +59,9 @@ const getLeaderboard = async (req, res) => {
            }
    
            return {
-             id: candidate._id,
-             userName: candidate.userName,
+             id: candidateGroup.id,
+             userName: candidateGroup.userName,
+             email: candidateGroup.email,
              rating: currentRating,
              totalInterviews: reports.length,
            };

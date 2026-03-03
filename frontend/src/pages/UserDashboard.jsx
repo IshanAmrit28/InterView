@@ -369,7 +369,7 @@ const UserDashboard = () => {
                   ) : (
                      <div className="flex flex-col gap-1">
                         {leaderboardData.leaderboard.map((u) => {
-                           const isCurrentUser = user && u.userName === user.userName;
+                           const isCurrentUser = user && u.email === user.email;
                            return (
                              <div 
                                key={u.id}
