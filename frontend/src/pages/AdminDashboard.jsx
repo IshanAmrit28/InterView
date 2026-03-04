@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import {
   fetchAllUsers,
@@ -18,6 +19,7 @@ import {
   CheckCircle2,
   XCircle,
   ArrowLeft,
+  LogOut,
   FolderOpen
 } from "lucide-react";
 import AnimatedBackground from "../components/AnimatedBackground";
@@ -25,7 +27,8 @@ import AnimatedBackground from "../components/AnimatedBackground";
 const CATEGORIES = ["DBMS", "OS", "CN", "OOP", "RESUME", "ALGORITHM"];
 
 const AdminDashboard = () => {
-  const { user } = useAuth();
+  const { user, logoutUser } = useAuth();
+  const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState("users"); // 'users' or 'questions'
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -127,6 +130,17 @@ const AdminDashboard = () => {
               </p>
             </div>
           </div>
+
+          <button
+            onClick={() => {
+              logoutUser();
+              navigate("/admin/login");
+            }}
+            className="flex items-center gap-2 bg-red-600/10 hover:bg-red-600 text-red-500 hover:text-white px-6 py-3 rounded-xl font-bold border border-red-500/20 transition-all shadow-lg hover:shadow-red-600/30"
+          >
+            <LogOut size={20} />
+            Logout Session
+          </button>
         </div>
 
         {/* Global Notifications */}
