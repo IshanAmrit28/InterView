@@ -323,12 +323,21 @@ const UserDashboard = () => {
 
               {/* Applied Jobs Table */}
               <div className="bg-white dark:bg-white dark:bg-gray-900/40 border border-gray-200 dark:border-gray-800 rounded-3xl p-6 md:p-8 backdrop-blur-md shadow-md dark:shadow-xl overflow-hidden mt-8">
-                 <div className="flex items-center gap-3 mb-6">
-                    <Activity className="w-5 h-5 text-blue-400" />
-                    <h2 className="text-lg font-bold">Applied Jobs</h2>
+                 <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-6 gap-4">
+                     <div className="flex items-center gap-3">
+                        <Activity className="w-5 h-5 text-blue-400" />
+                        <h2 className="text-lg font-bold">Applied Jobs</h2>
+                     </div>
+                     <button 
+                       onClick={() => navigate('/applied-jobs')}
+                       className="py-1.5 px-4 bg-blue-500/10 hover:bg-blue-500/20 text-blue-500 hover:text-blue-400 text-sm font-medium rounded-lg transition-colors flex items-center justify-center gap-2 border border-blue-500/20 whitespace-nowrap"
+                     >
+                       View All
+                       <ChevronRight className="w-4 h-4" />
+                     </button>
                  </div>
                  <div className="w-full overflow-x-auto">
-                    <AppliedJobTable />
+                    <AppliedJobTable limit={5} />
                  </div>
               </div>
 

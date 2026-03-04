@@ -3,12 +3,17 @@ import { Table, TableBody, TableCaption, TableCell, TableHead, TableHeader, Tabl
 import { Badge } from './ui/badge'
 import { useSelector } from 'react-redux'
 
-const AppliedJobTable = () => {
-    const {allAppliedJobs} = useSelector(store=>store.job);
+const AppliedJobTable = ({ limit = null }) => {
+    /** @type {{ allAppliedJobs: any[] }} */
+    const {allAppliedJobs} = useSelector(/** @param {any} store */ (store)=>store.job);
+    
+    // Slice the jobs if a limit is provided
+    const displayJobs = limit ? allAppliedJobs.slice(0, limit) : allAppliedJobs;
+
     return (
         <div>
             <Table>
-                <TableCaption>A list of your applied jobs</TableCaption>
+                {!limit && <TableCaption>A list of your applied jobs</TableCaption>}
                 <TableHeader>
                     <TableRow>
                         <TableHead>Date</TableHead>
@@ -19,12 +24,20 @@ const AppliedJobTable = () => {
                 </TableHeader>
                 <TableBody>
                     {
-                        (!allAppliedJobs || allAppliedJobs.length <= 0) ? <span>You haven't applied any job yet.</span> : allAppliedJobs.map((appliedJob) => (
+                        (!displayJobs || displayJobs.length <= 0) ? (
+                            <TableRow>
+                                <TableCell colSpan={4} className="text-center">You haven't applied to any jobs yet.</TableCell>
+                            </TableRow>
+                        ) : displayJobs.map((appliedJob) => (
                             <TableRow key={appliedJob._id}>
                                 <TableCell>{appliedJob?.createdAt?.split("T")[0]}</TableCell>
-                                <TableCell>{appliedJob.job?.title}</TableCell>
-                                <TableCell>{appliedJob.job?.company?.name}</TableCell>
-                                <TableCell className="text-right"><Badge className={`${appliedJob?.status === "rejected" ? 'bg-red-400' : appliedJob.status === 'pending' ? 'bg-gray-400' : 'bg-green-400'}`}>{appliedJob.status.toUpperCase()}</Badge></TableCell>
+                                <TableCell>{appliedJob?.job?.title}</TableCell>
+                                <TableCell>{appliedJob?.job?.company?.name}</TableCell>
+                                <TableCell className="text-right">
+                                    <Badge variant="outline" className={`${appliedJob?.status === "rejected" ? 'bg-red-400' : appliedJob?.status === 'pending' ? 'bg-gray-400' : 'bg-green-400'}`}>
+                                        {appliedJob?.status?.toUpperCase()}
+                                    </Badge>
+                                </TableCell>
                             </TableRow>
                         ))
                     }

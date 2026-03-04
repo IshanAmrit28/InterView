@@ -66,7 +66,7 @@ const ProfileEdit = () => {
       }
 
       // We use the job board's unified profile update endpoint since it handles multipart/form-data
-      const response = await axios.post(`${USER_API_END_POINT}/profile/update`, formData, {
+      const response = await axios.post(`${USER_API_END_POINT}profile/update`, formData, {
           headers: { 'Content-Type': 'multipart/form-data' },
           withCredentials: true
       });

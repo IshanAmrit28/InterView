@@ -37,6 +37,7 @@ import Leaderboard from "./pages/Leaderboard";
 import AdminLogin from "./pages/AdminLogin";
 import AdminSignup from "./pages/AdminSignup";
 import AdminDashboard from "./pages/AdminDashboard";
+import AppliedJobsPage from "./pages/AppliedJobsPage";
 
 // Job Board Imports
 import Jobs from './components/Jobs';
@@ -113,6 +114,7 @@ function AppContent() {
             <Route path="/profile" element={<ProtectedRoute allowedRoles={["candidate", "recruiter"]}><UserDashboard /></ProtectedRoute>} />
             <Route path="/profile/edit" element={<ProtectedRoute allowedRoles={["candidate", "recruiter"]}><ProfileEdit /></ProtectedRoute>} />
             <Route path="/profile/:id" element={<ProtectedRoute allowedRoles={["candidate", "recruiter"]}><PublicProfile /></ProtectedRoute>} />
+            <Route path="/applied-jobs" element={<ProtectedRoute allowedRoles={["candidate", "recruiter"]}><AppliedJobsPage /></ProtectedRoute>} />
             <Route path="/leaderboard" element={<ProtectedRoute allowedRoles={["candidate", "recruiter"]}><Leaderboard /></ProtectedRoute>} />
             {/* Admin Routes */}
             <Route path="/admin/login" element={<AdminLogin />} />

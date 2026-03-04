@@ -37,9 +37,10 @@ app.use(cookieParser());
 
 app.use(
   cors({
-    origin: "*", // Allow all origins (standard for public/development APIs)
+    origin: ["http://localhost:5173", "https://inter-view-swart.vercel.app"], // Allow specific origins
     methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
     allowedHeaders: ["Content-Type", "Authorization"],
+    credentials: true,
   }),
 ); // CORS should also run before the routers
 
