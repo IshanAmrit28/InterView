@@ -209,9 +209,17 @@ const UserDashboard = () => {
 
                  <div className="text-center md:text-left z-10 w-full">
                     <h1 className="text-2xl md:text-4xl font-extrabold mb-1">{user?.userName}</h1>
-                    <p className="text-gray-600 dark:text-gray-400 mb-6 flex items-center justify-center md:justify-start gap-2 text-sm">
-                      <Star className="w-4 h-4" /> Global Talent Profile
-                    </p>
+                    <div className="flex flex-col md:flex-row items-center justify-center md:justify-start gap-4 mb-6">
+                      <p className="text-gray-600 dark:text-gray-400 flex items-center justify-center md:justify-start gap-2 text-sm mb-0">
+                        <Star className="w-4 h-4" /> Global Talent Profile
+                      </p>
+                      <button
+                        onClick={() => navigate('/profile/edit')}
+                        className="flex items-center gap-2 px-4 py-1.5 bg-indigo-500/10 hover:bg-indigo-500/20 text-indigo-400 border border-indigo-500/30 rounded-full text-sm font-medium transition-colors cursor-pointer"
+                      >
+                        Edit Profile
+                      </button>
+                    </div>
                     
                     <div className="flex flex-wrap items-center justify-center md:justify-start gap-6">
                        <div className="group relative">
