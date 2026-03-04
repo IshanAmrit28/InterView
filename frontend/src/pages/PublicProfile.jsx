@@ -9,7 +9,7 @@ import { useAuth } from '../context/AuthContext';
 import './UserDashboard.css';
 import { API_BASE_URL as BASE_URL } from '../constants';
 
-const API_BASE_URL = `${BASE_URL}/api`;
+const API_BASE_URL = `${BASE_URL}/api/v1`;
 
 const PublicProfile = () => {
   const { id } = useParams();

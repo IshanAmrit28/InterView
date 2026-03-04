@@ -5,7 +5,7 @@ import { Trophy, CheckCircle, ChevronLeft, ChevronRight, Loader2, Search } from 
 import { useAuth } from '../context/AuthContext';
 import { API_BASE_URL as BASE_URL } from '../constants';
 
-const API_BASE_URL = `${BASE_URL}/api`;
+const API_BASE_URL = `${BASE_URL}/api/v1`;
 
 const Leaderboard = () => {
   const { user, loading: authLoading } = useAuth();

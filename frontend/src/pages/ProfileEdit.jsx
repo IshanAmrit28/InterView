@@ -9,7 +9,7 @@ import { useDispatch } from 'react-redux';
 import { setUser as setReduxUser } from '../redux/authSlice';
 import { toast } from 'sonner';
 
-const API_BASE_URL = `${BASE_URL}/api`;
+const API_BASE_URL = `${BASE_URL}/api/v1`;
 
 const ProfileEdit = () => {
   const { user, loginUser } = useAuth();
@@ -184,7 +184,7 @@ const ProfileEdit = () => {
                    onChange={changeEventHandler}
                    className="w-full bg-gray-800/50 border border-gray-700 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-purple-500 transition"
                    placeholder="Write a brief introduction about yourself..."
-                   rows="3"
+                   rows={3}
                  />
                </div>
 
