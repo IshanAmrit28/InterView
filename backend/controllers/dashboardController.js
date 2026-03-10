@@ -153,7 +153,10 @@ exports.getDashboardData = async (req, res) => {
         },
         heatmapData: heatmapMapList,
         sectorScores,
-        reports
+        reports: reports.map(r => ({
+            ...r.toObject(),
+            overallScore: r.reportStructure?.overallScore || 0
+        }))
       }
     });
   } catch (error) {

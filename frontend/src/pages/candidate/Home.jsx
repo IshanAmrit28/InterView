@@ -26,60 +26,36 @@ function Home() {
 
   const quickActions = [
     {
-      title: 'Browse Notes',
-      desc: '17 Topics Available',
-      icon: <BookOpen size={24} />,
-      link: '/notes',
-      color: 'blue',
-      gradient: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)'
-    },
-    {
       title: 'Take Quiz',
-      desc: 'Test Your Knowledge',
-      icon: <PenTool size={24} />,
-      link: '/quiz',
+      desc: 'Test your core concepts with timed assessments',
+      icon: <PenTool size={28} />,
+      link: '/candidate/quiz',
       color: 'green',
-      gradient: 'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)'
+      gradient: 'linear-gradient(135deg, #22c55e 0%, #16a34a 100%)'
     },
     {
       title: 'AI Assistant',
-      desc: 'Ask Anything',
-      icon: <Bot size={24} />,
-      link: '/chat',
-      color: 'purple',
-      gradient: 'linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)'
-    },
-    {
-      title: 'Study Plan',
-      desc: 'Create Roadmap',
-      icon: <Calendar size={24} />,
-      link: '/study-plan',
-      color: 'orange',
-      gradient: 'linear-gradient(135deg, #fa709a 0%, #fee140 100%)'
+      desc: 'Get instant answers and guidance from our AI',
+      icon: <Bot size={28} />,
+      link: '/candidate/chat',
+      color: 'blue',
+      gradient: 'linear-gradient(135deg, #3b82f6 0%, #2563eb 100%)'
     },
     {
       title: 'Mock Interview',
-      desc: 'AI Practice Sessions',
-      icon: <Bot size={24} />,
-      link: '/interview',
+      desc: 'Practice real-world scenarios with AI feedback',
+      icon: <Bot size={28} />,
+      link: '/candidate/practice',
       color: 'purple',
-      gradient: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)'
+      gradient: 'linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%)'
     },
     {
       title: 'Learning Roadmap',
-      desc: 'Structured Paths',
-      icon: <Target size={24} />,
-      link: '/roadmap',
-      color: 'blue',
-      gradient: 'linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)'
-    },
-    {
-      title: 'Interview Questions',
-      desc: 'Role-Based Prep',
-      icon: <Zap size={24} />,
-      link: '/coding-practice',
-      color: 'purple',
-      gradient: 'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)'
+      desc: 'Follow structured paths designed for your role',
+      icon: <Target size={28} />,
+      link: '/candidate/roadmap',
+      color: 'orange',
+      gradient: 'linear-gradient(135deg, #f97316 0%, #ea580c 100%)'
     }
   ]
 
@@ -138,27 +114,34 @@ function Home() {
         </div>
 
         <div className="topics-list">
-          {upcomingTopics.map((topic, idx) => (
-            <Link
-              key={idx}
-              to={`/topic/${topic.id}`}
-              className="topic-card"
-              style={{ textDecoration: 'none' }}
-            >
-              <div className="topic-header">
-                <h4>{topic.title}</h4>
-                <span className={`badge badge-${topic.difficulty === 'Hard' ? 'orange' : 'blue'}`}>
-                  {topic.difficulty}
-                </span>
-              </div>
-              <div className="topic-meta">
-                <span className="badge badge-purple">{topic.category}</span>
-                <span style={{ display: 'flex', alignItems: 'center', gap: 4, fontSize: 12, color: 'var(--text-muted)' }}>
-                  <Clock size={12} /> {topic.time}
-                </span>
-              </div>
-            </Link>
-          ))}
+          {upcomingTopics.map((topic, idx) => {
+            const gradient = topic.difficulty === 'Hard' 
+              ? 'linear-gradient(135deg, #f97316 0%, #ea580c 100%)' 
+              : 'linear-gradient(135deg, #3b82f6 0%, #2563eb 100%)';
+            
+            return (
+              <Link
+                key={idx}
+                to={`/candidate/topic/${topic.id}`}
+                className="topic-card"
+                style={{ textDecoration: 'none' }}
+              >
+                <div className="action-gradient" style={{ background: gradient }}></div>
+                <div className="topic-header">
+                  <h4>{topic.title}</h4>
+                  <span className={`badge badge-${topic.difficulty === 'Hard' ? 'orange' : 'blue'}`}>
+                    {topic.difficulty}
+                  </span>
+                </div>
+                <div className="topic-meta">
+                  <span className="badge badge-purple">{topic.category}</span>
+                  <span style={{ display: 'flex', alignItems: 'center', gap: 4, fontSize: 12, color: 'var(--text-muted)' }}>
+                    <Clock size={12} /> {topic.time}
+                  </span>
+                </div>
+              </Link>
+            );
+          })}
         </div>
 
         {/* Motivational Quote */}

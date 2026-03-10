@@ -40,6 +40,7 @@ exports.getAllJobs = async (req, res) => {
     try {
         const keyword = req.query.keyword || "";
         const query = {
+            status: "active",
             $or: [
                 { title: { $regex: keyword, $options: "i" } },
                 { description: { $regex: keyword, $options: "i" } },
@@ -89,10 +90,15 @@ exports.getJobById = async (req, res) => {
 exports.getAdminJobs = async (req, res) => {
     try {
         const adminId = req.id;
-        const jobs = await Job.find({ company: req.user.company }).populate({
-            path: 'company',
-            options: { sort: { createdAt: -1 } }
-        });
+        const jobs = await Job.find({ company: req.user.company })
+            .populate({
+                path: 'company',
+                options: { sort: { createdAt: -1 } }
+            })
+            .populate({
+                path: 'created_by',
+                select: 'fullname userName'
+            });
         if (!jobs) {
             return res.status(404).json({
                 message: "Jobs not found.",
@@ -101,6 +107,40 @@ exports.getAdminJobs = async (req, res) => {
         }
         return res.status(200).json({
             jobs,
+            success: true
+        });
+    } catch (error) {
+        console.log(error);
+        return res.status(500).json({ message: "Internal server error", success: false });
+    }
+};
+
+exports.updateJobStatus = async (req, res) => {
+    try {
+        const { status } = req.body;
+        const jobId = req.params.id;
+
+        if (!status || !['active', 'inactive'].includes(status)) {
+            return res.status(400).json({
+                message: "Valid status ('active' or 'inactive') is required.",
+                success: false
+            });
+        }
+
+        // Find the job and verify it belongs to the recruiter's company
+        const job = await Job.findOne({ _id: jobId, company: req.user.company });
+        if (!job) {
+            return res.status(404).json({
+                message: "Job not found or access denied.",
+                success: false
+            });
+        }
+
+        job.status = status;
+        await job.save();
+
+        return res.status(200).json({
+            message: `Job status updated to ${status}.`,
             success: true
         });
     } catch (error) {

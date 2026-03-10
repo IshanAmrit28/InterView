@@ -219,7 +219,7 @@ body {
 .app-container {
   max-width: var(--max-width);
   margin: 0 auto;
-  padding: 0 var(--sp-6);
+  padding: var(--sp-8) var(--sp-6) 0 var(--sp-6);
 }
 
 .page-header {

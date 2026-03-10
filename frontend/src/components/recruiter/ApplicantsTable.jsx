@@ -57,6 +57,7 @@ const ApplicantsTable = () => {
                         <TableHead className="text-gray-400 font-semibold">Status</TableHead>
                         <TableHead className="text-gray-400 font-semibold">Date</TableHead>
                         <TableHead className="text-gray-400 font-semibold text-right">Action</TableHead>
+                        <TableHead className="text-gray-400 font-semibold">Updated By</TableHead>
                     </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -128,6 +129,16 @@ const ApplicantsTable = () => {
                                             }
                                         </PopoverContent>
                                     </Popover>
+                                </TableCell>
+                                <TableCell className="text-gray-400 text-sm">
+                                    {item?.status !== "pending" && item?.updatedBy ? (
+                                        <span className="flex flex-col">
+                                            <span className="text-xs text-gray-500">Modified by</span>
+                                            <span className="text-indigo-400 font-medium">{item.updatedBy.fullname || item.updatedBy.userName}</span>
+                                        </span>
+                                    ) : (
+                                        <span className="text-gray-600 italic">--</span>
+                                    )}
                                 </TableCell>
                             </TableRow>
                         ))

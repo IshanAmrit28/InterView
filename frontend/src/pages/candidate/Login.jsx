@@ -1,9 +1,10 @@
 // frontend/src/Pages/Login.jsx
 import React, { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
-import { login } from "../../services/authServices";
+import { Mail, Lock, LogIn } from "lucide-react";
+import { GoogleLogin } from '@react-oauth/google';
+import { login, googleLogin } from "../../services/authServices";
 import { useAuth } from "../../context/AuthContext";
-import { Mail, Lock } from "lucide-react";
 
 const Login = () => {
   const [formData, setFormData] = useState({ email: "", password: "", role: "candidate" });
@@ -132,10 +133,38 @@ const Login = () => {
 
             <button
               type="submit"
-              className="bg-[#f8e8b6] text-black font-bold text-lg py-3 rounded-lg hover:bg-[#f6de96] hover:scale-[1.01] transition-all duration-200 w-full shadow-lg"
+              className="bg-[#f8e8b6] text-black font-bold text-lg py-3 rounded-lg hover:bg-[#f6de96] hover:scale-[1.01] transition-all duration-200 w-full shadow-lg mb-6"
             >
               Login
             </button>
+
+            <div className="relative flex items-center justify-center mb-6">
+              <div className="border-t border-gray-800 w-full"></div>
+              <span className="bg-black px-4 text-xs text-gray-500 uppercase tracking-widest whitespace-nowrap">Or continue with</span>
+              <div className="border-t border-gray-800 w-full"></div>
+            </div>
+
+            <div className="flex justify-center">
+              <GoogleLogin
+                onSuccess={async (credentialResponse) => {
+                  try {
+                    const response = await googleLogin(credentialResponse.credential);
+                    if (response.success) {
+                      loginUser(response.user);
+                      navigate("/candidate/dashboard");
+                    }
+                  } catch (err) {
+                    setError("Google Login Failed. Please try again.");
+                  }
+                }}
+                onError={() => {
+                  setError("Google Login Failed");
+                }}
+                theme="dark"
+                shape="pill"
+                width="400"
+              />
+            </div>
           </form>
 
           <div className="mt-8 text-sm text-gray-400 text-center w-full max-w-md">

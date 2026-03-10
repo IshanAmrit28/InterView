@@ -82,9 +82,10 @@ exports.getApplicants = async (req, res) => {
         const job = await Job.findOne({ _id: jobId, company: req.user.company }).populate({
             path: 'applications',
             options: { sort: { createdAt: -1 } },
-            populate: {
-                path: 'applicant'
-            }
+            populate: [
+                { path: 'applicant' },
+                { path: 'updatedBy', select: 'fullname userName' }
+            ]
         });
         if (!job) {
             return res.status(404).json({
@@ -124,6 +125,7 @@ exports.updateStatus = async (req, res) => {
 
         // update the status
         application.status = status.toLowerCase();
+        application.updatedBy = req.id; // Record who updated it
         await application.save();
 
         return res.status(200).json({

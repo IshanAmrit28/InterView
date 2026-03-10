@@ -17,3 +17,7 @@ export const getAdminJobs = async () => {
 export const postJob = async (data) => {
     return await api.post(`${JOB_API_END_POINT}/post`, data);
 };
+
+export const updateJobStatus = async (id, status) => {
+    return await api.put(`${JOB_API_END_POINT}/status/${id}`, { status });
+};

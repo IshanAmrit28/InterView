@@ -2,7 +2,7 @@
 export const pdfNotes = [
     // DSA & Algorithms
     { id: 1, title: 'Best DSA Concepts for FAANG', category: 'DSA', difficulty: 'Hard', fileName: 'Best DSA concepts for FAANG.pdf', tags: ['algorithms', 'interview', 'faang'] },
-    { id: 2, title: 'DSA in Python - Complete Theory', category: 'DSA', difficulty: 'Medium', fileName: 'DSA in python complete theory hand writing notes (1).pdf', tags: ['python', 'dsa', 'theory'] },
+    { id: 1, title: 'Best DSA Concepts for FAANG', category: 'DSA', difficulty: 'Hard', fileName: 'Best DSA concepts for FAANG.pdf', tags: ['algorithms', 'interview', 'faang'] },
     { id: 3, title: 'Graph Data Structure', category: 'DSA', difficulty: 'Hard', fileName: 'Graph Data Structure.pdf', tags: ['graphs', 'algorithms'] },
     { id: 4, title: 'Last Minute DSA Revision Sheet', category: 'DSA', difficulty: 'Medium', fileName: 'Last Minute DSA Revision Sheet.pdf', tags: ['revision', 'quick-reference'] },
     { id: 5, title: 'LeetCode Important Questions & Solutions', category: 'DSA', difficulty: 'Hard', fileName: 'Leetcode Important Questions Solutions -1.pdf', tags: ['leetcode', 'solutions'] },
@@ -13,10 +13,8 @@ export const pdfNotes = [
     { id: 8, title: 'System Design Basics', category: 'System Design', difficulty: 'Hard', fileName: 'System Design Basics.pdf', tags: ['system-design', 'scalability'] },
 
     // Web Development
-    { id: 9, title: 'React Handwritten Notes', category: 'Web Dev', difficulty: 'Medium', fileName: 'React-Handwritten-notes.pdf', tags: ['react', 'frontend'] },
     { id: 10, title: 'ReactJS Notes for Professionals', category: 'Web Dev', difficulty: 'Medium', fileName: 'ReactJSNotesForProfessionals.pdf', tags: ['react', 'professional'] },
     { id: 11, title: '30 Days of React eBook', category: 'Web Dev', difficulty: 'Easy', fileName: '30-days-of-react-ebook-fullstackio.pdf', tags: ['react', 'tutorial'] },
-    { id: 12, title: 'NodeJS Handwritten Notes', category: 'Web Dev', difficulty: 'Medium', fileName: 'NodeJS-Handwritten-Notes.pdf', tags: ['nodejs', 'backend'] },
     { id: 13, title: 'CSS Notes', category: 'Web Dev', difficulty: 'Easy', fileName: 'CSS Notes.pdf', tags: ['css', 'styling'] },
     { id: 14, title: 'JavaScript Class Notes 1', category: 'Web Dev', difficulty: 'Medium', fileName: 'JS1 ClassNotes.pdf', tags: ['javascript', 'basics'] },
     { id: 15, title: 'JavaScript Class Notes 2', category: 'Web Dev', difficulty: 'Medium', fileName: 'JS2 ClassNotes.pdf', tags: ['javascript'] },
@@ -31,7 +29,6 @@ export const pdfNotes = [
     // Database & SQL
     { id: 23, title: 'DBMS Notes', category: 'DBMS', difficulty: 'Hard', fileName: 'DBMS_Notes (2).pdf', tags: ['database', 'theory'] },
     { id: 24, title: 'SQL Notes', category: 'DBMS', difficulty: 'Medium', fileName: 'SQL (notes) (1) (1).pdf', tags: ['sql', 'queries'] },
-    { id: 25, title: 'SQL Handwritten Notes', category: 'DBMS', difficulty: 'Medium', fileName: 'SQL Handwritten Notes .pdf', tags: ['sql', 'handwritten'] },
     { id: 26, title: 'SQL Notes by Apna College', category: 'DBMS', difficulty: 'Easy', fileName: 'SQL Notes by Apna College (1) (1).pdf', tags: ['sql', 'tutorial'] },
     { id: 27, title: '800+ SQL Server Interview Questions', category: 'DBMS', difficulty: 'Hard', fileName: '800+ SQL Server Interview Questions and Answers .pdf', tags: ['sql', 'interview'] },
 
@@ -63,7 +60,6 @@ export const pdfNotes = [
 
     // Miscellaneous
     { id: 44, title: 'Class Notes', category: 'General', difficulty: 'Easy', fileName: 'Class Notes.pdf', tags: ['notes', 'general'] },
-    { id: 45, title: 'Calendar Handwritten', category: 'General', difficulty: 'Easy', fileName: 'Calendar Handwritten.pdf', tags: ['calendar', 'planning'] },
     { id: 46, title: 'Lecture Notes', category: 'General', difficulty: 'Medium', fileName: 'lecture-notes (1).pdf', tags: ['lecture', 'notes'] },
     { id: 47, title: 'Infosys Pseudo Code', category: 'Interview', difficulty: 'Medium', fileName: 'infosys pseudo  (1).pdf', tags: ['infosys', 'pseudo-code'] },
     { id: 48, title: 'Remote Supportive Employers', category: 'Career', difficulty: 'Easy', fileName: 'Remote Supportive Employers.pdf', tags: ['remote', 'jobs'] },
@@ -79,7 +75,6 @@ export const pdfNotes = [
     { id: 56, title: 'Big Data Interview Q&A', category: 'DBMS', difficulty: 'Hard', fileName: 'Big Data Interview QnA (1).pdf', tags: ['big-data', 'interview'] },
     { id: 57, title: 'Secure Linux Server Guide', category: 'DevOps', difficulty: 'Hard', fileName: 'Building a Secure Linux Server from Scratch.pdf', tags: ['linux', 'security'] },
     { id: 58, title: 'Cyber Security Roadmap', category: 'DevOps', difficulty: 'Medium', fileName: 'Cyber_Sec_Roadmap_.pdf', tags: ['security', 'roadmap'] },
-    { id: 59, title: 'DBMS Complete Handwritten Notes', category: 'DBMS', difficulty: 'Medium', fileName: 'DBMS Complete Notes Handwritten.pdf', tags: ['dbms', 'notes'] },
     { id: 60, title: 'DBMS Notes (Alternative)', category: 'DBMS', difficulty: 'Medium', fileName: 'DBMS-Notes.pdf', tags: ['dbms', 'notes'] },
     { id: 61, title: 'DNS Security Guide', category: 'Networks', difficulty: 'Hard', fileName: 'DNS_Security_Guide_Done.pdf', tags: ['dns', 'security'] },
     { id: 62, title: 'Gray Hat Python', category: 'Python', difficulty: 'Hard', fileName: 'Gray Hat Python.pdf', tags: ['python', 'security'] },

@@ -15,8 +15,21 @@ const userSchema = new mongoose.Schema(
     },
     password: {
       type: String,
-      required: [true, "Password is required"],
+      required: false,
     },
+    authProvider: {
+      type: String,
+      enum: ["local", "google"],
+      default: "local",
+    },
+    googleId: {
+      type: String,
+      index: true,
+    },
+    hasPassword: {
+      type: Boolean,
+      default: true,
+    },
     fullname: {
       type: String,
       required: false // Optional for backward compatibility with old signup

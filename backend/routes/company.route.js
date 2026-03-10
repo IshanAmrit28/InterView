@@ -16,7 +16,7 @@ router.route("/public").get(getPublicCompanies);
 
 // 2. ADMIN ONLY - Management (As per your requirement)
 router.route("/register").post(protect, isSuperAdmin, registerCompany);
-router.route("/get").get(protect, isSuperAdmin, getCompany);
+router.route("/get").get(protect, isAdminOrRecruiter, getCompany);
 
 // 3. ID-based / Update (Recruiters can update their own via isAdminOrRecruiter)
 router.route("/get/:id").get(protect, getCompanyById);

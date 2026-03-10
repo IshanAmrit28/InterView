@@ -10,7 +10,7 @@ const Signup = () => {
     email: "",
     password: "",
     confirmPassword: "",
-    role: "candidate",
+    userType: "candidate",
   });
   const [error, setError] = useState("");
   const navigate = useNavigate();
@@ -35,7 +35,7 @@ const Signup = () => {
         email: formData.email,
         password: formData.password,
         confirmPassword: formData.confirmPassword,
-        userType: "candidate", // Enforce candidate role
+        userType: formData.userType, // Use state value
       };
 
       await signup(payload);
@@ -165,6 +165,9 @@ const Signup = () => {
                 <span className="text-sm font-medium text-gray-300">Recruiter</span>
               </label>
             </div> */}
+
+            {/* Hidden userType field */}
+            <input type="hidden" name="userType" value="candidate" />
 
             <button
               type="submit"

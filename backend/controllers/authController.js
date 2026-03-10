@@ -3,6 +3,8 @@ const { check, validationResult } = require("express-validator");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const User = require("../models/user");
+const { OAuth2Client } = require("google-auth-library");
+const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
 
 // 🔹 Helper: Generate JWT
 const generateToken = (user) =>
@@ -33,7 +35,7 @@ exports.signup = [
     }
 
     try {
-      const { userName, email, password, userType } = req.body;
+      const { userName, email, password, userType, fullname, phoneNumber, company } = req.body;
 
       const existingUser = await User.findOne({ email });
       if (existingUser)
@@ -42,9 +44,14 @@ exports.signup = [
       const hashedPassword = await bcrypt.hash(password, 12);
       const user = await User.create({
         userName,
+        fullname: fullname || userName,
         email,
+        phoneNumber,
         password: hashedPassword,
         userType,
+        company: company || undefined,
+        authProvider: 'local',
+        hasPassword: true
       });
 
       const token = generateToken(user);
@@ -278,4 +285,176 @@ exports.register = async (req, res) => {
         console.log(error);
         return res.status(500).json({ message: "Internal server error", success: false });
     }
+};
+// ==================== GET COMPANY MEMBERS ====================
+exports.getCompanyMembers = async (req, res) => {
+    try {
+        const companyId = req.user.company;
+        if (!companyId) {
+            return res.status(400).json({
+                message: "No company associated with this account.",
+                success: false
+            });
+        }
+
+        const members = await User.find({ 
+            company: companyId
+        }).select("userName fullname email profile.profilePhoto updatedAt");
+
+        return res.status(200).json({
+            success: true,
+            members
+        });
+    } catch (error) {
+        console.error("fetch members error:", error);
+        return res.status(500).json({ message: "Internal server error", success: false });
+    }
+};
+
+// ==================== GOOGLE LOGIN ====================
+exports.googleLogin = async (req, res) => {
+  const { idToken } = req.body;
+
+  if (!idToken) {
+    return res.status(400).json({ message: "Google ID Token is required", success: false });
+  }
+
+  try {
+    const ticket = await client.verifyIdToken({
+      idToken,
+      audience: process.env.GOOGLE_CLIENT_ID,
+    });
+
+    const payload = ticket.getPayload();
+    const { sub: googleId, email, name, picture } = payload;
+
+    let user = await User.findOne({ email });
+
+    if (user) {
+      // User exists, update googleId if not present (merging local to google)
+      if (!user.googleId) {
+        user.googleId = googleId;
+        user.authProvider = user.authProvider === 'local' ? 'local' : 'google'; // Keep as local if they already have a password
+        await user.save();
+      }
+    } else {
+      // Create new candidate user
+      user = await User.create({
+        userName: name,
+        fullname: name,
+        email,
+        googleId,
+        authProvider: 'google',
+        hasPassword: false,
+        userType: 'candidate',
+        profile: {
+          profilePhoto: picture || ""
+        }
+      });
+    }
+
+    const token = generateToken(user);
+    
+    const userResponse = {
+      id: user._id,
+      _id: user._id,
+      userName: user.userName,
+      fullname: user.fullname,
+      email: user.email,
+      userType: user.userType,
+      role: user.userType,
+      profile: user.profile,
+      authProvider: user.authProvider,
+      hasPassword: user.hasPassword,
+      createdAt: user.createdAt,
+    };
+
+    res.status(200).cookie("token", token, { maxAge: 1 * 24 * 60 * 60 * 1000, httpOnly: true, sameSite: 'none', secure: true }).json({
+      message: `Welcome ${userResponse.fullname}`,
+      user: userResponse,
+      token,
+      success: true
+    });
+  } catch (error) {
+    console.error("Google login error:", error);
+    res.status(500).json({ message: "Google authentication failed", success: false, error: error.message });
+  }
+};
+
+// ==================== SET PASSWORD (For OAuth users) ====================
+exports.setPassword = async (req, res) => {
+  const { password, confirmPassword } = req.body;
+  const userId = req.user.id;
+
+  if (!password || !confirmPassword) {
+    return res.status(400).json({ message: "Password and confirmation are required", success: false });
+  }
+
+  if (password !== confirmPassword) {
+    return res.status(400).json({ message: "Passwords do not match", success: false });
+  }
+
+  if (password.length < 6) {
+    return res.status(400).json({ message: "Password must be at least 6 characters", success: false });
+  }
+
+  try {
+    const user = await User.findById(userId);
+    if (!user) return res.status(404).json({ message: "User not found", success: false });
+
+    if (user.hasPassword) {
+      return res.status(400).json({ message: "Password already set. Use Change Password instead.", success: false });
+    }
+
+    const hashedPassword = await bcrypt.hash(password, 12);
+    user.password = hashedPassword;
+    user.hasPassword = true;
+    await user.save();
+
+    res.status(200).json({ message: "Password set successfully", success: true });
+  } catch (error) {
+    console.error("Set password error:", error);
+    res.status(500).json({ message: "Failed to set password", success: false });
+  }
+};
+
+// ==================== CHANGE PASSWORD ====================
+exports.changePassword = async (req, res) => {
+  const { oldPassword, newPassword, confirmPassword } = req.body;
+  const userId = req.user.id;
+
+  if (!oldPassword || !newPassword || !confirmPassword) {
+    return res.status(400).json({ message: "All fields are required", success: false });
+  }
+
+  if (newPassword !== confirmPassword) {
+    return res.status(400).json({ message: "New passwords do not match", success: false });
+  }
+
+  if (newPassword.length < 6) {
+    return res.status(400).json({ message: "New password must be at least 6 characters", success: false });
+  }
+
+  try {
+    const user = await User.findById(userId).select("+password");
+    if (!user) return res.status(404).json({ message: "User not found", success: false });
+
+    if (!user.hasPassword) {
+      return res.status(400).json({ message: "No password set. Use Set Password instead.", success: false });
+    }
+
+    const isMatch = await bcrypt.compare(oldPassword, user.password);
+    if (!isMatch) {
+      return res.status(400).json({ message: "Incorrect current password", success: false });
+    }
+
+    const hashedPassword = await bcrypt.hash(newPassword, 12);
+    user.password = hashedPassword;
+    await user.save();
+
+    res.status(200).json({ message: "Password changed successfully", success: true });
+  } catch (error) {
+    console.error("Change password error:", error);
+    res.status(500).json({ message: "Failed to change password", success: false });
+  }
 };

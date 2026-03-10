@@ -36,7 +36,7 @@ const InterviewDashboard = () => {
   };
 
   return (
-    <div className="min-h-screen bg-[#09090b] text-white pt-24 px-8 pb-12 font-sans overflow-x-hidden relative">
+    <div className="min-h-screen bg-[#09090b] text-white pt-12 px-8 pb-12 font-sans overflow-x-hidden relative">
       <div className="fixed top-[-20%] left-[-10%] w-[60%] h-[60%] rounded-full bg-blue-900/20 blur-[120px] pointer-events-none" />
       <div className="fixed bottom-[-20%] right-[-10%] w-[50%] h-[50%] rounded-full bg-indigo-900/20 blur-[120px] pointer-events-none" />
       

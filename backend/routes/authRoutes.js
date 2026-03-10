@@ -10,6 +10,9 @@ authRoutes.post("/signup", authController.signup);
 // Login route
 authRoutes.post("/login", authController.login);
 
+// Google Login route
+authRoutes.post("/google-login", authController.googleLogin);
+
 // Logout route
 authRoutes.post("/logout", authController.logout);
 

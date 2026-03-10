@@ -31,7 +31,16 @@ const AppliedJobTable = ({ limit = null }) => {
                         ) : displayJobs.map((appliedJob) => (
                             <TableRow key={appliedJob._id}>
                                 <TableCell>{appliedJob?.createdAt?.split("T")[0]}</TableCell>
-                                <TableCell>{appliedJob?.job?.title}</TableCell>
+                                <TableCell>
+                                    <div className="flex items-center gap-2">
+                                        {appliedJob?.job?.title}
+                                        {appliedJob?.job?.status === 'inactive' && (
+                                            <Badge variant="outline" className="text-[10px] bg-red-500/10 text-red-500 border-red-500/20 px-1 py-0 h-4">
+                                                CLOSED
+                                            </Badge>
+                                        )}
+                                    </div>
+                                </TableCell>
                                 <TableCell>{appliedJob?.job?.company?.name}</TableCell>
                                 <TableCell className="text-right">
                                     <Badge variant="outline" className={`${appliedJob?.status === "rejected" ? 'bg-red-400' : appliedJob?.status === 'pending' ? 'bg-gray-400' : 'bg-green-400'}`}>

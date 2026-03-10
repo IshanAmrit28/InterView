@@ -12,6 +12,7 @@ const RecruiterSignup = () => {
     password: "",
     confirmPassword: "",
     company: "",
+    userType: "recruiter",
   });
   const [companies, setCompanies] = useState([]);
   const [error, setError] = useState("");
@@ -59,7 +60,7 @@ const RecruiterSignup = () => {
         email: formData.email,
         password: formData.password,
         confirmPassword: formData.confirmPassword,
-        role: "recruiter",
+        userType: formData.userType,
         company: formData.company,
       };
 
@@ -190,6 +191,9 @@ const RecruiterSignup = () => {
                     />
                 </div>
             </div>
+
+            {/* Hidden userType field */}
+            <input type="hidden" name="userType" value="recruiter" />
 
             <button
               type="submit"

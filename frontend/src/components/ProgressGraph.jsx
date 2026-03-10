@@ -46,7 +46,7 @@ const ProgressGraph = ({ reports }) => {
           hour: "2-digit",
           minute: "2-digit"
         }),
-        score: report.overallScore || 0,
+        score: report.overallScore ?? report.reportStructure?.overallScore ?? 0,
         role: report.role || "Interview",
       };
     });

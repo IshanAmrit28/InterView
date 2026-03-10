@@ -1,5 +1,6 @@
 // @ts-nocheck
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
+import { Badge } from '../../components/ui/badge'
 
 import { Label } from '../../components/ui/label'
 import { Input } from '../../components/ui/input'
@@ -32,15 +33,17 @@ const PostJob = () => {
     const { companies } = useSelector(/** @type {any} */ store => store.company);
     const { user } = useSelector(/** @type {any} */ store => store.auth);
 
+    const recruiterCompanyId = user?.company || user?.profile?.company;
+
     useEffect(() => {
         if (companies && companies.length === 1 && !input.companyId) {
             setInput(prev => ({ ...prev, companyId: companies[0]._id }));
-        } else if (companies && companies.length > 0 && user?.company && !input.companyId) {
+        } else if (companies && companies.length > 0 && recruiterCompanyId && !input.companyId) {
             // For recruiters, prioritize their linked company
-            const recruiterCompany = companies.find(c => c._id === user.company);
+            const recruiterCompany = companies.find(c => c._id === recruiterCompanyId);
             if (recruiterCompany) setInput(prev => ({ ...prev, companyId: recruiterCompany._id }));
         }
-    }, [companies, user, input.companyId]);
+    }, [companies, user, input.companyId, recruiterCompanyId]);
 
     const changeEventHandler = (e) => {
         setInput({ ...input, [e.target.name]: e.target.value });
@@ -170,7 +173,16 @@ const PostJob = () => {
 
                         <div className="space-y-2 md:col-span-2">
                             <Label className="text-gray-300">Company</Label>
-                            {companies.length > 0 ? (
+                            {recruiterCompanyId ? (
+                                <div className="p-4 bg-gray-800/30 border border-indigo-500/20 rounded-xl flex items-center justify-between">
+                                    <span className="text-indigo-400 font-bold text-lg">
+                                        {companies.find(c => c._id === recruiterCompanyId)?.name || "Loading Company..."}
+                                    </span>
+                                    <Badge variant="outline" className="bg-indigo-500/10 text-indigo-400 border-indigo-500/20 text-[10px]">
+                                        Assigned Organization
+                                    </Badge>
+                                </div>
+                            ) : companies.length > 0 ? (
                                 <Select onValueChange={(value) => setInput({...input, companyId: value})} value={input.companyId}>
                                     <SelectTrigger className="w-full bg-gray-800/50 border-gray-700 text-white focus:border-indigo-500 rounded-xl">
                                         <SelectValue placeholder="Select a Company" />

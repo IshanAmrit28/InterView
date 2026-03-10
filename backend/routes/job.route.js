@@ -8,5 +8,6 @@ router.post("/post", protect, isRecruiter, jobController.postJob);
 router.get("/get", jobController.getAllJobs);
 router.get("/getadminjobs", protect, isRecruiter, jobController.getAdminJobs);
 router.get("/get/:id", protect, jobController.getJobById);
+router.put("/status/:id", protect, isRecruiter, jobController.updateJobStatus);
 
 module.exports = router;

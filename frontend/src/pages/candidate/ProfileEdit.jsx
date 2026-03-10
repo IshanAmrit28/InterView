@@ -4,7 +4,116 @@ import api from '../../services/api';
 import { useDispatch } from 'react-redux';
 import { toast } from 'sonner';
 import { useAuth } from '../../context/AuthContext';
-import { ArrowLeft, AlertCircle, CheckCircle2, User, Phone, Mail, BookOpen, Wrench, FileText, Loader2, Save } from 'lucide-react';
+import { ArrowLeft, AlertCircle, CheckCircle2, User, Phone, Mail, BookOpen, Wrench, FileText, Loader2, Save, Lock, ShieldCheck } from 'lucide-react';
+import { setPassword, changePassword } from '../../services/authServices';
+
+const PasswordManager = () => {
+   const { user, loginUser } = useAuth();
+   const [pwLoading, setPwLoading] = useState(false);
+   const [pwData, setPwData] = useState({
+      oldPassword: "",
+      newPassword: "",
+      confirmPassword: ""
+   });
+
+   const handlePwChange = (e) => {
+      setPwData({ ...pwData, [e.target.name]: e.target.value });
+   };
+
+   const handlePasswordSubmit = async (e) => {
+      e.preventDefault();
+      if (pwData.newPassword !== pwData.confirmPassword) {
+         toast.error("Passwords do not match");
+         return;
+      }
+
+      setPwLoading(true);
+      try {
+         let response;
+         if (user?.hasPassword) {
+            response = await changePassword({
+               oldPassword: pwData.oldPassword,
+               newPassword: pwData.newPassword,
+               confirmPassword: pwData.confirmPassword
+            });
+         } else {
+            response = await setPassword({
+               password: pwData.newPassword,
+               confirmPassword: pwData.confirmPassword
+            });
+         }
+
+         if (response.success) {
+            toast.success(response.message);
+            setPwData({ oldPassword: "", newPassword: "", confirmPassword: "" });
+            // If we just set a password, update the user object locally
+            if (!user.hasPassword) {
+               loginUser({ ...user, hasPassword: true });
+            }
+         }
+      } catch (err) {
+         toast.error(err.response?.data?.message || "Failed to update password");
+      } finally {
+         setPwLoading(false);
+      }
+   };
+
+   return (
+      <div className="space-y-4 bg-gray-800/30 p-6 rounded-2xl border border-gray-800/50">
+         <div className="space-y-4">
+            {user?.hasPassword && (
+               <div className="space-y-1">
+                  <label className="text-xs font-medium text-gray-400 ml-1">Current Password</label>
+                  <input 
+                     type="password" 
+                     name="oldPassword"
+                     value={pwData.oldPassword}
+                     onChange={handlePwChange}
+                     className="w-full bg-gray-900/50 border border-gray-700 rounded-xl px-4 py-2 text-sm text-white focus:outline-none focus:border-indigo-500"
+                     placeholder="••••••••"
+                     required
+                  />
+               </div>
+            )}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+               <div className="space-y-1">
+                  <label className="text-xs font-medium text-gray-400 ml-1">New Password</label>
+                  <input 
+                     type="password" 
+                     name="newPassword"
+                     value={pwData.newPassword}
+                     onChange={handlePwChange}
+                     className="w-full bg-gray-900/50 border border-gray-700 rounded-xl px-4 py-2 text-sm text-white focus:outline-none focus:border-indigo-500"
+                     placeholder="••••••••"
+                     required
+                  />
+               </div>
+               <div className="space-y-1">
+                  <label className="text-xs font-medium text-gray-400 ml-1">Confirm New Password</label>
+                  <input 
+                     type="password" 
+                     name="confirmPassword"
+                     value={pwData.confirmPassword}
+                     onChange={handlePwChange}
+                     className="w-full bg-gray-900/50 border border-gray-700 rounded-xl px-4 py-2 text-sm text-white focus:outline-none focus:border-indigo-500"
+                     placeholder="••••••••"
+                     required
+                  />
+               </div>
+            </div>
+            <button 
+               type="button" 
+               onClick={handlePasswordSubmit}
+               disabled={pwLoading}
+               className="flex items-center gap-2 px-6 py-2.5 bg-gray-700 hover:bg-gray-600 text-gray-200 rounded-xl text-sm font-semibold transition disabled:opacity-50"
+            >
+               {pwLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : <ShieldCheck className="w-4 h-4" />}
+               {user?.hasPassword ? "Update Password" : "Save Password"}
+            </button>
+         </div>
+      </div>
+   );
+};
 
 const ProfileEdit = () => {
   const { user, loginUser } = useAuth();
@@ -270,6 +379,7 @@ const ProfileEdit = () => {
                  </div>
                </div>
 
+
                <button 
                  type="submit" 
                  disabled={loading}
@@ -279,6 +389,21 @@ const ProfileEdit = () => {
                  {loading ? 'Uploading & Saving...' : 'Save Complete Profile'}
                </button>
             </form>
+
+            {/* Password Management Section */}
+            <div className="mt-12 pt-8 border-t border-gray-800">
+               <h2 className="text-xl font-bold mb-4 flex items-center gap-2">
+                 <Lock className="w-5 h-5 text-yellow-500" /> 
+                 {user?.hasPassword ? "Change Password" : "Set Your Password"}
+               </h2>
+               <p className="text-sm text-gray-400 mb-6 font-medium">
+                 {user?.hasPassword 
+                   ? "Update your existing account password below." 
+                   : "Your account was created via Google. Set a password to enable manual login."}
+               </p>
+               
+               <PasswordManager />
+            </div>
          </div>
       </div>
     </div>

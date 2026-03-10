@@ -17,6 +17,10 @@ const applicationSchema = new mongoose.Schema({
         type: String,
         enum: ['pending', 'reviewing', 'shortlisted', 'rejected', 'accepted'],
         default: 'pending'
+    },
+    updatedBy: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'User'
     }
 }, { timestamps: true });
 
