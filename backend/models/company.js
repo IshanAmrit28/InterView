@@ -23,6 +23,11 @@ const companySchema = new mongoose.Schema({
         ref: 'User',
         required: true,
         index: true
+    },
+    status: {
+        type: String,
+        enum: ['active', 'inactive'],
+        default: 'active'
     }
 }, { timestamps: true });
 

@@ -78,7 +78,8 @@ exports.getAppliedJobs = async (req, res) => {
 exports.getApplicants = async (req, res) => {
     try {
         const jobId = req.params.id;
-        const job = await Job.findById(jobId).populate({
+        // Find job and ensure it belongs to the recruiter's company
+        const job = await Job.findOne({ _id: jobId, company: req.user.company }).populate({
             path: 'applications',
             options: { sort: { createdAt: -1 } },
             populate: {

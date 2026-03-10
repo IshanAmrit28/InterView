@@ -29,6 +29,8 @@ const Login = () => {
       loginUser(response.user);
       if (response.user.role === 'recruiter' || response.user.userType === 'recruiter') {
         navigate("/recruiter/companies");
+      } else if (response.user.role === 'admin' || response.user.userType === 'admin') {
+        navigate("/admin/dashboard");
       } else {
         navigate("/candidate/dashboard");
       }

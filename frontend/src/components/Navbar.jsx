@@ -65,10 +65,16 @@ function Navbar() {
           {isAuthenticated ? (
             <>
               <button 
-                className="profile-icon-btn"
+                className="profile-icon-btn overflow-hidden p-0 flex items-center justify-center"
                 onClick={() => setIsProfileOpen(!isProfileOpen)}
               >
-                {user?.userName ? user.userName.substring(0, 2).toUpperCase() : <User className="w-5 h-5" />}
+                {user?.profile?.profilePhoto ? (
+                  <img src={user.profile.profilePhoto} alt="Profile" className="w-full h-full object-cover" />
+                ) : user?.userName ? (
+                  user.userName.substring(0, 2).toUpperCase()
+                ) : (
+                  <User className="w-5 h-5" />
+                )}
               </button>
 
               {isProfileOpen && (

@@ -105,7 +105,7 @@ function TopicDetail() {
                 <div style={{ textAlign: 'center', padding: 60, color: 'white' }}>
                     <h2>Topic Not Found</h2>
                     <br />
-                    <Link to="/dashboard" className="back-btn">← Back to Dashboard</Link>
+                    <Link to="/candidate/dashboard" className="back-btn">← Back to Dashboard</Link>
                 </div>
             </div>
         )
@@ -120,7 +120,7 @@ function TopicDetail() {
             <div className="max-w-wrapper">
                 {/* Header */}
                 <div className="topic-header glass-card" style={{ marginTop: 24 }}>
-                    <button onClick={() => navigate('/dashboard')} className="back-btn">
+                    <button onClick={() => navigate('/candidate/dashboard')} className="back-btn">
                         <ArrowLeft size={18} /> Back to Dashboard
                     </button>
 

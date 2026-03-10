@@ -18,7 +18,8 @@ adminRouter.post("/questions", adminController.createQuestion);
 // Delete a question
 adminRouter.delete("/questions/:id", adminController.deleteQuestion);
 
-// Update a question's category
-adminRouter.put("/questions/:id/category", adminController.categorizeQuestion);
+// ==================== COMPANY MANAGEMENT ====================
+const companyController = require("../controllers/company.controller");
+adminRouter.get("/companies/public", companyController.getPublicCompanies);
 
 module.exports = adminRouter;

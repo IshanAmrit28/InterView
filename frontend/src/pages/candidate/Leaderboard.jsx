@@ -112,8 +112,8 @@ const Leaderboard = () => {
                  <tbody>
                    {data.leaderboard.map((u, i) => (
                      <tr 
-                       key={u.id}
-                       onClick={() => navigate(`/profile/${u.id}`)} 
+                       key={u._id}
+                       onClick={() => navigate(`/candidate/profile/${u._id}`)} 
                        className={`border-b border-slate-800/50 hover:bg-slate-800/30 cursor-pointer transition-colors ${u.email === user.email ? 'bg-indigo-900/20 hover:bg-indigo-900/30' : ''}`}
                      >
                        <td className="px-6 py-4 font-medium text-gray-400">

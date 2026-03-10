@@ -8,6 +8,7 @@ import { useNavigate } from 'react-router-dom'
 
 const CompaniesTable = () => {
     const { companies, searchCompanyByText } = useSelector(/** @type {any} */ (store) => store.company || {});
+    const { user } = useSelector((store) => store.auth);
     const [filterCompany, setFilterCompany] = useState(companies);
     const navigate = useNavigate();
     useEffect(()=>{
@@ -50,16 +51,23 @@ const CompaniesTable = () => {
                                     </TableCell>
                                     <TableCell className="font-medium">{company.name}</TableCell>
                                     <TableCell>{company.createdAt.split("T")[0]}</TableCell>
-                                    <TableCell className="text-right cursor-pointer">
-                                        <Popover>
-                                            <PopoverTrigger><MoreHorizontal className="text-gray-400 hover:text-white transition-colors" /></PopoverTrigger>
-                                            <PopoverContent className="w-32 bg-gray-900 border-gray-800 text-gray-200 shadow-xl">
-                                                <div onClick={()=> navigate(`/recruiter/companies/${company._id}`)} className='flex items-center gap-2 w-full cursor-pointer hover:bg-gray-800 p-2 rounded-md transition-colors'>
-                                                    <Edit2 className='w-4 text-indigo-400' />
-                                                    <span>Edit</span>
-                                                </div>
-                                            </PopoverContent>
-                                        </Popover>
+                                    <TableCell className="text-right">
+                                        {user?.userType === 'admin' ? (
+                                            <Popover>
+                                                <PopoverTrigger><MoreHorizontal className="text-gray-400 hover:text-white transition-colors cursor-pointer" /></PopoverTrigger>
+                                                <PopoverContent className="w-32 bg-gray-900 border-gray-800 text-gray-200 shadow-xl">
+                                                    <div 
+                                                        onClick={()=> navigate(user?.userType === 'admin' ? `/admin/companies/${company._id}` : `/recruiter/companies/${company._id}`)} 
+                                                        className='flex items-center gap-2 w-full cursor-pointer hover:bg-gray-800 p-2 rounded-md transition-colors'
+                                                    >
+                                                        <Edit2 className='w-4 text-indigo-400' />
+                                                        <span>Edit</span>
+                                                    </div>
+                                                </PopoverContent>
+                                            </Popover>
+                                        ) : (
+                                            <span className="text-xs text-gray-500 italic">View Only</span>
+                                        )}
                                     </TableCell>
                                 </TableRow>
                             ))

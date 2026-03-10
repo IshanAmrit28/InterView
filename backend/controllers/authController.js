@@ -100,6 +100,7 @@ exports.login = async (req, res) => {
       role: user.userType,
       phoneNumber: user.phoneNumber,
       profile: user.profile,
+      company: user.company,
       // Use user.get('report') to bypass IDE TypeScript strict checking for virtuals
       report: user.get('report'), 
       createdAt: user.createdAt,
@@ -129,21 +130,10 @@ exports.updateProfile = async (req, res) => {
   try {
       const { fullname, email, phoneNumber, bio, skills, userName } = req.body;
       
-      const file = req.file;
-      let cloudResponse;
-      if(file) {
-        const getDataUri = require("../utils/datauri.js");
-        const cloudinary = require("../utils/cloudinary.js");
-        const fileUri = getDataUri(file);
-        cloudResponse = await cloudinary.uploader.upload(fileUri.content, {
-          resource_type: "raw" // Allows uploading PDFs and documents
-        });
-      }
+      const files = req.files;
+      const getDataUri = require("../utils/datauri.js");
+      const cloudinary = require("../utils/cloudinary.js");
 
-      let skillsArray;
-      if(skills){
-          skillsArray = skills.split(",");
-      }
       const userId = req.id || req.user.id; // middleware authentication
       let user = await User.findById(userId);
 
@@ -152,6 +142,55 @@ exports.updateProfile = async (req, res) => {
               message: "User not found.",
               success: false
           });
+      }
+
+      if(!user.profile) {
+          user.profile = { skills: [], profilePhoto: "" };
+      }
+
+      // Handle Profile Photo Upload
+      if (files && files.profilePhoto) {
+          const profilePhotoFile = files.profilePhoto[0];
+          const fileUri = getDataUri(profilePhotoFile);
+          const cloudResponse = await cloudinary.uploader.upload(fileUri.content, {
+              folder: "profile_photos",
+              resource_type: "image"
+          });
+          user.profile.profilePhoto = cloudResponse.secure_url;
+      }
+
+      // Handle Resume Upload (Field name "resume")
+      if (files && files.resume) {
+          const resumeFile = files.resume[0];
+          const fileUri = getDataUri(resumeFile);
+          const cloudResponse = await cloudinary.uploader.upload(fileUri.content, {
+              folder: "resumes",
+              resource_type: "raw"
+          });
+          user.profile.resume = cloudResponse.secure_url;
+          user.profile.resumeOriginalName = resumeFile.originalname;
+      }
+
+      // Handle Legacy File Upload (Field name "file")
+      if (files && files.file) {
+        const legacyFile = files.file[0];
+        const fileUri = getDataUri(legacyFile);
+        // Determine if it's an image or a document based on mimetype
+        const isImage = legacyFile.mimetype.startsWith('image/');
+        const cloudResponse = await cloudinary.uploader.upload(fileUri.content, {
+            resource_type: isImage ? "image" : "raw"
+        });
+        if (isImage) {
+            user.profile.profilePhoto = cloudResponse.secure_url;
+        } else {
+            user.profile.resume = cloudResponse.secure_url;
+            user.profile.resumeOriginalName = legacyFile.originalname;
+        }
+    }
+
+      let skillsArray;
+      if(skills){
+          skillsArray = skills.split(",");
       }
       
       // updating data
@@ -162,15 +201,6 @@ exports.updateProfile = async (req, res) => {
       if(bio) user.profile.bio = bio;
       if(skills) user.profile.skills = skillsArray;
     
-      // resume comes later here...
-      if(cloudResponse){
-          if(!user.profile) {
-              user.profile = { skills: [], profilePhoto: "" };
-          }
-          user.profile.resume = cloudResponse.secure_url; // save the cloudinary url
-          user.profile.resumeOriginalName = file.originalname; // Save the original file name
-      }
-
       await user.save();
 
       const userResponse = {
@@ -234,6 +264,7 @@ exports.register = async (req, res) => {
             phoneNumber,
             password: hashedPassword,
             userType: role,
+            company: role === 'recruiter' ? req.body.company : undefined,
             profile:{
                 profilePhoto: cloudResponse ? cloudResponse.secure_url : "",
             }

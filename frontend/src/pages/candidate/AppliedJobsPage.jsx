@@ -17,7 +17,7 @@ const AppliedJobsPage = () => {
                 <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
                     <div className="flex items-center gap-4">
                         <button 
-                            onClick={() => navigate('/profile')}
+                            onClick={() => navigate('/candidate/profile')}
                             className="p-2 hover:bg-gray-200 dark:hover:bg-gray-800 rounded-full transition-colors"
                             aria-label="Back to Dashboard"
                         >

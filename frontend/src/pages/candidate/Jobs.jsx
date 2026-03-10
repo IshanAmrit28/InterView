@@ -5,9 +5,11 @@ import Job from '../../components/Job';
 import { useSelector } from 'react-redux';
 import { motion } from 'framer-motion';
 import useGetAllJobs from '../../hooks/useGetAllJobs';
+import useGetAppliedJobs from '../../hooks/useGetAppliedJobs';
 
 const Jobs = () => {
     useGetAllJobs();
+    useGetAppliedJobs();
     const { allJobs, searchedQuery } = useSelector(store => store.job);
     const [filterJobs, setFilterJobs] = useState(allJobs);
 

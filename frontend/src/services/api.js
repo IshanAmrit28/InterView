@@ -23,6 +23,13 @@ api.interceptors.response.use(
     return response;
   },
   (error) => {
+    // Log the error for debugging
+    if (error.response) {
+      console.error(`[API_ERROR] ${error.config.method.toUpperCase()} ${error.config.url} - Status: ${error.response.status}`, error.response.data);
+    } else {
+      console.error(`[API_ERROR] ${error.config.method.toUpperCase()} ${error.config.url} - No response received`, error.message);
+    }
+
     // Standardize text/HTML proxy crashes natively sent by misconfigured backends
     if (error.response && error.response.data && typeof error.response.data === "string") {
       error.response.data = {

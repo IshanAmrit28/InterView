@@ -13,6 +13,11 @@ export const registerCompany = async (data) => {
     return await api.post(`${COMPANY_API_END_POINT}/register`, data);
 };
 
+export const fetchPublicCompanies = async () => {
+    const res = await api.get(`${COMPANY_API_END_POINT}/public`);
+    return res.data;
+};
+
 export const updateCompany = async (id, data) => {
     return await api.put(`${COMPANY_API_END_POINT}/update/${id}`, data);
 };

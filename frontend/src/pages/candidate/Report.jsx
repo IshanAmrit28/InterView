@@ -130,7 +130,7 @@ const Report = () => {
             {/* <p className="text-gray-400 mt-1">Report ID: {reportId}</p> */}
           </div>
           <button
-            onClick={() => navigate("/practice")}
+            onClick={() => navigate("/candidate/practice")}
             className="bg-blue-600 hover:bg-blue-500 text-white px-6 py-3 rounded-lg font-semibold transition"
           >
             Start New Practice

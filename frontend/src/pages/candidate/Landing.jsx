@@ -11,7 +11,7 @@ function Landing() {
     const handleStartPracticing = (e) => {
         e.preventDefault();
         if (user) {
-            navigate('/dashboard');
+            navigate('/candidate/dashboard');
         } else {
             navigate('/login');
         }
@@ -53,7 +53,7 @@ function Landing() {
                             Start Practicing Free
                             <ArrowRight size={20} className="btn-icon-right" />
                         </button>
-                        <Link to="/roadmap" className="btn-modern btn-outline-glass">
+                        <Link to="/candidate/roadmap" className="btn-modern btn-outline-glass">
                             <Target size={20} className="btn-icon-left" />
                             Explore Roadmaps
                         </Link>

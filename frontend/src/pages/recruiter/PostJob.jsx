@@ -29,7 +29,19 @@ const PostJob = () => {
     const [loading, setLoading]= useState(false);
     const navigate = useNavigate();
 
-    const { companies } = useSelector(store => store.company);
+    const { companies } = useSelector(/** @type {any} */ store => store.company);
+    const { user } = useSelector(/** @type {any} */ store => store.auth);
+
+    useEffect(() => {
+        if (companies && companies.length === 1 && !input.companyId) {
+            setInput(prev => ({ ...prev, companyId: companies[0]._id }));
+        } else if (companies && companies.length > 0 && user?.company && !input.companyId) {
+            // For recruiters, prioritize their linked company
+            const recruiterCompany = companies.find(c => c._id === user.company);
+            if (recruiterCompany) setInput(prev => ({ ...prev, companyId: recruiterCompany._id }));
+        }
+    }, [companies, user, input.companyId]);
+
     const changeEventHandler = (e) => {
         setInput({ ...input, [e.target.name]: e.target.value });
     };
@@ -41,6 +53,13 @@ const PostJob = () => {
 
     const submitHandler = async (e) => {
         e.preventDefault();
+        const { title, description, requirements, salary, location, jobType, experience, position, companyId } = input;
+        
+        if (!title || !description || !requirements || !salary || !location || !jobType || !experience || !position || !companyId) {
+            toast.error("Please fill in all required fields including company.");
+            return;
+        }
+
         try {
             setLoading(true);
             const res = await postJob(input);
@@ -49,7 +68,7 @@ const PostJob = () => {
                 navigate("/recruiter/jobs");
             }
         } catch (error) {
-            toast.error(error.response.data.message);
+            toast.error(error.response?.data?.message || "Failed to post job");
         } finally{
             setLoading(false);
         }
@@ -64,7 +83,7 @@ const PostJob = () => {
                 <form onSubmit={submitHandler} className='bg-gray-900/60 border border-gray-800 rounded-3xl p-8 backdrop-blur-md shadow-2xl'>
                     <div className="mb-8 border-b border-gray-800 pb-6">
                         <h1 className="text-3xl font-bold">Post a New Job</h1>
-                        <p className="text-gray-400 mt-2">Fill in the job details to publish to the board.</p>
+                        <p className="text-gray-400 mt-2">Publish a job for your company.</p>
                     </div>
                 
                     <div className='grid grid-cols-1 md:grid-cols-2 gap-6'>
@@ -148,28 +167,26 @@ const PostJob = () => {
                                 className="bg-gray-800/50 border-gray-700 text-white focus:border-indigo-500 rounded-xl"
                             />
                         </div>
-                        
-                        <div className="space-y-2 md:col-span-2 mt-2">
-                             <Label className="text-gray-300">Target Company</Label>
-                             {companies.length > 0 ? (
-                                <Select onValueChange={selectChangeHandler}>
-                                    <SelectTrigger className="w-full bg-gray-800/50 border border-gray-700 text-white rounded-xl py-3 h-12">
+
+                        <div className="space-y-2 md:col-span-2">
+                            <Label className="text-gray-300">Company</Label>
+                            {companies.length > 0 ? (
+                                <Select onValueChange={(value) => setInput({...input, companyId: value})} value={input.companyId}>
+                                    <SelectTrigger className="w-full bg-gray-800/50 border-gray-700 text-white focus:border-indigo-500 rounded-xl">
                                         <SelectValue placeholder="Select a Company" />
                                     </SelectTrigger>
-                                    <SelectContent className="bg-gray-800 border-gray-700 text-white">
+                                    <SelectContent className="bg-gray-900 border-gray-800 text-white">
                                         <SelectGroup>
-                                            {
-                                                companies.map((company) => {
-                                                    return (
-                                                        <SelectItem key={company._id} value={company?.name?.toLowerCase()} className="hover:bg-gray-700 focus:bg-gray-700 focus:text-white cursor-pointer">{company.name}</SelectItem>
-                                                    )
-                                                })
-                                            }
+                                            {companies.map((company) => (
+                                                <SelectItem key={company._id} value={company._id} className="hover:bg-gray-800 focus:bg-gray-800">
+                                                    {company.name}
+                                                </SelectItem>
+                                            ))}
                                         </SelectGroup>
                                     </SelectContent>
                                 </Select>
                             ) : (
-                                <p className='text-sm text-red-500 bg-red-500/10 p-4 border border-red-500/20 rounded-xl'>*You must create a company before posting a job.</p>
+                                <p className='text-red-400 text-sm'>Please register a company first before posting a job.</p>
                             )}
                         </div>
                     </div> 

@@ -21,7 +21,7 @@ exports.postJob = async (req, res) => {
             jobType,
             experienceLevel: experience,
             position,
-            company: companyId,
+            company: req.user.company || companyId, // Prefer recruiter's assigned company
             created_by: userId
         });
         return res.status(201).json({
@@ -89,7 +89,7 @@ exports.getJobById = async (req, res) => {
 exports.getAdminJobs = async (req, res) => {
     try {
         const adminId = req.id;
-        const jobs = await Job.find({ created_by: adminId }).populate({
+        const jobs = await Job.find({ company: req.user.company }).populate({
             path: 'company',
             options: { sort: { createdAt: -1 } }
         });

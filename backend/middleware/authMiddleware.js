@@ -1,66 +1,51 @@
-//backend\middleware\authMiddleware.js
 const jwt = require("jsonwebtoken");
 const User = require("../models/user");
 
-// Middleware to protect routes (PROTECT remains the same)
 const protect = async (req, res, next) => {
-  let token; // Check for "Authorization: Bearer <token>" or cookies
-
-  if (
-    req.headers.authorization &&
-    req.headers.authorization.startsWith("Bearer")
-  ) {
-    token = req.headers.authorization.split(" ")[1]; // Verify token
-  } else if (req.cookies && req.cookies.token) {
-    token = req.cookies.token;
-  }
-
-  if (token) {
-    try {
-      const decoded = jwt.verify(token, process.env.JWT_SECRET);
-
-      // Backward compatibility: jobboard uses userId, main app uses id
-      const userId = decoded.id || decoded.userId;
-
-      req.user = await User.findById(userId).select("-password");
-      req.id = userId; // To make it compatible with jobboard controllers
-
-      if (!req.user) {
-        return res.status(401).json({ message: "User not found" });
-      }
-
-      next();
-    } catch (error) {
-      console.error("JWT Error:", error.message);
-      return res.status(401).json({ message: "Not authorized, token invalid" });
+    let token;
+    if (req.headers.authorization?.startsWith("Bearer")) {
+        token = req.headers.authorization.split(" ")[1];
+    } else if (req.cookies?.token) {
+        token = req.cookies.token;
     }
-  } else {
-    return res
-      .status(401)
-      .json({ message: "Not authorized, no token provided" });
-  }
+
+    if (!token) return res.status(401).json({ success: false, message: "No token provided" });
+
+    try {
+        const decoded = jwt.verify(token, process.env.JWT_SECRET);
+        const userId = decoded.id || decoded.userId;
+        req.user = await User.findById(userId).select("-password");
+        req.id = userId;
+
+        if (!req.user) return res.status(401).json({ success: false, message: "User not found" });
+        next();
+    } catch (error) {
+        return res.status(401).json({ success: false, message: "Invalid token" });
+    }
 };
 
-// NEW: Middleware to check if the authenticated user is a recruiter
+// Normalized role helper to prevent case-sensitivity bugs
+const getRole = (user) => (user?.userType || "").toLowerCase().trim();
+
 const isRecruiter = (req, res, next) => {
-  // Check if req.user (attached by 'protect' middleware) exists and has the correct type
-  if (req.user && req.user.userType === "recruiter") {
-    next();
-  } else {
-    // Forbidden: 403 status code
-    res
-      .status(403)
-      .json({ message: "Access denied. Requires Recruiter privileges." });
-  }
+    if (getRole(req.user) === "recruiter") return next();
+    res.status(403).json({ success: false, message: "Access denied. Recruiter only." });
 };
 
-// NEW: Middleware to check if the authenticated user is a admin
 const isSuperAdmin = (req, res, next) => {
-  if (req.user && req.user.userType === "admin") {
-    next();
-  } else {
-    res.status(403).json({ message: "Access denied. Requires Super Admin privileges." });
-  }
+    if (getRole(req.user) === "admin") return next();
+    res.status(403).json({ success: false, message: "Access denied. Admin only." });
 };
 
-module.exports = { protect, isRecruiter, isSuperAdmin };
+const isCandidate = (req, res, next) => {
+    if (getRole(req.user) === "candidate") return next();
+    res.status(403).json({ success: false, message: "Access denied. Candidate only." });
+};
+
+const isAdminOrRecruiter = (req, res, next) => {
+    const role = getRole(req.user);
+    if (role === "admin" || role === "recruiter") return next();
+    res.status(403).json({ success: false, message: "Access denied. Requires Admin or Recruiter privileges." });
+};
+
+module.exports = { protect, isRecruiter, isSuperAdmin, isCandidate, isAdminOrRecruiter };

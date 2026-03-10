@@ -3,7 +3,7 @@ const User = require("../models/user");
 
 // Compute a strictly Codeforces-style user rating based on chronological reports
 const computeUserRating = (reports) => {
-  let currentRating = 0; // Base Elo for a new user
+  let currentRating = 1000; // Base rating for all users
 
   if (!reports || reports.length === 0) return currentRating;
 
@@ -37,43 +37,20 @@ const computeUserRating = (reports) => {
 };
 
 const getGlobalRankings = async () => {
-    // Aggregate rankings by looking at all users
-    const users = await User.find({ userType: "candidate" });
+    // 1. Fetch all candidates sorted by their persistent rating
+    const users = await User.find({ userType: "candidate" })
+      .select("_id userName email rating profile")
+      .sort({ rating: -1 })
+      .lean();
     
-    // Group candidates by unique email ID
-    const emailGroupMap = {};
-    for (const cand of users) {
-      if (!cand.email) continue;
-      const emailLower = cand.email.toLowerCase();
-      if (!emailGroupMap[emailLower]) {
-        emailGroupMap[emailLower] = {
-           userId: cand._id,
-           userName: cand.userName,
-           email: emailLower,
-           candidateIds: []
-        };
-      }
-      emailGroupMap[emailLower].candidateIds.push(cand._id);
-    }
-    
-    const uniqueCandidates = Object.values(emailGroupMap);
-    const rankings = [];
-
-    for (const group of uniqueCandidates) {
-        // Fetch reports matching any instance of this linked email
-        const reports = await Report.find({ candidateId: { $in: group.candidateIds } });
-        const rating = computeUserRating(reports);
-        rankings.push({
-            userId: group.userId, // Return primary candidate ID
-            userName: group.userName,
-            email: group.email,    // Send email to match strictly on frontend
-            rating: rating
-        });
-    }
-
-    // Sort descending
-    rankings.sort((a, b) => b.rating - a.rating);
-    return rankings;
+    // 2. Map to the simplified ranking structure
+    return users.map(user => ({
+        userId: user._id, 
+        userName: user.userName,
+        email: user.email ? user.email.toLowerCase() : "",
+        rating: user.rating || 1000,
+        profilePhoto: user.profile ? user.profile.profilePhoto : ""
+    }));
 };
 
 exports.getDashboardData = async (req, res) => {
@@ -272,6 +249,7 @@ exports.getPublicProfile = async (req, res) => {
       success: true,
       data: {
         userName: user.userName,
+        profilePhoto: user.profile ? user.profile.profilePhoto : "",
         profileData: {
             rating,
             rank,

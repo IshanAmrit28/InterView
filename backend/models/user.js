@@ -41,6 +41,11 @@ const userSchema = new mongoose.Schema(
             default:""
         }
     },
+    company:{
+        type:mongoose.Schema.Types.ObjectId,
+        ref:'Company',
+        index: true
+    },
     rating: {
       type: Number,
       default: 1000,

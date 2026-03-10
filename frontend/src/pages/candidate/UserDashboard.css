@@ -18,12 +18,12 @@
 }
 
 .react-calendar-heatmap .color-empty {
-  fill: rgba(30, 41, 59, 0.5); /* Deep slate */
+  fill: #1e293b; /* Slate-800 - much better for dark theme */
 }
 
 /* Custom color scales mapping to indigo intensities */
 .react-calendar-heatmap .color-scale-1 {
-  fill: #312e81; /* indigo-900 */
+  fill: #3730a3; /* indigo-800 */
 }
 
 .react-calendar-heatmap .color-scale-2 {
@@ -35,7 +35,7 @@
 }
 
 .react-calendar-heatmap .color-scale-4 {
-  fill: #818cf8; /* indigo-400 */
+  fill: #a5b4fc; /* indigo-300 - high contrast for most active */
 }
 
 /* Add a hover effect to heatmap rects */

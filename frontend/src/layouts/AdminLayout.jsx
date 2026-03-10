@@ -1,11 +1,14 @@
-import { Outlet } from "react-router-dom";
+import { Outlet, useLocation } from "react-router-dom";
 import AdminNavbar from "../components/AdminNavbar.jsx";
 
 const AdminLayout = () => {
+  const location = useLocation();
+  const hideNavbar = location.pathname.includes("/login") || location.pathname.includes("/signup");
+
   return (
     <>
-      <AdminNavbar />
-      <main className="main-content">
+      {!hideNavbar && <AdminNavbar />}
+      <main className={!hideNavbar ? "main-content" : ""}>
         <Outlet />
       </main>
     </>

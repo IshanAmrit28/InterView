@@ -18,7 +18,7 @@ const PracticeSetup = () => {
   const fileInputRef = useRef(null);
 
   // Navigate back to the mock dashboard
-  const onClose = () => navigate("/practice");
+  const onClose = () => navigate("/candidate/practice");
 
   const handleFileChange = (e) => {
     const file = e.target.files[0];
@@ -51,7 +51,7 @@ const PracticeSetup = () => {
       const result = await startInterview(formData);
 
       // Navigate to the interview room, passing the critical data
-      navigate("/interview", {
+      navigate("/candidate/interview", {
         state: {
           reportId: result.reportId,
           reportStructure: result.reportStructure,

@@ -54,7 +54,7 @@ const InterviewDashboard = () => {
           </div>
           
           <button
-            onClick={() => navigate("/practice-setup")}
+            onClick={() => navigate("/candidate/practice-setup")}
             className="group relative flex items-center gap-3 px-8 py-4 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 rounded-2xl font-bold text-lg shadow-[0_0_40px_-10px_rgba(79,70,229,0.5)] hover:shadow-[0_0_60px_-15px_rgba(79,70,229,0.7)] transition-all duration-300 hover:-translate-y-1 overflow-hidden"
           >
             <div className="absolute inset-0 w-full h-full bg-white/20 -translate-x-full group-hover:animate-[shimmer_1.5s_infinite]" />
@@ -92,7 +92,7 @@ const InterviewDashboard = () => {
                   You haven't completed any mock interviews. Click the start button above to launch your first session!
                 </p>
                 <button
-                  onClick={() => navigate("/practice-setup")}
+                  onClick={() => navigate("/candidate/practice-setup")}
                   className="text-indigo-400 font-semibold hover:text-indigo-300 transition-colors"
                 >
                   Start your first interview &rarr;
@@ -132,7 +132,7 @@ const InterviewDashboard = () => {
                         </td>
                         <td className="p-4 text-right">
                           <button
-                            onClick={() => navigate(`/report/${report.reportId}`)}
+                            onClick={() => navigate(`/candidate/report/${report.reportId}`)}
                             className="inline-flex items-center gap-2 px-4 py-2 bg-gray-800 hover:bg-gray-700 text-indigo-400 hover:text-indigo-300 rounded-lg font-medium text-sm transition-all group-hover:shadow-md"
                           >
                             View Report
@@ -163,7 +163,7 @@ const InterviewDashboard = () => {
                     </div>
                     <p className="text-gray-400 text-sm mb-4">{formatDate(report.createdAt)}</p>
                     <button
-                      onClick={() => navigate(`/report/${report.reportId}`)}
+                      onClick={() => navigate(`/candidate/report/${report.reportId}`)}
                       className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-gray-800 hover:bg-gray-700 text-indigo-400 rounded-lg font-medium text-sm transition-all"
                     >
                       View Full Report

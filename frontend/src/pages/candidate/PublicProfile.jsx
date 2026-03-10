@@ -6,6 +6,7 @@ import { Loader2, ArrowLeft, Trophy, Target, Calendar as CalendarIcon } from 'lu
 import { ResponsiveContainer, BarChart, CartesianGrid, XAxis, YAxis, Tooltip as RechartsTooltip, Bar, Cell } from 'recharts';
 import CalendarHeatmap from 'react-calendar-heatmap';
 import 'react-calendar-heatmap/dist/styles.css';
+import './UserDashboard.css';
 
 const PublicProfile = () => {
   const { id } = useParams();
@@ -25,7 +26,7 @@ const PublicProfile = () => {
 
     // If viewing own profile, redirect to private dashboard
     if (user.id === id || user._id === id) {
-       navigate('/profile');
+       navigate('/candidate/profile');
        return;
     }
 
@@ -64,7 +65,7 @@ const PublicProfile = () => {
           <h2 className="text-2xl font-bold mb-4">Profile Unavailable</h2>
           <p className="mb-6">{error}</p>
           <button 
-            onClick={() => navigate('/leaderboard')}
+            onClick={() => navigate('/candidate/leaderboard')}
             className="px-6 py-2.5 bg-indigo-600 hover:bg-indigo-700 rounded-xl transition font-medium flex items-center justify-center gap-2 mx-auto"
           >
             <ArrowLeft className="w-4 h-4" /> Back to Leaderboard
@@ -105,7 +106,7 @@ const PublicProfile = () => {
       
       <div className="max-w-4xl mx-auto relative z-10 space-y-8">
         
-        <button onClick={() => navigate('/leaderboard')} className="flex items-center gap-2 text-gray-400 hover:text-white transition group w-max">
+        <button onClick={() => navigate('/candidate/leaderboard')} className="flex items-center gap-2 text-gray-400 hover:text-white transition group w-max">
             <ArrowLeft className="w-5 h-5 group-hover:-translate-x-1 transition-transform" />
             <span className="font-medium">Leaderboard</span>
         </button>
@@ -114,9 +115,13 @@ const PublicProfile = () => {
         <div className="bg-gradient-to-br from-gray-900/60 to-gray-800/40 border border-gray-800 rounded-3xl p-8 backdrop-blur-md shadow-xl flex flex-col md:flex-row items-center gap-8 lg:gap-12 relative overflow-hidden">
              
              <div className="flex-shrink-0 relative">
-               <div className="w-24 h-24 md:w-32 md:h-32 rounded-full bg-gradient-to-br from-indigo-500/50 via-purple-500/50 to-pink-500/50 p-1">
-                 <div className="w-full h-full bg-gray-900 rounded-full flex items-center justify-center text-3xl font-extrabold uppercase tracking-widest text-transparent bg-clip-text bg-gradient-to-br from-indigo-100 to-purple-200">
-                   {userName?.substring(0, 2) || "U"}
+               <div className="w-24 h-24 md:w-32 md:h-32 rounded-full bg-gradient-to-br from-indigo-500/50 via-purple-500/50 to-pink-500/50 p-1 flex items-center justify-center overflow-hidden">
+                 <div className="w-full h-full bg-gray-900 rounded-full flex items-center justify-center text-3xl font-extrabold uppercase tracking-widest text-transparent bg-clip-text bg-gradient-to-br from-indigo-100 to-purple-200 overflow-hidden">
+                   {profileData.profilePhoto ? (
+                     <img src={profileData.profilePhoto} alt="Profile" className="w-full h-full object-cover" />
+                   ) : (
+                     userName?.substring(0, 2) || "U"
+                   )}
                  </div>
                </div>
                {stats.rank === 1 && (
@@ -205,11 +210,22 @@ const PublicProfile = () => {
 
             {/* Activity Heatmap */}
             <div className="bg-gray-900/40 border border-gray-800 rounded-3xl p-6 md:p-8 backdrop-blur-md shadow-xl overflow-hidden flex flex-col justify-center">
-               <div className="flex items-center gap-3 mb-4">
-                  <CalendarIcon className="w-5 h-5 text-pink-400" />
-                  <div>
-                     <h2 className="text-sm uppercase tracking-wider font-bold text-gray-300">Activity Grid</h2>
-                     <p className="text-xs text-gray-400">1-Year History</p>
+               <div className="flex items-center justify-between w-full mb-4">
+                  <div className="flex items-center gap-3">
+                     <CalendarIcon className="w-5 h-5 text-pink-400" />
+                     <div>
+                        <h2 className="text-sm uppercase tracking-wider font-bold text-gray-300">Activity Grid</h2>
+                        <p className="text-xs text-gray-400">1-Year History</p>
+                     </div>
+                  </div>
+                  <div className="flex items-center gap-1.5 text-[9px] text-gray-400 bg-slate-800/40 px-3 py-1.5 rounded-full border border-slate-700/50">
+                     <span>Less</span>
+                     <div className="w-2 h-2 rounded-[1px] bg-[#1e293b]"></div>
+                     <div className="w-2 h-2 rounded-[1px] bg-[#3730a3]"></div>
+                     <div className="w-2 h-2 rounded-[1px] bg-[#4338ca]"></div>
+                     <div className="w-2 h-2 rounded-[1px] bg-[#6366f1]"></div>
+                     <div className="w-2 h-2 rounded-[1px] bg-[#a5b4fc]"></div>
+                     <span>More</span>
                   </div>
                </div>
 

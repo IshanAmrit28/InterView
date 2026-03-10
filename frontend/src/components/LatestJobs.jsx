@@ -4,7 +4,12 @@ import { useSelector } from 'react-redux';
 
 // const randomJobs = [1, 2, 3, 4, 5, 6, 7, 8];
 
+import useGetAllJobs from '../hooks/useGetAllJobs';
+import useGetAppliedJobs from '../hooks/useGetAppliedJobs';
+
 const LatestJobs = () => {
+    useGetAllJobs();
+    useGetAppliedJobs();
     const {allJobs} = useSelector(store=>store.job);
    
     return (

@@ -2,12 +2,14 @@ import React from 'react'
 import { Button } from './ui/button'
 import { Bookmark } from 'lucide-react'
 import { Avatar, AvatarImage } from './ui/avatar'
+import { useSelector } from 'react-redux'
 import { Badge } from './ui/badge'
 import { useNavigate } from 'react-router-dom'
 
 const Job = ({job}) => {
     const navigate = useNavigate();
-    // const jobId = "lsekdhjgdsnfvsdkjf";
+    const { allAppliedJobs } = useSelector(store => store.job);
+    const isApplied = allAppliedJobs?.some(application => application.job?._id === job?._id);
 
     const daysAgoFunction = (mongodbTime) => {
         const createdAt = new Date(mongodbTime);
@@ -45,8 +47,14 @@ const Job = ({job}) => {
                 <Badge className={'text-[#7209b7] font-bold'} variant="ghost">{job?.salary}LPA</Badge>
             </div>
             <div className='flex items-center gap-4 mt-4'>
-                <Button onClick={()=> navigate(`/description/${job?._id}`)} variant="outline">Details</Button>
-                <Button onClick={()=> navigate(`/description/${job?._id}`)} className="bg-[#7209b7]">Apply Now</Button>
+                <Button onClick={()=> navigate(`/candidate/description/${job?._id}`)} variant="outline">Details</Button>
+                {
+                    isApplied ? (
+                        <Button className="bg-emerald-600 cursor-default opacity-90 hover:bg-emerald-600">Applied</Button>
+                    ) : (
+                        <Button onClick={()=> navigate(`/candidate/description/${job?._id}`)} className="bg-[#7209b7]">Apply Now</Button>
+                    )
+                }
             </div>
         </div>
     )

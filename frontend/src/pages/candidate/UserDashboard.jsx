@@ -14,6 +14,7 @@ import {
 } from 'lucide-react';
 import CalendarHeatmap from 'react-calendar-heatmap';
 import 'react-calendar-heatmap/dist/styles.css';
+import './UserDashboard.css';
 import { 
   BarChart, Bar, Legend, Cell, CartesianGrid, XAxis, YAxis, Tooltip as RechartsTooltip, ResponsiveContainer
 } from 'recharts';
@@ -184,9 +185,13 @@ const UserDashboard = () => {
                  <div className="absolute top-0 right-0 w-64 h-64 bg-indigo-500/10 rounded-full blur-[80px]" />
                  
                  <div className="flex-shrink-0 relative">
-                   <div className="w-24 h-24 md:w-32 md:h-32 rounded-full bg-gradient-to-br from-indigo-500 via-purple-500 to-pink-500 p-1">
-                     <div className="w-full h-full bg-white dark:bg-gray-900 rounded-full flex items-center justify-center text-3xl font-extrabold uppercase tracking-widest text-transparent bg-clip-text bg-gradient-to-br from-indigo-600 to-purple-600 dark:from-indigo-300 dark:to-purple-300">
-                       {user?.userName?.substring(0, 2) || "U"}
+                   <div className="w-24 h-24 md:w-32 md:h-32 rounded-full bg-gradient-to-br from-indigo-500 via-purple-500 to-pink-500 p-1 flex items-center justify-center overflow-hidden">
+                     <div className="w-full h-full bg-white dark:bg-gray-900 rounded-full flex items-center justify-center text-3xl font-extrabold uppercase tracking-widest text-transparent bg-clip-text bg-gradient-to-br from-indigo-600 to-purple-600 dark:from-indigo-300 dark:to-purple-300 overflow-hidden">
+                       {user?.profile?.profilePhoto ? (
+                         <img src={user.profile.profilePhoto} alt="Profile" className="w-full h-full object-cover" />
+                       ) : (
+                         user?.userName?.substring(0, 2) || "U"
+                       )}
                      </div>
                    </div>
                    {profileData.rank === 1 && (
@@ -203,7 +208,7 @@ const UserDashboard = () => {
                         <Star className="w-4 h-4" /> Global Talent Profile
                       </p>
                       <button
-                        onClick={() => navigate('/profile/edit')}
+                        onClick={() => navigate('/candidate/profile/edit')}
                         className="flex items-center gap-2 px-4 py-1.5 bg-indigo-500/10 hover:bg-indigo-500/20 text-indigo-400 border border-indigo-500/30 rounded-full text-sm font-medium transition-colors cursor-pointer"
                       >
                         Edit Profile
@@ -318,7 +323,7 @@ const UserDashboard = () => {
                         <h2 className="text-lg font-bold">Applied Jobs</h2>
                      </div>
                      <button 
-                       onClick={() => navigate('/applied-jobs')}
+                       onClick={() => navigate('/candidate/applied-jobs')}
                        className="py-1.5 px-4 bg-blue-500/10 hover:bg-blue-500/20 text-blue-500 hover:text-blue-400 text-sm font-medium rounded-lg transition-colors flex items-center justify-center gap-2 border border-blue-500/20 whitespace-nowrap"
                      >
                        View All
@@ -343,10 +348,10 @@ const UserDashboard = () => {
                     <div className="flex items-center gap-1.5 text-[10px] text-gray-400 bg-slate-800/50 px-3 py-1.5 rounded-full border border-slate-700">
                        <span>Less</span>
                        <div className="w-2.5 h-2.5 rounded-[2px] bg-[#1e293b]"></div>
-                       <div className="w-2.5 h-2.5 rounded-[2px] bg-indigo-900"></div>
-                       <div className="w-2.5 h-2.5 rounded-[2px] bg-indigo-700"></div>
-                       <div className="w-2.5 h-2.5 rounded-[2px] bg-indigo-500"></div>
-                       <div className="w-2.5 h-2.5 rounded-[2px] bg-indigo-400"></div>
+                       <div className="w-2.5 h-2.5 rounded-[2px] bg-[#3730a3]"></div>
+                       <div className="w-2.5 h-2.5 rounded-[2px] bg-[#4338ca]"></div>
+                       <div className="w-2.5 h-2.5 rounded-[2px] bg-[#6366f1]"></div>
+                       <div className="w-2.5 h-2.5 rounded-[2px] bg-[#a5b4fc]"></div>
                        <span>More</span>
                     </div>
                  </div>
@@ -392,8 +397,8 @@ const UserDashboard = () => {
                            const isCurrentUser = user && u.email === user.email;
                            return (
                              <div 
-                               key={u.id}
-                               onClick={() => { if (!isCurrentUser) navigate(`/profile/${u.id}`); }} 
+                               key={u._id}
+                               onClick={() => { if (!isCurrentUser) navigate(`/candidate/profile/${u._id}`); }} 
                                className={`flex items-center justify-between p-3 rounded-xl transition-colors ${
                                   isCurrentUser ? 'bg-indigo-900/20 border border-indigo-500/30' : 'hover:bg-slate-800/40 cursor-pointer border border-transparent'
                                }`}
@@ -428,7 +433,7 @@ const UserDashboard = () => {
               {/* Link to Full Leaderboard */}
               <div className="bg-[#111b27]/80 border-t border-slate-800 p-3 flex justify-center items-center">
                  <button 
-                   onClick={() => navigate('/leaderboard')}
+                   onClick={() => navigate('/candidate/leaderboard')}
                    className="w-full py-2.5 bg-indigo-600/10 hover:bg-indigo-600/20 text-indigo-300 hover:text-indigo-200 text-sm font-semibold rounded-lg border border-indigo-500/20 transition-colors flex items-center justify-center gap-2"
                  >
                    View Full Leaderboard

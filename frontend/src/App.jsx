@@ -65,7 +65,7 @@ function AppContent() {
         }}
       >
         <Routes>
-          {/* Public Auth & Landing Routes (In Candidate Layout natively but outside /candidate path) */}
+          {/* Public Auth & Landing Routes */}
           <Route element={<CandidateLayout />}>
             <Route path="/" element={<Landing />} />
             <Route path="/login" element={<Login />} />
@@ -74,29 +74,28 @@ function AppContent() {
             {/* Candidate Role Protected Routes */}
             <Route path="/candidate/*" element={<CandidateRoutes />} />
             
-            {/* Explicit core roots as requested */}
+            {/* Explicit core roots */}
             <Route element={<ProtectedRoute allowedRoles={["candidate"]} />}>
               <Route path="/dashboard" element={<Dashboard />} />
               <Route path="/profile" element={<Profile />} />
               <Route path="/jobs" element={<Jobs />} />
               <Route path="/roadmap" element={<Roadmap />} />
             </Route>
-
           </Route>
 
-          {/* Fallback & Forbidden */}
+          {/* Recruiter Routes */}
+          <Route element={<RecruiterLayout />}>
+            <Route path="/recruiter/*" element={<RecruiterRoutes />} />
+          </Route>
+
+          {/* Admin Routes */}
+          <Route element={<AdminLayout />}>
+            <Route path="/admin/*" element={<AdminRoutes />} />
+          </Route>
+
+          {/* Forbidden & 404 */}
           <Route path="/forbidden" element={<Forbidden />} />
           <Route path="*" element={<NotFound />} />
-
-          {/* Recruiter Role Nested Routes */}
-          <Route path="/recruiter" element={<RecruiterLayout />}>
-            <Route path="*" element={<RecruiterRoutes />} />
-          </Route>
-
-          {/* Admin Role Nested Routes */}
-          <Route path="/admin" element={<AdminLayout />}>
-            <Route path="*" element={<AdminRoutes />} />
-          </Route>
         </Routes>
       </div>
     </div>

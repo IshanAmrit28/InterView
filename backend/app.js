@@ -1,23 +1,12 @@
-//backend\app.js
-// Core Module
 const path = require("path");
 require("dotenv").config();
-
-// FATAL STARTUP VALIDATION: Prevent token forgery by enforcing JWT_SECRET
-if (!process.env.JWT_SECRET || process.env.JWT_SECRET.trim() === "") {
-  console.error("FATAL ERROR: JWT_SECRET environment variable is missing or empty. Server cannot start securely.");
-  process.exit(1);
-}
-
-// External Module
 const express = require("express");
-const { default: mongoose } = require("mongoose");
+const mongoose = require("mongoose");
 const cors = require("cors");
-//Local Module
+const cookieParser = require("cookie-parser");
 
+// LOCAL MODULES - Routes
 const questionRouter = require("./routes/questionRoutes");
-const errorsController = require("./controllers/errors");
-
 const authRoutes = require("./routes/authRoutes");
 const userRouter = require("./routes/userRoutes");
 const reportRouter = require("./routes/reportRoutes");
@@ -28,36 +17,52 @@ const chatRouter = require("./routes/chatRoutes");
 const leaderboardRoutes = require("./routes/leaderboardRoutes");
 const resumeAnalyzerRoutes = require("./routes/resumeAnalyzerRoutes");
 const jobTrackerRoutes = require("./routes/jobTrackerRoutes");
+const companyRouter = require("./routes/company.route");
+const jobBoardRouter = require("./routes/job.route");
+const applicationRouter = require("./routes/application.route");
+const errorsController = require("./controllers/errors");
+
+// FATAL STARTUP VALIDATION
+if (!process.env.JWT_SECRET || process.env.JWT_SECRET.trim() === "") {
+  console.error("FATAL ERROR: JWT_SECRET is missing. Server cannot start.");
+  process.exit(1);
+}
 
 const app = express();
 
-// FIX: Ensure body parsers are executed FIRST to populate req.body
-app.use(express.urlencoded({ extended: true })); // Handles application/x-www-form-urlencoded
-app.use(express.json()); // Handles application/json (used by Login/Signup)
-const cookieParser = require("cookie-parser");
+// MIDDLEWARE
+app.use(express.urlencoded({ extended: true }));
+app.use(express.json());
 app.use(cookieParser());
 
 app.use(
   cors({
-    origin: ["http://localhost:5173", "http://localhost:5174", "https://inter-view-swart.vercel.app"], // Allow specific origins
+    origin: ["http://localhost:5173", "http://localhost:5174", "https://inter-view-swart.vercel.app"],
     methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
     allowedHeaders: ["Content-Type", "Authorization"],
     credentials: true,
-  }),
-); // CORS should also run before the routers
+  })
+);
 
+// Minimal logging to keep console clean
 app.use((req, res, next) => {
-  console.log("[GLOBAL LOG]", req.method, req.originalUrl || req.url);
+  console.log(`[${req.method}] ${req.originalUrl}`);
   next();
 });
 
-const companyRouter = require("./routes/company.route");
-const jobBoardRouter = require("./routes/job.route");
-const applicationRouter = require("./routes/application.route");
+// ROUTES
+app.use("/ping", (req, res) => res.send("PONG"));
 
+// Company & Job Board Core
+app.use("/company", companyRouter);
+app.use("/job", jobBoardRouter);
+app.use("/application", applicationRouter);
+app.use("/user", userRouter);
+
+// Interview & Platform Features
+app.use("/auth", authRoutes);
 app.use("/questions", questionRouter);
 app.use("/interview", reportRouter);
-app.use("/auth", (req, res, next) => { console.log("HIT API V1 AUTH", req.method, req.url); next(); }, authRoutes);
 app.use("/youtube", youtubeRouter);
 app.use("/admin", adminRouter);
 app.use("/dashboard", dashboardRouter);
@@ -66,17 +71,11 @@ app.use("/resume", resumeAnalyzerRoutes);
 app.use("/job-tracker", jobTrackerRoutes);
 app.use("/chat", chatRouter);
 
-// Job Board Routes
-app.use("/user", userRouter); // Alias for Job Board Auth
-app.use("/company", companyRouter);
-app.use("/job", jobBoardRouter);
-app.use("/application", applicationRouter);
-
+// ERROR HANDLING
 app.use(errorsController.pageNotFound);
 
-// Global Error Handler
 app.use((err, req, res, next) => {
-  console.error("Global Error:", err.stack);
+  console.error("Server Error:", err.message);
   res.status(500).json({
     success: false,
     message: err.message || "Internal Server Error"
@@ -89,11 +88,11 @@ const MONGO_URL = process.env.MONGO_URL;
 mongoose
   .connect(MONGO_URL)
   .then(() => {
-    console.log("Connected to MongoDB using Mongoose");
+    console.log("MongoDB Connected");
     app.listen(PORT, () => {
-      console.log(`Server running on address http://localhost:${PORT}`);
+      console.log(`Server: http://localhost:${PORT}`);
     });
   })
   .catch((err) => {
-    console.log("Error connecting to MongoDB with Mongoose", err);
+    console.error("MongoDB Connection Error:", err.message);
   });

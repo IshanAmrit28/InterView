@@ -21,7 +21,12 @@ const ProfileEdit = () => {
       phoneNumber: user?.phoneNumber || "",
       bio: user?.profile?.bio || "",
       skills: user?.profile?.skills?.join(",") || "",
-      file: null
+      profilePhoto: null,
+      resume: null
+  });
+
+  const [previews, setPreviews] = useState({
+      profilePhoto: user?.profile?.profilePhoto || ""
   });
 
   if (!user) {
@@ -34,8 +39,18 @@ const ProfileEdit = () => {
   }
 
   const fileChangeHandler = (e) => {
+      const field = e.target.name;
       const file = e.target.files?.[0];
-      setInput({ ...input, file })
+      if (file) {
+          setInput({ ...input, [field]: file });
+          if (field === 'profilePhoto') {
+              const reader = new FileReader();
+              reader.onloadend = () => {
+                  setPreviews({ ...previews, profilePhoto: reader.result });
+              };
+              reader.readAsDataURL(file);
+          }
+      }
   }
 
   const handleSubmit = async (e) => {
@@ -56,8 +71,11 @@ const ProfileEdit = () => {
       formData.append("phoneNumber", input.phoneNumber);
       formData.append("bio", input.bio);
       formData.append("skills", input.skills);
-      if (input.file) {
-          formData.append("file", input.file);
+      if (input.profilePhoto) {
+          formData.append("profilePhoto", input.profilePhoto);
+      }
+      if (input.resume) {
+          formData.append("resume", input.resume);
       }
 
       const response = await api.post(`/user/profile/update`, formData, {
@@ -69,7 +87,7 @@ const ProfileEdit = () => {
         // Sync the updated user info to context and redux
         loginUser(response.data.user);
         toast.success(response.data.message);
-        setTimeout(() => navigate('/profile'), 1500);
+        setTimeout(() => navigate('/candidate/profile'), 1500);
       }
     } catch (err) {
        setError(err.response?.data?.message || err.message || "Failed to update profile");
@@ -85,7 +103,7 @@ const ProfileEdit = () => {
       <div className="fixed bottom-[-20%] right-[-10%] w-[50%] h-[50%] rounded-full bg-purple-900/10 blur-[120px] pointer-events-none" />
       
       <div className="max-w-2xl w-full relative z-10 space-y-8 mt-8">
-         <button onClick={() => navigate('/profile')} className="flex items-center gap-2 text-gray-400 hover:text-white transition group w-max mb-4">
+         <button onClick={() => navigate('/candidate/profile')} className="flex items-center gap-2 text-gray-400 hover:text-white transition group w-max mb-4">
             <ArrowLeft className="w-5 h-5 group-hover:-translate-x-1 transition-transform" />
             <span className="font-medium">Back to Profile</span>
          </button>
@@ -109,6 +127,31 @@ const ProfileEdit = () => {
             )}
 
             <form onSubmit={handleSubmit} className="space-y-6">
+               {/* Profile Photo Upload Section */}
+               <div className="flex flex-col items-center justify-center mb-8">
+                  <div className="relative group">
+                    <div className="w-32 h-32 rounded-full overflow-hidden border-4 border-indigo-500/30 bg-gray-800 flex items-center justify-center shadow-xl">
+                       {previews.profilePhoto ? (
+                         <img src={previews.profilePhoto} alt="Profile Preview" className="w-full h-full object-cover" />
+                       ) : (
+                         <User className="w-16 h-16 text-gray-600" />
+                       )}
+                    </div>
+                    <label htmlFor="photo-upload" className="absolute bottom-0 right-0 bg-indigo-600 hover:bg-indigo-700 p-2 rounded-full cursor-pointer shadow-lg transition-all transform group-hover:scale-110">
+                       <Save className="w-4 h-4 text-white" />
+                       <input 
+                         type="file" 
+                         id="photo-upload" 
+                         name="profilePhoto" 
+                         accept="image/*" 
+                         onChange={fileChangeHandler} 
+                         className="hidden" 
+                       />
+                    </label>
+                  </div>
+                  <p className="text-xs text-gray-500 mt-3 italic text-center">Click the icon to upload a new profile picture</p>
+               </div>
+
                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                    <div className="space-y-2">
                      <label className="text-sm font-medium text-gray-300 flex items-center gap-2">
@@ -203,25 +246,25 @@ const ProfileEdit = () => {
                     <input 
                       type="file" 
                       accept="application/pdf"
-                      id="file-upload"
-                      name="file"
+                      id="resume-upload"
+                      name="resume"
                       onChange={fileChangeHandler}
                       className="hidden"
                     />
                     <label 
-                      htmlFor="file-upload"
+                      htmlFor="resume-upload"
                       className="cursor-pointer bg-gray-800 hover:bg-gray-700 border border-gray-700 rounded-xl px-4 py-3 text-gray-300 transition flex-1 text-center"
                     >
-                      {input.file ? input.file.name : "Choose a new PDF file to upload"}
+                      {input.resume ? input.resume.name : "Choose a new PDF file to upload"}
                     </label>
-                    {user?.profile?.resume && !input.file && (
+                    {(user?.profile?.resume || input.resume) && (
                         <a 
-                          href={user.profile.resume} 
+                          href={input.resume ? URL.createObjectURL(input.resume) : user.profile.resume} 
                           target="_blank" 
                           rel="noopener noreferrer" 
                           className="bg-indigo-600/20 hover:bg-indigo-600/40 text-indigo-400 px-4 py-3 rounded-xl transition whitespace-nowrap border border-indigo-500/30"
                         >
-                          View Current
+                          View {input.resume ? 'New' : 'Current'}
                         </a>
                     )}
                  </div>

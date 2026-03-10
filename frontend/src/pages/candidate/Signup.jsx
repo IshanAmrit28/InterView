@@ -35,7 +35,7 @@ const Signup = () => {
         email: formData.email,
         password: formData.password,
         confirmPassword: formData.confirmPassword,
-        userType: formData.role,
+        userType: "candidate", // Enforce candidate role
       };
 
       await signup(payload);
@@ -140,8 +140,8 @@ const Signup = () => {
               </div>
             </div>
 
-            {/* Role Selection */}
-            <div className="flex items-center justify-around bg-[#1a1a1a] p-3 rounded-lg border border-gray-800 mt-2">
+            {/* Role Selection - Disabled for candidate signup portal */}
+            {/* <div className="flex items-center justify-around bg-[#1a1a1a] p-3 rounded-lg border border-gray-800 mt-2">
               <label className="flex items-center gap-2 cursor-pointer">
                 <input
                   type="radio"
@@ -164,7 +164,7 @@ const Signup = () => {
                 />
                 <span className="text-sm font-medium text-gray-300">Recruiter</span>
               </label>
-            </div>
+            </div> */}
 
             <button
               type="submit"

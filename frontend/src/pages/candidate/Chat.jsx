@@ -9,7 +9,7 @@ function Chat() {
     {
       id: 1,
       sender: "ai",
-      text: "Hello. I am **Naruto**. How can I assist you with your studies today?",
+      text: "Hello! I am **Naruto Uzumaki**, your Sensei for today. Are you ready for some serious training to land that dream role? Let's give it our all! **Dattebayo!**",
     },
   ]);
   const [input, setInput] = useState("");
@@ -144,10 +144,10 @@ function Chat() {
         <div className="chat-header">
           <div className="chat-title-group">
             <div className="bot-avatar-large">
-              <Bot size={24} />
+              <img src="/naruto-sensei.png" alt="Naruto Sensei" style={{ width: '100%', height: '100%', borderRadius: 'inherit', objectFit: 'cover' }} />
             </div>
             <div>
-              <h1
+              <h2
                 style={{
                   fontSize: 16,
                   fontWeight: 600,
@@ -155,8 +155,8 @@ function Chat() {
                   color: "var(--text-main)",
                 }}
               >
-                Naruto Sensie
-              </h1>
+                Naruto Sensei
+              </h2>
               <div
                 style={{
                   display: "flex",
@@ -176,8 +176,12 @@ function Chat() {
         <div className="messages-area">
           {messages.map((msg) => (
             <div key={msg.id} className={`message-wrapper ${msg.sender}`}>
-              <div className="message-avatar">
-                {msg.sender === "ai" ? <Bot size={18} /> : <User size={18} />}
+              <div className="message-avatar overflow-hidden">
+                {msg.sender === "ai" ? (
+                   <img src="/naruto-sensei.png" alt="Naruto" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                ) : (
+                   <User size={18} />
+                )}
               </div>
               <div className="message-bubble">
                 {msg.sender === "ai" && (
@@ -204,8 +208,8 @@ function Chat() {
           ))}
           {isLoading && (
             <div className="message-wrapper ai">
-              <div className="message-avatar">
-                <Bot size={18} />
+              <div className="message-avatar overflow-hidden">
+                <img src="/naruto-sensei.png" alt="Naruto" className="animate-pulse" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
               </div>
               <div
                 className="message-bubble"
