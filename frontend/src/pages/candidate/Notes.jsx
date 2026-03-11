@@ -2,12 +2,20 @@ import { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import { Folder, Search, FileText, Download, ExternalLink } from 'lucide-react'
 import { pdfNotes, categories, searchNotes, getNotesByCategory } from '../../data/notesData'
+import DocumentViewer from '../../components/shared/DocumentViewer'
 
 import './Notes.css'
 
 function Notes() {
     const [activeCategory, setActiveCategory] = useState('All')
     const [searchQuery, setSearchQuery] = useState('')
+    const [viewerOpen, setViewerOpen] = useState(false);
+    const [selectedNote, setSelectedNote] = useState(null);
+
+    const openNote = (note) => {
+        setSelectedNote(note);
+        setViewerOpen(true);
+    };
 
     const displayedNotes = searchQuery
         ? searchNotes(searchQuery)
@@ -98,15 +106,13 @@ function Notes() {
                                 </div>
 
                                 <div style={{ marginTop: 12, display: 'flex', gap: 8 }}>
-                                    <a
-                                        href={`/PLACEMENT NOTES/${note.fileName}`}
-                                        target="_blank"
-                                        rel="noopener noreferrer"
+                                    <button
+                                        onClick={() => openNote(note)}
                                         className="pdf-action-btn"
-                                        style={{ flexGrow: 1 }}
+                                        style={{ flexGrow: 1, border: 'none', cursor: 'pointer' }}
                                     >
-                                        <ExternalLink size={14} /> Open PDF
-                                    </a>
+                                        <ExternalLink size={14} /> Open Preview
+                                    </button>
                                     <a
                                         href={`/PLACEMENT NOTES/${note.fileName}`}
                                         download
@@ -123,10 +129,15 @@ function Notes() {
                             </div>
                         )}
                     </div>
-
                 </div>
-
             </div>
+
+            <DocumentViewer 
+                isOpen={viewerOpen}
+                onClose={() => setViewerOpen(false)}
+                fileUrl={selectedNote ? encodeURI(`/PLACEMENT NOTES/${selectedNote.fileName}`) : ''}
+                fileName={selectedNote?.title}
+            />
         </div>
     )
 }

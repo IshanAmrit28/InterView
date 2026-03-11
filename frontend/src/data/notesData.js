@@ -2,8 +2,7 @@
 export const pdfNotes = [
     // DSA & Algorithms
     { id: 1, title: 'Best DSA Concepts for FAANG', category: 'DSA', difficulty: 'Hard', fileName: 'Best DSA concepts for FAANG.pdf', tags: ['algorithms', 'interview', 'faang'] },
-    { id: 1, title: 'Best DSA Concepts for FAANG', category: 'DSA', difficulty: 'Hard', fileName: 'Best DSA concepts for FAANG.pdf', tags: ['algorithms', 'interview', 'faang'] },
-    { id: 3, title: 'Graph Data Structure', category: 'DSA', difficulty: 'Hard', fileName: 'Graph Data Structure.pdf', tags: ['graphs', 'algorithms'] },
+    { id: 2, title: 'Graph Data Structure', category: 'DSA', difficulty: 'Hard', fileName: 'Graph Data Structure.pdf', tags: ['graphs', 'algorithms'] },
     { id: 4, title: 'Last Minute DSA Revision Sheet', category: 'DSA', difficulty: 'Medium', fileName: 'Last Minute DSA Revision Sheet.pdf', tags: ['revision', 'quick-reference'] },
     { id: 5, title: 'LeetCode Important Questions & Solutions', category: 'DSA', difficulty: 'Hard', fileName: 'Leetcode Important Questions Solutions -1.pdf', tags: ['leetcode', 'solutions'] },
     { id: 6, title: 'SDE Questions', category: 'DSA', difficulty: 'Hard', fileName: 'SDE Questions.pdf', tags: ['sde', 'interview'] },

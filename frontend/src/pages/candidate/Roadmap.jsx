@@ -72,7 +72,7 @@ const externalRoadmaps = {
 }
 
 function Roadmap() {
-    const [selectedRoadmap, setSelectedRoadmap] = useState('frontend')
+    const [selectedRoadmap, setSelectedRoadmap] = useState(null)
     const [selectedTab, setSelectedTab] = useState('internal')
     const [expandedMilestones, setExpandedMilestones] = useState({})
     const [completedMilestones, setCompletedMilestones] = useState(() => {
@@ -207,159 +207,184 @@ function Roadmap() {
                         })}
                     </div>
 
-                    {/* Roadmap Header */}
-                    <div className="roadmap-header" style={{ background: currentRoadmap.color }}>
-                        <div className="roadmap-header-content">
-                            <div className="roadmap-icon-large">
-                                {getRoadmapIcon(currentRoadmap.id, 64)}
-                            </div>
-                            <div>
-                                <h2>{currentRoadmap.title}</h2>
-                                <p>{currentRoadmap.description}</p>
-                            </div>
-                        </div>
-                        <div className="roadmap-stats">
-                            <div className="roadmap-stat">
-                                <Clock size={20} />
-                                <span>{currentRoadmap.estimatedTime}</span>
-                            </div>
-                            <div className="roadmap-stat">
-                                <BookOpen size={20} />
-                                <span>{currentRoadmap.milestones.length} Modules</span>
-                            </div>
-                            {getCompletionPercentage(currentRoadmap.id) > 0 && (
-                                <div className="roadmap-stat">
-                                    <TrendingUp size={20} />
-                                    <span>{getCompletionPercentage(currentRoadmap.id)}% Done</span>
-                                </div>
-                            )}
-                        </div>
-                    </div>
-
-                    {/* Timeline */}
-                    <div className="roadmap-timeline">
-                        {currentRoadmap.milestones.length > 0 ? currentRoadmap.milestones.map((milestone, index) => {
-                            const isCompleted = isMilestoneCompleted(currentRoadmap.id, milestone.id)
-                            const isExpanded = expandedMilestones[milestone.id]
-
-                            return (
-                                <div key={milestone.id} className={`milestone-card ${isCompleted ? 'completed' : ''}`}>
-                                    {/* Timeline Connector */}
-                                    <div className="timeline-connector">
-                                        <div className="timeline-dot" style={{
-                                            background: isCompleted ? '#10b981' : getDifficultyColor(milestone.difficulty)
-                                        }}>
-                                            {isCompleted ? (
-                                                <Check size={16} color="white" strokeWidth={3} />
-                                            ) : (
-                                                <span className="milestone-number">{index + 1}</span>
-                                            )}
-                                        </div>
-                                        {index < currentRoadmap.milestones.length - 1 && (
-                                            <div className={`timeline-line ${isCompleted ? 'completed' : ''}`} />
-                                        )}
+                    {currentRoadmap ? (
+                        <>
+                            {/* Roadmap Header */}
+                            <div className="roadmap-header" style={{ background: currentRoadmap.color }}>
+                                <div className="roadmap-header-content">
+                                    <div className="roadmap-icon-large">
+                                        {getRoadmapIcon(currentRoadmap.id, 64)}
                                     </div>
-
-                                    {/* Milestone Content */}
-                                    <div className="milestone-content">
-                                        <div className="milestone-header-row" onClick={() => toggleExpand(milestone.id)}>
-                                            <div className="milestone-title-section">
-                                                <div className="milestone-top-badges">
-                                                    <span
-                                                        className="difficulty-badge"
-                                                        style={{ color: getDifficultyColor(milestone.difficulty), borderColor: getDifficultyColor(milestone.difficulty) }}
-                                                    >
-                                                        {milestone.difficulty}
-                                                    </span>
-                                                    <span className="time-badge">
-                                                        <Clock size={12} />
-                                                        {milestone.estimatedHours}h
-                                                    </span>
-                                                </div>
-                                                <h3>{milestone.title}</h3>
-                                                <p className="milestone-description">{milestone.description}</p>
-                                            </div>
-
-                                            <div className="milestone-actions">
-                                                <button
-                                                    className={`milestone-check-btn ${isCompleted ? 'checked' : ''}`}
-                                                    onClick={(e) => {
-                                                        e.stopPropagation()
-                                                        toggleMilestone(currentRoadmap.id, milestone.id)
-                                                    }}
-                                                    title={isCompleted ? "Mark as incomplete" : "Mark as complete"}
-                                                >
-                                                    {isCompleted ? <CheckCircle2 size={28} /> : <Circle size={28} />}
-                                                </button>
-                                                <button className="expand-btn">
-                                                    {isExpanded ? <ChevronUp size={20} /> : <ChevronDown size={20} />}
-                                                </button>
-                                            </div>
+                                    <div>
+                                        <h2>{currentRoadmap.title}</h2>
+                                        <p>{currentRoadmap.description}</p>
+                                    </div>
+                                </div>
+                                <div className="roadmap-stats">
+                                    <div className="roadmap-stat">
+                                        <Clock size={20} />
+                                        <span>{currentRoadmap.estimatedTime}</span>
+                                    </div>
+                                    <div className="roadmap-stat">
+                                        <BookOpen size={20} />
+                                        <span>{currentRoadmap.milestones.length} Modules</span>
+                                    </div>
+                                    {getCompletionPercentage(currentRoadmap.id) > 0 && (
+                                        <div className="roadmap-stat">
+                                            <TrendingUp size={20} />
+                                            <span>{getCompletionPercentage(currentRoadmap.id)}% Done</span>
                                         </div>
+                                    )}
+                                </div>
+                            </div>
 
-                                        {/* Expanded Content */}
-                                        {isExpanded && (
-                                            <div className="milestone-details">
-                                                <div className="milestone-section">
-                                                    <h4><PlayCircle size={16} /> Key Topics</h4>
-                                                    <div className="roadmap-milestone-body">
-                                                        {milestone.content && <div className="roadmap-milestone-content" style={{
-                                                            marginBottom: '1rem',
-                                                            lineHeight: '1.6',
-                                                            color: 'var(--text-main)',
-                                                            fontSize: '0.95rem',
-                                                            padding: '1rem',
-                                                            background: 'var(--bg-inset)',
-                                                            borderRadius: '8px',
-                                                            borderLeft: `4px solid ${currentRoadmap.color}`
-                                                        }}>
-                                                            {milestone.content}
+                            {/* Timeline */}
+                            <div className="roadmap-timeline">
+                                {currentRoadmap.milestones.length > 0 ? currentRoadmap.milestones.map((milestone, index) => {
+                                    const isCompleted = isMilestoneCompleted(currentRoadmap.id, milestone.id)
+                                    const isExpanded = expandedMilestones[milestone.id]
+
+                                    return (
+                                        <div key={milestone.id} className={`milestone-card ${isCompleted ? 'completed' : ''}`}>
+                                            {/* Timeline Connector */}
+                                            <div className="timeline-connector">
+                                                <div className="timeline-dot" style={{
+                                                    background: isCompleted ? '#10b981' : getDifficultyColor(milestone.difficulty)
+                                                }}>
+                                                    {isCompleted ? (
+                                                        <Check size={16} color="white" strokeWidth={3} />
+                                                    ) : (
+                                                        <span className="milestone-number">{index + 1}</span>
+                                                    )}
+                                                </div>
+                                                {index < currentRoadmap.milestones.length - 1 && (
+                                                    <div className={`timeline-line ${isCompleted ? 'completed' : ''}`} />
+                                                )}
+                                            </div>
+
+                                            {/* Milestone Content */}
+                                            <div className="milestone-content">
+                                                <div className="milestone-header-row" onClick={() => toggleExpand(milestone.id)}>
+                                                    <div className="milestone-title-section">
+                                                        <div className="milestone-top-badges">
+                                                            <span
+                                                                className="difficulty-badge"
+                                                                style={{ color: getDifficultyColor(milestone.difficulty), borderColor: getDifficultyColor(milestone.difficulty) }}
+                                                            >
+                                                                {milestone.difficulty}
+                                                            </span>
+                                                            <span className="time-badge">
+                                                                <Clock size={12} />
+                                                                {milestone.estimatedHours}h
+                                                            </span>
                                                         </div>
-                                                        }
-                                                        <div className="roadmap-topics-grid">
-                                                            {milestone.topics.map((topic, i) => (
-                                                                <div key={topic} className="roadmap-topic-chip">
-                                                                    {topic}
-                                                                </div>
-                                                            ))}
-                                                        </div>
+                                                        <h3>{milestone.title}</h3>
+                                                        <p className="milestone-description">{milestone.description}</p>
+                                                    </div>
+
+                                                    <div className="milestone-actions">
+                                                        <button
+                                                            className={`milestone-check-btn ${isCompleted ? 'checked' : ''}`}
+                                                            onClick={(e) => {
+                                                                e.stopPropagation()
+                                                                toggleMilestone(currentRoadmap.id, milestone.id)
+                                                            }}
+                                                            title={isCompleted ? "Mark as incomplete" : "Mark as complete"}
+                                                        >
+                                                            {isCompleted ? <CheckCircle2 size={28} /> : <Circle size={28} />}
+                                                        </button>
+                                                        <button className="expand-btn">
+                                                            {isExpanded ? <ChevronUp size={20} /> : <ChevronDown size={20} />}
+                                                        </button>
                                                     </div>
                                                 </div>
 
-                                                {milestone.resources && milestone.resources.length > 0 && (
-                                                    <div className="milestone-section">
-                                                        <h4><BookOpen size={16} /> Resources</h4>
-                                                        <div className="resources-list">
-                                                            {milestone.resources.map((resource, idx) => (
-                                                                <a
-                                                                    key={resource.url}
-                                                                    href={resource.url}
-                                                                    target="_blank"
-                                                                    rel="noopener noreferrer"
-                                                                    className="resource-link-item"
-                                                                >
-                                                                    <FileText size={14} />
-                                                                    {resource.title}
-                                                                    <ExternalLink size={12} className="ext-icon" />
-                                                                </a>
-                                                            ))}
+                                                {/* Expanded Content */}
+                                                {isExpanded && (
+                                                    <div className="milestone-details">
+                                                        <div className="milestone-section">
+                                                            <h4><PlayCircle size={16} /> Key Topics</h4>
+                                                            <div className="roadmap-milestone-body">
+                                                                {milestone.content && <div className="roadmap-milestone-content" style={{
+                                                                    marginBottom: '1rem',
+                                                                    lineHeight: '1.6',
+                                                                    color: 'var(--text-main)',
+                                                                    fontSize: '0.95rem',
+                                                                    padding: '1rem',
+                                                                    background: 'var(--bg-inset)',
+                                                                    borderRadius: '8px',
+                                                                    borderLeft: `4px solid ${currentRoadmap.color}`
+                                                                }}>
+                                                                    {milestone.content}
+                                                                </div>
+                                                                }
+                                                                <div className="roadmap-topics-grid">
+                                                                    {milestone.topics.map((topic, i) => (
+                                                                        <div key={topic} className="roadmap-topic-chip">
+                                                                            {topic}
+                                                                        </div>
+                                                                    ))}
+                                                                </div>
+                                                            </div>
                                                         </div>
+
+                                                        {milestone.resources && milestone.resources.length > 0 && (
+                                                            <div className="milestone-section">
+                                                                <h4><BookOpen size={16} /> Resources</h4>
+                                                                <div className="resources-list">
+                                                                    {milestone.resources.map((resource, idx) => (
+                                                                        <a
+                                                                            key={resource.url}
+                                                                            href={resource.url}
+                                                                            target="_blank"
+                                                                            rel="noopener noreferrer"
+                                                                            className="resource-link-item"
+                                                                        >
+                                                                            <FileText size={14} />
+                                                                            {resource.title}
+                                                                            <ExternalLink size={12} className="ext-icon" />
+                                                                        </a>
+                                                                    ))}
+                                                                </div>
+                                                            </div>
+                                                        )}
                                                     </div>
                                                 )}
                                             </div>
-                                        )}
+                                        </div>
+                                    )
+                                }) : (
+                                    <div className="empty-roadmap-state">
+                                        <p>Content for this roadmap is coming soon.</p>
+                                        <a href={currentRoadmap.link} target="_blank" rel="noreferrer" className="btn-primary">
+                                            View on roadmap.sh <ExternalLink size={16} />
+                                        </a>
                                     </div>
-                                </div>
-                            )
-                        }) : (
-                            <div className="empty-roadmap-state">
-                                <p>Content for this roadmap is coming soon.</p>
-                                <a href={currentRoadmap.link} target="_blank" rel="noreferrer" className="btn-primary">
-                                    View on roadmap.sh <ExternalLink size={16} />
-                                </a>
+                                )}
                             </div>
-                        )}
-                    </div>
+                        </>
+                    ) : (
+                        <div className="select-roadmap-placeholder" style={{ 
+                            textAlign: 'center', 
+                            padding: '60px 20px', 
+                            background: 'var(--bg-card)', 
+                            borderRadius: '12px', 
+                            marginTop: '24px',
+                            border: '1px dashed var(--border-main)'
+                        }}>
+                            <div className="placeholder-icon" style={{ 
+                                color: 'var(--text-muted)', 
+                                marginBottom: '16px',
+                                opacity: 0.5
+                            }}>
+                                <BookOpen size={64} />
+                            </div>
+                            <h3 style={{ fontSize: '20px', fontWeight: '600', marginBottom: '8px' }}>Select a Roadmap</h3>
+                            <p style={{ color: 'var(--text-muted)', maxWidth: '400px', margin: '0 auto' }}>
+                                Choose a learning path from the selector above to see the structured modules and track your progress.
+                            </p>
+                        </div>
+                    )}
                 </>
             ) : (
                 <div className="external-roadmaps-container">

@@ -60,10 +60,10 @@ function Home() {
   ]
 
   const upcomingTopics = [
-    { id: 'dynamic-programming', title: 'Dynamic Programming Patterns', difficulty: 'Hard', time: '45 min', category: 'DSA' },
-    { id: 'system-design-caching', title: 'System Design: Caching', difficulty: 'Medium', time: '30 min', category: 'System Design' },
-    { id: 'react-performance', title: 'React Performance Optimization', difficulty: 'Medium', time: '25 min', category: 'Web Dev' },
-    { id: 'database-indexing', title: 'Database Indexing Strategies', difficulty: 'Hard', time: '40 min', category: 'DBMS' }
+    { id: 'cloud', title: 'Cloud Architecture & Scaling', difficulty: 'Medium', time: '30 min', category: 'Cloud' },
+    { id: 'ml', title: 'Machine Learning Fundamentals', difficulty: 'Hard', time: '45 min', category: 'ML' },
+    { id: 'devops', title: 'CI/CD Pipeline Mastery', difficulty: 'Hard', time: '40 min', category: 'DevOps' },
+    { id: 'system-design-caching', title: 'System Design: Caching', difficulty: 'Medium', time: '30 min', category: 'System Design' }
   ]
 
   return (

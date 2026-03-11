@@ -7,12 +7,20 @@ import { toast } from 'sonner';
 import { updateStatus } from '../../services/applicationServices';
 import { Badge } from '../ui/badge';
 import { updateApplicantStatus } from '../../redux/applicationSlice';
+import DocumentViewer from '../shared/DocumentViewer';
 
 const shortlistingStatus = ["Accepted", "Rejected"];
 
 const ApplicantsTable = () => {
     const { applicants } = useSelector(/** @type {any} */ (store) => store.application || {});
     const dispatch = useDispatch();
+    const [viewerOpen, setViewerOpen] = useState(false);
+    const [selectedResume, setSelectedResume] = useState({ url: '', name: '' });
+
+    const openResume = (url, name) => {
+        setSelectedResume({ url, name });
+        setViewerOpen(true);
+    };
 
     const statusHandler = async (status, id) => {
         try {
@@ -26,23 +34,6 @@ const ApplicantsTable = () => {
         }
     }
 
-    const getResumeUrl = (url) => {
-        if (!url) return "";
-        const lowerUrl = url.toLowerCase();
-        
-        // If it's a standard web-viewable file (PDF or Image), return as is
-        const isWebViewable = lowerUrl.endsWith('.pdf') || 
-                             lowerUrl.endsWith('.png') || 
-                             lowerUrl.endsWith('.jpg') || 
-                             lowerUrl.endsWith('.jpeg') ||
-                             lowerUrl.endsWith('.webp');
-
-        if (isWebViewable) return url;
-
-        // For everything else (Word docs, extensionless Cloudinary raw links, etc.), 
-        // use the Google Docs Viewer to force an in-browser preview.
-        return `https://docs.google.com/viewer?url=${encodeURIComponent(url)}&embedded=true`;
-    };
 
     return (
         <div className="rounded-xl border border-gray-800 bg-[#09090b] overflow-hidden">
@@ -70,18 +61,16 @@ const ApplicantsTable = () => {
                                 <TableCell>
                                     {
                                         item.applicant?.profile?.resume ? (
-                                            <a 
-                                                href={getResumeUrl(item?.applicant?.profile?.resume)} 
-                                                target="_blank" 
-                                                rel="noopener noreferrer"
-                                                className="flex items-center gap-2 text-indigo-400 hover:text-indigo-300 cursor-pointer transition-colors group w-max"
+                                            <button 
+                                                onClick={() => openResume(item?.applicant?.profile?.resume, item?.applicant?.profile?.resumeOriginalName || "Resume")} 
+                                                className="flex items-center gap-2 text-indigo-400 hover:text-indigo-300 cursor-pointer transition-colors group w-max border-none bg-transparent"
                                             >
                                                 <FileText className="w-4 h-4" />
                                                 <span className="underline truncate max-w-[150px]">
                                                     {item?.applicant?.profile?.resumeOriginalName || "View Resume"}
                                                 </span>
                                                 <ExternalLink className="w-3 h-3 opacity-0 group-hover:opacity-100 transition-opacity" />
-                                            </a>
+                                            </button>
                                         ) : <span className="text-gray-500 italic">NA</span>
                                     }
                                 </TableCell>
@@ -145,6 +134,12 @@ const ApplicantsTable = () => {
                     }
                 </TableBody>
             </Table>
+            <DocumentViewer 
+                isOpen={viewerOpen} 
+                onClose={() => setViewerOpen(false)} 
+                fileUrl={selectedResume.url ? (selectedResume.url.startsWith('http') ? selectedResume.url : encodeURI(selectedResume.url)) : ''} 
+                fileName={selectedResume.name} 
+            />
         </div>
     )
 }

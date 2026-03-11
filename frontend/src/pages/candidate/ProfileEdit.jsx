@@ -4,8 +4,9 @@ import api from '../../services/api';
 import { useDispatch } from 'react-redux';
 import { toast } from 'sonner';
 import { useAuth } from '../../context/AuthContext';
-import { ArrowLeft, AlertCircle, CheckCircle2, User, Phone, Mail, BookOpen, Wrench, FileText, Loader2, Save, Lock, ShieldCheck } from 'lucide-react';
+import { ArrowLeft, AlertCircle, CheckCircle2, User, Phone, Mail, BookOpen, Wrench, FileText, Loader2, Save, Lock, ShieldCheck, Eye } from 'lucide-react';
 import { setPassword, changePassword } from '../../services/authServices';
+import DocumentViewer from '../../components/shared/DocumentViewer';
 
 const PasswordManager = () => {
    const { user, loginUser } = useAuth();
@@ -133,6 +134,17 @@ const ProfileEdit = () => {
       profilePhoto: null,
       resume: null
   });
+
+  const [viewerOpen, setViewerOpen] = useState(false);
+  const [selectedResume, setSelectedResume] = useState({ url: '', name: '' });
+
+  const openResume = (e) => {
+      e.preventDefault();
+      const url = input.resume ? URL.createObjectURL(input.resume) : user.profile.resume;
+      const name = input.resume ? input.resume.name : (user.profile.resumeOriginalName || 'Resume.pdf');
+      setSelectedResume({ url, name });
+      setViewerOpen(true);
+  };
 
   const [previews, setPreviews] = useState({
       profilePhoto: user?.profile?.profilePhoto || ""
@@ -367,14 +379,13 @@ const ProfileEdit = () => {
                       {input.resume ? input.resume.name : "Choose a new PDF file to upload"}
                     </label>
                     {(user?.profile?.resume || input.resume) && (
-                        <a 
-                          href={input.resume ? URL.createObjectURL(input.resume) : user.profile.resume} 
-                          target="_blank" 
-                          rel="noopener noreferrer" 
-                          className="bg-indigo-600/20 hover:bg-indigo-600/40 text-indigo-400 px-4 py-3 rounded-xl transition whitespace-nowrap border border-indigo-500/30"
+                        <button 
+                          onClick={openResume}
+                          className="bg-indigo-600/20 hover:bg-indigo-600/40 text-indigo-400 px-4 py-3 rounded-xl transition whitespace-nowrap border border-indigo-500/30 flex items-center gap-2 cursor-pointer"
                         >
+                          <Eye className="w-4 h-4" />
                           View {input.resume ? 'New' : 'Current'}
-                        </a>
+                        </button>
                     )}
                  </div>
                </div>
@@ -402,10 +413,16 @@ const ProfileEdit = () => {
                    : "Your account was created via Google. Set a password to enable manual login."}
                </p>
                
-               <PasswordManager />
-            </div>
-         </div>
-      </div>
+          <PasswordManager />
+       </div>
+    </div>
+    <DocumentViewer 
+       isOpen={viewerOpen} 
+       onClose={() => setViewerOpen(false)} 
+       fileUrl={selectedResume.url ? (selectedResume.url.startsWith('blob:') ? selectedResume.url : encodeURI(selectedResume.url)) : ''} 
+       fileName={selectedResume.name} 
+    />
+  </div>
     </div>
   );
 };

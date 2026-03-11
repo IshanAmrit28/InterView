@@ -5,6 +5,9 @@ export const quizTopics = [
     { id: 'web', name: 'Web Technologies', count: 27, difficulty: 'Easy' },
     { id: 'cn', name: 'Computer Networks', count: 15, difficulty: 'Medium' },
     { id: 'aptitude', name: 'General Aptitude', count: 15, difficulty: 'Medium' },
+    { id: 'cloud', name: 'Cloud Computing', count: 25, difficulty: 'Medium' },
+    { id: 'devops', name: 'DevOps & SRE', count: 25, difficulty: 'High' },
+    { id: 'ml', name: 'Machine Learning', count: 25, difficulty: 'High' },
 ];
 
 export const quizzes = {
@@ -1026,8 +1029,539 @@ export const quizzes = {
             answer: 1,
             explanation: "CP of 20 = SP of x. Profit = 25%. (20-x)/x = 1/4 -> 80 - 4x = x -> 5x = 80 -> x = 16."
         }
+    ],
+    cloud: [
+        {
+            id: 1,
+            question: "Which cloud service model provides the highest level of abstraction and least management overhead?",
+            options: ["IaaS", "PaaS", "SaaS", "FaaS"],
+            answer: 2,
+            explanation: "SaaS (Software as a Service) allows users to use applications over the internet without managing any underlying infrastructure or platforms."
+        },
+        {
+            id: 2,
+            question: "What is the 'Shared Responsibility Model' in cloud computing?",
+            options: ["Cloud provider handles everything", "User handles everything", "Division of security tasks between provider and customer", "Shared cost between users"],
+            answer: 2,
+            explanation: "The CSP handles security 'of' the cloud, while the customer handles security 'in' the cloud (data, configuration, etc.)."
+        },
+        {
+            id: 3,
+            question: "Which of the following describes 'Vertical Scaling'?",
+            options: ["Adding more instances", "Increasing CPU/RAM of an existing instance", "Distributing load over multiple servers", "Using CDNs"],
+            answer: 1,
+            explanation: "Vertical scaling (scaling up) involves adding more power to an existing machine, whereas horizontal scaling involves adding more machines."
+        },
+        {
+            id: 4,
+            question: "What is a 'Region' in major cloud providers like AWS or Azure?",
+            options: ["A single datacenter", "A geographic area containing multiple Availability Zones", "A virtual private cloud", "A specific server rack"],
+            answer: 1,
+            explanation: "A Region is a physical location in the world where multiple Availability Zones (datacenters) are located."
+        },
+        {
+            id: 5,
+            question: "Which storage type is best for static website hosting in the cloud?",
+            options: ["Block Storage", "Object Storage", "File Storage", "RAM Disk"],
+            answer: 1,
+            explanation: "Object storage (like AWS S3) is highly scalable and ideal for unstructured data and static web content."
+        },
+        {
+            id: 6,
+            question: "What is the primary benefit of 'Serverless' computing?",
+            options: ["No servers are involved", "Users don't manage server infrastructure", "Always free of cost", "Faster execution than VMs"],
+            answer: 1,
+            explanation: "Serverless doesn't mean no servers; it means the provider handles all server management, allowing developers to focus solely on code."
+        },
+        {
+            id: 7,
+            question: "What is 'Cloud-Native' architecture primary focus?",
+            options: ["Running legacy apps in VMs", "Using containers, microservices, and dynamic orchestration", "Buying physical servers", "Using only one cloud provider"],
+            answer: 1,
+            explanation: "Cloud-native apps are designed to leverage cloud features like elasticity, containers (Docker), and orchestration (Kubernetes)."
+        },
+        {
+            id: 8,
+            question: "In cloud databases, what does 'Read Replicas' help with?",
+            options: ["Data durability", "Write performance", "Read scalability and reducing primary load", "Backup recovery"],
+            answer: 2,
+            explanation: "Read replicas allow you to scale out read-heavy workloads by offloading reads from the primary database instance."
+        },
+        {
+            id: 9,
+            question: "What is 'IaC' (Infrastructure as Code)?",
+            options: ["Manual server setup", "Managing infrastructure through machine-readable definition files", "Writing code only for frontend", "A programming language"],
+            answer: 1,
+            explanation: "IaC (e.g., Terraform, CloudFormation) allows you to automate infrastructure deployment using code, ensuring consistency and version control."
+        },
+        {
+            id: 10,
+            question: "Which scenario is most suitable for 'Spot Instances'?",
+            options: ["Production database", "Mission-critical apps", "Batch processing and fault-tolerant workloads", "Real-time user transactions"],
+            answer: 2,
+            explanation: "Spot instances offer high discounts but can be reclaimed by the provider; they are best for tasks that can handle interruptions."
+        },
+        {
+            id: 11,
+            question: "What is a 'VPC' (Virtual Private Cloud)?",
+            options: ["A public internet connection", "A private, isolated section of the cloud network", "A physical server", "A types of database"],
+            answer: 1,
+            explanation: "A VPC allows you to launch cloud resources into a virtual network that you've defined and isolated."
+        },
+        {
+            id: 12,
+            question: "What is 'Edge Computing'?",
+            options: ["Centralized cloud storage", "Processing data closer to the source/user", "Using old versions of cloud", "High-performance GPUs"],
+            answer: 1,
+            explanation: "Edge computing reduces latency by processing data at the 'edge' of the network, near where it is generated."
+        },
+        {
+            id: 13,
+            question: "Which cloud service helps in distributing incoming application traffic?",
+            options: ["Auto Scaling", "Load Balancer", "Route Table", "VPC Peering"],
+            answer: 1,
+            explanation: "A Load Balancer distributes incoming traffic across multiple targets (like EC2 instances) to increase availability."
+        },
+        {
+            id: 14,
+            question: "What is 'Egress' traffic in cloud billing?",
+            options: ["Data coming into the cloud", "Data leaving the cloud network", "Internal data transfer", "API calls"],
+            answer: 1,
+            explanation: "Cloud providers usually charge for data leaving their network (Egress), while data coming in (Ingress) is often free."
+        },
+        {
+            id: 15,
+            question: "What is the purpose of a 'CDN' (Content Delivery Network)?",
+            options: ["Database backup", "Delivering content with low latency using edge locations", "Increasing CPU power", "Private connectivity"],
+            answer: 1,
+            explanation: "CDNs (like CloudFront) cache content globally to serve users from the location closest to them."
+        },
+        {
+            id: 16,
+            question: "What is 'Cold Start' in serverless functions?",
+            options: ["Restarting a server", "Latency when a function is invoked after being idle", "Starting a VM", "Freezing code"],
+            answer: 1,
+            explanation: "A cold start happens when a serverless function is triggered after not being used for a while, requiring the provider to initialize the environment."
+        },
+        {
+            id: 17,
+            question: "What is 'Multi-Tenant' architecture?",
+            options: ["One server per user", "Multiple users sharing the same application and infrastructure", "Multiple clouds for one user", "Renting multiple offices"],
+            answer: 1,
+            explanation: "Multi-tenancy allows a single instance of software to serve multiple customers (tenants), maximizing resource efficiency."
+        },
+        {
+            id: 18,
+            question: "What is 'Cloud Agnostic'?",
+            options: ["Being locked into one provider", "Designing apps that can run on any cloud provider", "Rejecting cloud technology", "Using only private clouds"],
+            answer: 1,
+            explanation: "Cloud-agnostic tools (like Terraform/K8s) allow you to switch providers or avoid vendor lock-in."
+        },
+        {
+            id: 19,
+            question: "Which consistency model does S3 now support for all operations?",
+            options: ["Eventual Consistency", "Strong Read-After-Write Consistency", "Weak Consistency", "Delayed Consistency"],
+            answer: 1,
+            explanation: "Amazon S3 provides strong read-after-write consistency for all applications, simplifying distributed systems design."
+        },
+        {
+            id: 20,
+            question: "What is 'Blue-Green Deployment'?",
+            options: ["Color coding servers", "Running two identical environments, one live and one idle", "Incremental updates to all servers", "Deleting old servers immediately"],
+            answer: 1,
+            explanation: "It reduces downtime and risk by having two environments; you switch traffic to 'Green' while 'Blue' is the old version for rollback."
+        },
+        {
+            id: 21,
+            question: "Which cloud tool is used for auditing and logging API activity?",
+            options: ["CloudWatch", "CloudTrail", "IAM", "S3"],
+            answer: 1,
+            explanation: "CloudTrail (in AWS) records API calls made within an account, which is crucial for security auditing."
+        },
+        {
+            id: 22,
+            question: "What is 'Elasticity' in cloud?",
+            options: ["Fixing server size", "The ability to scale resources up or down automatically based on demand", "Manual scaling", "Network flexibility"],
+            answer: 1,
+            explanation: "Elasticity ensures that you have just the right amount of resources at any given time, saving costs."
+        },
+        {
+            id: 23,
+            question: "What is a 'Hybrid Cloud'?",
+            options: ["Two private clouds", "A mix of on-premises infrastructure and public cloud", "A mix of AWS and Azure only", "Using cloud only for storage"],
+            answer: 1,
+            explanation: "Hybrid cloud combines private (on-prem) and public cloud resources, allowing data and apps to be shared between them."
+        },
+        {
+            id: 24,
+            question: "What is 'Database Migration Service' (DMS)?",
+            options: ["Copying files", "Moving databases to the cloud with minimal downtime", "Deleting databases", "Updating database drivers"],
+            answer: 1,
+            explanation: "DMS helps migrate databases to the cloud quickly and securely, often while the source database remains operational."
+        },
+        {
+            id: 25,
+            question: "Which of these is a container orchestration service?",
+            options: ["AWS EC2", "Kubernetes (EKS/AKS/GKE)", "AWS Lambda", "Azure Functions"],
+            answer: 1,
+            explanation: "Kubernetes is the industry standard for automating deployment, scaling, and management of containerized applications."
+        }
+    ],
+    devops: [
+        {
+            id: 1,
+            question: "What is the primary goal of Continuous Integration (CI)?",
+            options: ["Deploying to production", "Automatically merging and testing code changes", "Monitoring server health", "Writing documentation"],
+            answer: 1,
+            explanation: "CI focuses on frequently merging code into a central repository where automated builds and tests are run."
+        },
+        {
+            id: 2,
+            question: "In Docker, what is the purpose of a Dockerfile?",
+            options: ["To store database records", "To define the steps to build a container image", "To manage network traffic", "To track user logins"],
+            answer: 1,
+            explanation: "A Dockerfile is a text document that contains all the commands a user could call on the command line to assemble an image."
+        },
+        {
+            id: 3,
+            question: "What is 'Immutable Infrastructure'?",
+            options: ["Manually updating servers", "Infrastructure that is never changed but replaced when updates are needed", "Storing data in immutable databases", "Physically locked server racks"],
+            answer: 1,
+            explanation: "Immutable infrastructure involves replacing servers with new ones rather than making changes in-place, ensuring consistency."
+        },
+        {
+            id: 4,
+            question: "Which Kubernetes resource ensures that a specified number of pod replicas are running at any given time?",
+            options: ["Pod", "Namespace", "Deployment/ReplicaSet", "Service"],
+            answer: 2,
+            explanation: "ReplicaSets (managed by Deployments) maintain a stable set of replica Pods running at any given time."
+        },
+        {
+            id: 5,
+            question: "What are the 'Four Golden Signals' of SRE monitoring?",
+            options: ["CPU, RAM, Disk, Network", "Latency, Traffic, Errors, Saturation", "Speed, Security, Scale, Stability", "Users, Costs, Bugs, Features"],
+            answer: 1,
+            explanation: "As defined by Google SRE, these are the four key metrics to monitor in user-facing systems."
+        },
+        {
+            id: 6,
+            question: "What does 'SLO' stand for in SRE?",
+            options: ["System Level Order", "Service Level Objective", "Service Logic Optimization", "System Load Overflow"],
+            answer: 1,
+            explanation: "An SLO is a target level for a service performance metric (SLI) that the SRE team commits to meeting."
+        },
+        {
+            id: 7,
+            question: "What is the difference between Blue-Green and Canary deployments?",
+            options: ["There is no difference", "Blue-Green switches all at once; Canary rolls out to a subset of users first", "Canary is faster than Blue-Green", "Blue-Green is only for databases"],
+            answer: 1,
+            explanation: "Canary allows testing new versions on a small user group before full rollout, while Blue-Green swaps two environments."
+        },
+        {
+            id: 8,
+            question: "What is 'Infrastructure as Code' (IaC) primarily used for?",
+            options: ["Writing application logic", "Automating infrastructure management through configuration files", "Debugging frontend code", "Scaling databases only"],
+            answer: 1,
+            explanation: "IaC tools like Terraform allow you to manage your entire infrastructure (networks, VMs, etc.) using declarative code."
+        },
+        {
+            id: 9,
+            question: "Which tool is commonly used for configuration management and automation?",
+            options: ["Ansible", "React", "PostgreSQL", "Docker"],
+            answer: 0,
+            explanation: "Ansible uses YAML-based playbooks to automate configuration, orchestration, and deployments."
+        },
+        {
+            id: 10,
+            question: "What is a 'Liveness Probe' in Kubernetes?",
+            options: ["Checks if the pod is ready to serve traffic", "Checks if the container is running and healthy; restarts if not", "Checks pod memory usage", "Checks network latency"],
+            answer: 1,
+            explanation: "A liveness probe tells Kubernetes if an application has crashed or deadlocked, triggering a restart if necessary."
+        },
+        {
+            id: 11,
+            question: "What is 'GitOps'?",
+            options: ["Using Git for everything", "Using Git as the single source of truth for infrastructure and app config", "A new version of Git", "Hosting Git on-premises"],
+            answer: 1,
+            explanation: "In GitOps, the desired state of your system is stored in Git, and automated tools (like ArgoCD) synchronize it with the cluster."
+        },
+        {
+            id: 12,
+            question: "In Prometheus, what is an 'Exporter'?",
+            options: ["A tool to backup data", "A component that fetches metrics from a system and formats them for Prometheus", "A report generator", "A load balancer"],
+            answer: 1,
+            explanation: "Exporters translate third-party metrics into a format Prometheus can scrape."
+        },
+        {
+            id: 13,
+            question: "What is the purpose of 'Chaos Engineering'?",
+            options: ["Trying to crash servers for fun", "Testing system resilience by injecting failures", "Randomly deleting files", "Scaling resources to the limit"],
+            answer: 1,
+            explanation: "Chaos Engineering (e.g., Chaos Monkey) helps identify weaknesses in distributed systems before they cause real outages."
+        },
+        {
+            id: 14,
+            question: "What is 'Trunk-based development'?",
+            options: ["Working on separate long-term branches", "Merging small updates frequently to a single main branch", "Using a tree-like folder structure", "Developing on a local backup server"],
+            answer: 1,
+            explanation: "Trunk-based development avoids 'merge hell' by encouraging developers to commit to 'main' several times a day."
+        },
+        {
+            id: 15,
+            question: "What does 'Docker Layer Caching' help with?",
+            options: ["Reducing image size", "Speeding up build times by reusing unchanged layers", "Encrypting images", "Managing multi-stage builds"],
+            answer: 1,
+            explanation: "Docker caches the results of each step in a Dockerfile; if a step hasn't changed, Docker reuses the cached layer."
+        },
+        {
+            id: 16,
+            question: "Which K8s resource is used to manage external access to services, typically HTTP?",
+            options: ["ConfigMap", "Ingress", "Secret", "Volume"],
+            answer: 1,
+            explanation: "An Ingress controller manages external traffic routing (Layer 7) into your Kubernetes cluster services."
+        },
+        {
+            id: 17,
+            question: "What is an 'Error Budget'?",
+            options: ["Money allocated for bug fixes", "The amount of allowed unreliability before development must stop to fix issues", "A list of known bugs", "The cost of cloud outages"],
+            answer: 1,
+            explanation: "If you exceed your error budget (e.g., 0.1% downtime), you stop deploying new features and focus on stability."
+        },
+        {
+            id: 18,
+            question: "What is 'Post-mortem' in SRE?",
+            options: ["Deleting an old server", "An analysis of an incident to prevent recurrence", "Closing a project", "A security scan"],
+            answer: 1,
+            explanation: "Blameless post-mortems focus on process and system failures rather than human error."
+        },
+        {
+            id: 19,
+            question: "Which tool is standard for creating dashboards from Prometheus data?",
+            options: ["Grafana", "Tableau", "Excel", "Logstash"],
+            answer: 0,
+            explanation: "Grafana is the most popular open-source tool for visualizing time-series database metrics."
+        },
+        {
+            id: 20,
+            question: "What is a 'Sidecar' pattern in Kubernetes?",
+            options: ["A backup server", "A container that runs alongside the main app container for helper tasks", "A user interface for K8s", "A type of load balancer"],
+            answer: 1,
+            explanation: "Sidecars handle peripheral tasks like logging, proxying (e.g., Istio), or monitoring for the main container."
+        },
+        {
+            id: 21,
+            question: "What is 'Rolling Update' in Kubernetes?",
+            options: ["Deleting all pods and starting new ones", "Gradually replacing old pods with new ones without downtime", "Updating the OS of the node", "Manual pod restart"],
+            answer: 1,
+            explanation: "Rolling updates allow deployments update to take place with zero downtime by incrementally updating instances."
+        },
+        {
+            id: 22,
+            question: "What does `kubectl describe pod <name>` do?",
+            options: ["Deletes the pod", "Shows detailed status and events for a pod", "Prints pod logs", "Starts a shell in the pod"],
+            answer: 1,
+            explanation: "It's essential for debugging as it shows events like image pull failures or resource constraints."
+        },
+        {
+            id: 23,
+            question: "What is the purpose of 'Secrets management' tools like HashiCorp Vault?",
+            options: ["Storing private keys", "Securely managing passwords, API keys, and certificates", "Encrypting hard drives", "Managing user roles"],
+            answer: 1,
+            explanation: "It centralizes and secures access to sensitive environment variables and credentials."
+        },
+        {
+            id: 24,
+            question: "In Jenkins, what is a 'Pipeline as Code'?",
+            options: ["Manual UI configuration", "Defining build steps in a Jenkinsfile", "Writing Jenkins plugins", "Using Python for builds"],
+            answer: 1,
+            explanation: "Jenkinsfiles allow you to version control your CI/CD pipeline logic alongside your source code."
+        },
+        {
+            id: 25,
+            question: "What is 'Shift-Left' testing?",
+            options: ["Moving tests to the end of the cycle", "Moving testing earlier in the development process", "Only testing on the left side of the UI", "Automation testing"],
+            answer: 1,
+            explanation: "Shift-left aims to find and fix bugs as soon as possible, reducing the cost of repairs."
+        }
+    ],
+    ml: [
+        {
+            id: 1,
+            question: "What is the primary difference between Supervised and Unsupervised learning?",
+            options: ["Supervised uses labeled data; Unsupervised does not", "Unsupervised is faster", "Supervised is for images only", "There is no difference"],
+            answer: 0,
+            explanation: "Supervised learning requires a dataset with known labels/outputs to train the model, while unsupervised find patterns in unlabeled data."
+        },
+        {
+            id: 2,
+            question: "In Machine Learning, what does the 'Bias-Variance Tradeoff' refer to?",
+            options: ["The cost of training vs the cost of deployment", "The balance between underfitting and overfitting", "Choosing between two different algorithms", "The speed of the model"],
+            answer: 1,
+            explanation: "High bias can cause underfitting (oversimplification), while high variance can cause overfitting (too much noise in training data)."
+        },
+        {
+            id: 3,
+            question: "Which of the following is a technique used to prevent Overfitting?",
+            options: ["Increasing model complexity", "Regularization (L1/L2)", "Using less training data", "Removing validation sets"],
+            answer: 1,
+            explanation: "Regularization adds a penalty for larger weights in the model, discouraging complexity and helping with generalization."
+        },
+        {
+            id: 4,
+            question: "What does 'Precision' measure in a classification model?",
+            options: ["Total correct predictions", "Accuracy of positive predictions", "Ability to find all positive instances", "The speed of prediction"],
+            answer: 1,
+            explanation: "Precision is the ratio of correctly predicted positive observations to the total predicted positives."
+        },
+        {
+            id: 5,
+            question: "In Gradient Descent, what is the 'Learning Rate'?",
+            options: ["The speed of data processing", "The size of the steps taken to reach the minimum of the loss function", "The number of layers in a neural network", "The accuracy of the model"],
+            answer: 1,
+            explanation: "Learning rate determines how much we adjust the weights of our network with respect to the loss gradient."
+        },
+        {
+            id: 6,
+            question: "Which algorithm is commonly used for Dimensionality Reduction?",
+            options: ["Random Forest", "K-Means", "PCA (Principal Component Analysis)", "Linear Regression"],
+            answer: 2,
+            explanation: "PCA transforms a large set of variables into a smaller one that still contains most of the information in the large set."
+        },
+        {
+            id: 7,
+            question: "What is the purpose of an 'Activation Function' in a Neural Network?",
+            options: ["To store data", "To introduce non-linearity into the output of a neuron", "To sort the data", "To reduce the number of neurons"],
+            answer: 1,
+            explanation: "Without non-linear activation functions (like ReLU), a neural network would just be a linear regression model regardless of the number of layers."
+        },
+        {
+            id: 8,
+            question: "In Random Forest, what does 'Bagging' stand for?",
+            options: ["Boosting Accuracy and Generative Graphs", "Bootstrap Aggregating", "Base Aggregation", "Batch Aggregating"],
+            answer: 1,
+            explanation: "Bagging involves training multiple models on different subsets of the data (with replacement) and averaging their predictions."
+        },
+        {
+            id: 9,
+            question: "Which of the following is a clustering algorithm?",
+            options: ["SVM", "Logistic Regression", "K-Means", "Decision Tree"],
+            answer: 2,
+            explanation: "K-Means is an unsupervised learning algorithm used for grouping unlabelled data into K clusters."
+        },
+        {
+            id: 10,
+            question: "What is 'Cross-Validation' used for?",
+            options: ["Checking for duplicate data", "Assessing how the results of a statistical analysis will generalize to an independent data set", "Encrypting the model", "Combining two datasets"],
+            answer: 1,
+            explanation: "K-fold cross-validation helps ensure the model isn't just memorizing the training data (overfitting)."
+        },
+        {
+            id: 11,
+            question: "What does 'MSE' stand for in regression?",
+            options: ["Mean Square Error", "Maximum Standard Error", "Median Standard Estimate", "Mean Square Entropy"],
+            answer: 0,
+            explanation: "MSE is a common loss function for regression that measures the average of the squares of the errors (deviations)."
+        },
+        {
+            id: 12,
+            question: "Which neural network architecture is most suitable for Image Recognition?",
+            options: ["RNN (Recurrent)", "CNN (Convolutional)", "GAN (Generative)", "Transformer"],
+            answer: 1,
+            explanation: "CNNs are designed to automatically and adaptively learn spatial hierarchies of features from images."
+        },
+        {
+            id: 13,
+            question: "What is 'Transfer Learning'?",
+            options: ["Moving data between servers", "Using a pre-trained model on a new, related task", "Teaching a model multiple languages", "Converting a model to a different framework"],
+            answer: 1,
+            explanation: "Transfer learning allows you to leverage knowledge gained from one task to improve performance on another, often with less data."
+        },
+        {
+            id: 14,
+            question: "What is the purpose of 'Softmax' function?",
+            options: ["To normalize values to a range of [0, 1] that sum to 1", "To make the model 'soft'", "To handle negative values only", "To speed up training"],
+            answer: 0,
+            explanation: "Softmax is typically used in the final layer of a multi-class classifier to represent the probability distribution of classes."
+        },
+        {
+            id: 15,
+            question: "What is 'One-Hot Encoding'?",
+            options: ["A way to encrypt data", "Converting categorical variables into a numerical format", "A feature scaling technique", "A type of neural network"],
+            answer: 1,
+            explanation: "One-hot encoding creates binary columns for each category, allowing the model to process non-numeric data."
+        },
+        {
+            id: 16,
+            question: "What is an 'Epoch' in ML training?",
+            options: ["One iteration over a single data point", "One complete pass through the entire training dataset", "A period of history", "The time taken for one prediction"],
+            answer: 1,
+            explanation: "Multiple epochs are usually needed for the model's weights to converge."
+        },
+        {
+            id: 17,
+            question: "In NLP, what is 'Word Embedding'?",
+            options: ["Storing words in a database", "Mapping words to vectors of real numbers", "Checking for spelling errors", "Translating text"],
+            answer: 1,
+            explanation: "Word embeddings (like Word2Vec) capture the semantic meaning and relationships between words in a high-dimensional space."
+        },
+        {
+            id: 18,
+            question: "What is 'Reinforcement Learning' primarily about?",
+            options: ["Finding patterns in data", "Making a series of decisions to maximize a reward", "Classifying images", "Predicting house prices"],
+            answer: 1,
+            explanation: "An agent learns to behave in an environment by performing actions and seeing the results (rewards or penalties)."
+        },
+        {
+            id: 19,
+            question: "Which of these is a popular ensemble method that builds trees sequentially?",
+            options: ["Random Forest", "XGBoost / Gradient Boosting", "K-Means", "Logistic Regression"],
+            answer: 1,
+            explanation: "Boosting algorithms (like XGBoost) train trees one after another, each one trying to correct the errors of the previous ones."
+        },
+        {
+            id: 20,
+            question: "What is 'Hyperparameter Tuning'?",
+            options: ["Changing the training data", "Finding the optimal settings for a learning algorithm (like learning rate or depth)", "Improving CPU performance", "Updating the model every hour"],
+            answer: 1,
+            explanation: "Hyperparameters are settings that are not learned from the data, but set before training starts."
+        },
+        {
+            id: 21,
+            question: "What does 'ReLU' stand for?",
+            options: ["Rectified Linear Unit", "Recurrent Linear Unit", "Randomized Linear Utility", "Relative Linear Unit"],
+            answer: 0,
+            explanation: "ReLU is one of the most commonly used activation functions in deep learning (outputting max(0, x))."
+        },
+        {
+            id: 22,
+            question: "What is the 'Kernel Trick' in SVM?",
+            options: ["Encrypting data", "Transforming low-dimensional data into higher-dimensional space to make it separable", "A way to speed up sorting", "A hardware optimization"],
+            answer: 1,
+            explanation: "Kernel functions allow SVMs to solve non-linear problems by implicitly mapping inputs into high-dimensional feature spaces."
+        },
+        {
+            id: 23,
+            question: "What is 'Early Stopping' used for?",
+            options: ["To save electricity", "To prevent overfitting by stopping training when validation error starts increasing", "To delete old models", "To stop the user from using the app"],
+            answer: 1,
+            explanation: "It monitors the model's performance on a validation set and stops training once it stops improving."
+        },
+        {
+            id: 24,
+            question: "What is the difference between RNN and LSTM?",
+            options: ["RNN is faster", "LSTM has memory cells to handle long-term dependencies better than standard RNN", "LSTM is only for images", "RNN is deprecated"],
+            answer: 1,
+            explanation: "Standard RNNs suffer from vanishing gradients; LSTMs solve this with gating mechanisms."
+        },
+        {
+            id: 25,
+            question: "What is 'MLOps'?",
+            options: ["Machine Learning Operators", "Practices for reliable and efficient deployment of ML models in production", "A new machine learning library", "Operating systems for ML"],
+            answer: 1,
+            explanation: "MLOps focuses on the lifecycle of ML models, including versioning, monitoring, and automated deployment."
+        }
     ]
-}
+};
 
 export const getQuizByTopic = (topicId) => {
     return quizzes[topicId] || [];
