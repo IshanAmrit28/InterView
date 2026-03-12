@@ -140,6 +140,11 @@ const CodingProblems = () => {
                                             <span className="category flex items-center gap-1">
                                                 <BookOpen size={14} /> DSA
                                             </span>
+                                            {problem.isSolved && (
+                                                <span className="solved-badge">
+                                                    <CheckCircle2 size={14} /> Solved
+                                                </span>
+                                            )}
                                         </div>
                                     </div>
                                 </div>

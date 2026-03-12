@@ -109,7 +109,35 @@ exports.getJobById = async (req, res) => {
                 success: false
             });
         }
-        return res.status(200).json({ job, success: true });
+
+        // Fetch associated assessment if it exists and is active
+        const Assessment = require("../models/assessment.model");
+        const assessment = await Assessment.findOne({ job: jobId, visibility: 'active' });
+
+        const jobObj = job.toObject();
+        if (assessment) {
+            jobObj.assessment = {
+                _id: assessment._id,
+                startTime: assessment.startTime,
+                endTime: assessment.endTime,
+                duration: assessment.duration
+            };
+
+            // Check if candidate has already completed or submitted this assessment
+            const CodingAssessmentReport = require("../models/codingAssessmentReport.model");
+            const report = await CodingAssessmentReport.findOne({ 
+                assessment: assessment._id, 
+                candidate: req.id // req.id is set by protect middleware
+            });
+
+            if (report && (report.status === 'completed' || report.status === 'submitted')) {
+                jobObj.isAssessmentCompleted = true;
+            } else {
+                jobObj.isAssessmentCompleted = false;
+            }
+        }
+
+        return res.status(200).json({ job: jobObj, success: true });
     } catch (error) {
         console.log(error);
         return res.status(500).json({ message: "Internal server error", success: false });
@@ -197,6 +225,39 @@ exports.getUniqueCompanies = async (req, res) => {
         const companies = await Company.find({ status: "active" }).select('name _id logo');
         
         return res.status(200).json({ companies, success: true });
+    } catch (error) {
+        console.log(error);
+        return res.status(500).json({ message: "Internal server error", success: false });
+    }
+};
+exports.deleteJob = async (req, res) => {
+    try {
+        const jobId = req.params.id;
+        
+        // Find the job and verify it belongs to the recruiter's company
+        const job = await Job.findOne({ _id: jobId, company: req.user.company });
+        if (!job) {
+            return res.status(404).json({
+                message: "Job not found or access denied.",
+                success: false
+            });
+        }
+
+        // Delete associated applications first (as per virtual relationship)
+        const Application = require("../models/application.js");
+        await Application.deleteMany({ job: jobId });
+
+        // Delete associated assessment if it exists
+        const Assessment = require("../models/assessment.model.js");
+        await Assessment.deleteOne({ job: jobId });
+
+        // Delete the job
+        await Job.findByIdAndDelete(jobId);
+
+        return res.status(200).json({
+            message: "Job deleted successfully.",
+            success: true
+        });
     } catch (error) {
         console.log(error);
         return res.status(500).json({ message: "Internal server error", success: false });

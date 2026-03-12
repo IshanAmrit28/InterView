@@ -24,6 +24,11 @@ import AppliedJobsPage from "../pages/candidate/AppliedJobsPage";
 import Jobs from "../pages/candidate/Jobs";
 import JobDescription from "../pages/candidate/JobDescription";
 import CodingInterface from "../pages/candidate/CodingInterface";
+import ContestList from "../pages/candidate/ContestList";
+import CandidateAssessmentPortal from "../pages/candidate/CandidateAssessmentPortal";
+import AssessmentCodingInterface from "../pages/candidate/AssessmentCodingInterface";
+import CandidateContestPortal from "../pages/candidate/CandidateContestPortal";
+import ContestCodingInterface from "../pages/candidate/ContestCodingInterface";
 
 const CandidateRoutes = () => {
   return (
@@ -51,6 +56,11 @@ const CandidateRoutes = () => {
       <Route path="jobs" element={<ProtectedRoute allowedRoles={["candidate"]}><Jobs /></ProtectedRoute>} />
       <Route path="description/:id" element={<ProtectedRoute allowedRoles={["candidate"]}><JobDescription /></ProtectedRoute>} />
       <Route path="practice/:problemId" element={<ProtectedRoute allowedRoles={["candidate"]}><CodingInterface /></ProtectedRoute>} />
+      <Route path="contests" element={<ProtectedRoute allowedRoles={["candidate"]}><ContestList /></ProtectedRoute>} />
+      <Route path="assessment/:assessmentId" element={<ProtectedRoute allowedRoles={["candidate"]}><CandidateAssessmentPortal /></ProtectedRoute>} />
+      <Route path="assessment/:assessmentId/solve/:problemId" element={<ProtectedRoute allowedRoles={["candidate"]}><AssessmentCodingInterface /></ProtectedRoute>} />
+      <Route path="contest/:contestId" element={<ProtectedRoute allowedRoles={["candidate"]}><CandidateContestPortal /></ProtectedRoute>} />
+      <Route path="contest/:contestId/solve/:problemId" element={<ProtectedRoute allowedRoles={["candidate"]}><ContestCodingInterface /></ProtectedRoute>} />
     </Routes>
   );
 };

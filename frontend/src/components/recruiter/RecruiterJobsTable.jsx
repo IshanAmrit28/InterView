@@ -2,11 +2,11 @@ import React, { useEffect, useState } from 'react'
 import { Table, TableBody, TableCaption, TableCell, TableHead, TableHeader, TableRow } from '../ui/table'
 import { Avatar, AvatarImage } from '../ui/avatar'
 import { Popover, PopoverContent, PopoverTrigger } from '../ui/popover'
-import { Edit2, Eye, MoreHorizontal, Power, PowerOff } from 'lucide-react'
+import { Edit2, Eye, MoreHorizontal, Power, PowerOff, Trash2 } from 'lucide-react'
 import { useSelector, useDispatch } from 'react-redux'
 import { useNavigate } from 'react-router-dom'
 import { Badge } from '../ui/badge'
-import { updateJobStatus } from '../../services/jobServices'
+import { updateJobStatus, deleteJob } from '../../services/jobServices'
 import { setAllAdminJobs } from '../../redux/jobSlice'
 import { toast } from 'sonner'
 
@@ -41,6 +41,22 @@ const AdminJobsTable = () => {
             }
         } catch (error) {
             toast.error(error.response?.data?.message || "Failed to update status");
+        }
+    }
+
+    const deleteHandler = async (jobId) => {
+        if (!window.confirm("Are you sure you want to delete this job? This action cannot be undone.")) return;
+        
+        try {
+            const res = await deleteJob(jobId);
+            if (res.data.success) {
+                toast.success(res.data.message);
+                // Update Redux state
+                const updatedJobs = allAdminJobs.filter(job => job._id !== jobId);
+                dispatch(setAllAdminJobs(updatedJobs));
+            }
+        } catch (error) {
+            toast.error(error.response?.data?.message || "Failed to delete job");
         }
     }
 
@@ -101,6 +117,10 @@ const AdminJobsTable = () => {
                                                             </>
                                                         )}
                                                     </div>
+                                                    <div onClick={() => deleteHandler(job._id)} className='flex items-center w-full gap-2 cursor-pointer mt-1 hover:bg-gray-800 p-2 rounded-md transition-colors text-red-400 hover:text-red-300'>
+                                                        <Trash2 className='w-4'/>
+                                                        <span>Delete</span>
+                                                    </div>
                                             </PopoverContent>
                                         </Popover>
                                     </TableCell>
@@ -115,4 +135,4 @@ const AdminJobsTable = () => {
     )
 }
 
-export default AdminJobsTable
+export default AdminJobsTable;

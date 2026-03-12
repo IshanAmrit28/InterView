@@ -14,5 +14,6 @@ router.get("/filters/companies", jobController.getUniqueCompanies);
 
 router.get("/get/:id", protect, jobController.getJobById);
 router.put("/status/:id", protect, isRecruiter, jobController.updateJobStatus);
+router.delete("/delete/:id", protect, isRecruiter, jobController.deleteJob);
 
 module.exports = router;

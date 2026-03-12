@@ -25,10 +25,11 @@ function RecruiterNavbar() {
   const isActive = (path) => (location.pathname === path ? "active" : "");
 
   const navItems = [
-    { name: "Dashboard", path: "/recruiter/companies" },
+    { name: "Dashboard", path: "/recruiter/dashboard" },
     { name: "Post Job", path: "/recruiter/jobs/create" },
-    { name: "My Jobs", path: "/recruiter/jobs" },
-    { name: "Applicants", path: "/recruiter/applicants" } // Routes to standalone applicants viewer
+    { name: "Jobs", path: "/recruiter/jobs" },
+    { name: "Assessments", path: "/recruiter/assessments" },
+    { name: "Questions", path: "/recruiter/questions" },
   ];
 
   return (
@@ -36,7 +37,7 @@ function RecruiterNavbar() {
       <div className="navbar-container">
 
         {/* Brand Logo - Text Only */}
-        <Link to="/recruiter/companies" className="navbar-brand">
+        <Link to="/recruiter/dashboard" className="navbar-brand">
           CareerByte Recruiter
         </Link>
         

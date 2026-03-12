@@ -1,5 +1,21 @@
 const Report = require("../models/reportModel");
 const User = require("../models/user");
+const UserContestRating = require("../models/userContestRating.model");
+const Submission = require("../models/submission");
+const CodingAssessmentReport = require("../models/codingAssessmentReport.model");
+const Job = require("../models/job");
+const Application = require("../models/application");
+const Assessment = require("../models/assessment.model");
+
+// Helper to get YYYY-MM-DD from a Date object in local time
+const formatDateYMD = (date) => {
+    if (!date) return null;
+    const d = new Date(date);
+    const year = d.getFullYear();
+    const month = String(d.getMonth() + 1).padStart(2, '0');
+    const day = String(d.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
+};
 
 // Compute a strictly Codeforces-style user rating based on chronological reports
 const computeUserRating = (reports) => {
@@ -38,7 +54,10 @@ const computeUserRating = (reports) => {
 
 const getGlobalRankings = async () => {
     // 1. Fetch all candidates sorted by their persistent rating
-    const users = await User.find({ userType: "candidate" })
+    const users = await User.find({ 
+        userType: "candidate",
+        rating: { $gt: 0 } // Only rank users who have completed at least one contest
+      })
       .select("_id userName email rating profile")
       .sort({ rating: -1 })
       .lean();
@@ -48,17 +67,22 @@ const getGlobalRankings = async () => {
         userId: user._id, 
         userName: user.userName,
         email: user.email ? user.email.toLowerCase() : "",
-        rating: user.rating || 1000,
+        rating: user.rating,
         profilePhoto: user.profile ? user.profile.profilePhoto : ""
     }));
 };
 
 exports.getDashboardData = async (req, res) => {
   try {
-    const userId = req.user.id;
+    const userId = req.user._id;
     
     // Fetch all reports for the user
     const reports = await Report.find({ candidateId: userId }).sort({ createdAt: 1 });
+    
+    // Fetch contest rating history
+    const contestHistory = await UserContestRating.find({ user: userId })
+        .populate('contest', 'title')
+        .sort({ createdAt: 1 });
     
     // Calculate global rankings
     const allRankings = await getGlobalRankings();
@@ -75,15 +99,27 @@ exports.getDashboardData = async (req, res) => {
         ? Math.round(((totalRankedUsers - rank) / (totalRankedUsers - 1)) * 100) 
         : (rank === 1 ? 100 : 0);
 
-    // Format Heatmap Data (Count reports per day)
+    // Format Heatmap Data (Aggregate activity from multiple sources)
     const heatmapDataMap = {};
+    
+    // 1. Interview Reports
     reports.forEach(report => {
-        const dateStr = new Date(report.createdAt).toISOString().split('T')[0];
-        if (heatmapDataMap[dateStr]) {
-            heatmapDataMap[dateStr]++;
-        } else {
-            heatmapDataMap[dateStr] = 1;
-        }
+        const dateStr = formatDateYMD(report.createdAt);
+        if (dateStr) heatmapDataMap[dateStr] = (heatmapDataMap[dateStr] || 0) + 1;
+    });
+
+    // 2. Normal Coding & Contest Submissions (Status: Accepted)
+    const acceptedSubmissions = await Submission.find({ user: userId, status: "Accepted" });
+    acceptedSubmissions.forEach(sub => {
+        const dateStr = formatDateYMD(sub.createdAt);
+        if (dateStr) heatmapDataMap[dateStr] = (heatmapDataMap[dateStr] || 0) + 1;
+    });
+
+    // 3. Coding Assessments
+    const assessments = await CodingAssessmentReport.find({ candidate: userId, status: "completed" });
+    assessments.forEach(ass => {
+        const dateStr = formatDateYMD(ass.submitTime || ass.createdAt);
+        if (dateStr) heatmapDataMap[dateStr] = (heatmapDataMap[dateStr] || 0) + 1;
     });
     
     const heatmapMapList = Object.keys(heatmapDataMap).map(date => ({
@@ -150,13 +186,23 @@ exports.getDashboardData = async (req, res) => {
             rank,
             totalRankedUsers,
             percentile,
+            bio: currentUser.profile?.bio || "",
+            resume: currentUser.profile?.resume || "",
+            resumeOriginalName: currentUser.profile?.resumeOriginalName || ""
         },
         heatmapData: heatmapMapList,
         sectorScores,
         reports: reports.map(r => ({
             ...r.toObject(),
             overallScore: r.reportStructure?.overallScore || 0
-        }))
+        })),
+        contestHistory: contestHistory.map(ch => ({
+            ...ch.toObject(),
+            date: ch.createdAt,
+            rating: ch.rating,
+            contestTitle: ch.contest?.title
+        })),
+        isUnrated: (rating || 0) === 0
       }
     });
   } catch (error) {
@@ -179,6 +225,11 @@ exports.getPublicProfile = async (req, res) => {
 
     // Fetch all reports for the user
     const reports = await Report.find({ candidateId: userId }).sort({ createdAt: 1 });
+
+    // Fetch contest rating history
+    const contestHistory = await UserContestRating.find({ user: userId })
+        .populate('contest', 'title')
+        .sort({ createdAt: 1 });
     
     // Calculate global rankings
     const allRankings = await getGlobalRankings();
@@ -192,15 +243,27 @@ exports.getPublicProfile = async (req, res) => {
         ? Math.round(((totalRankedUsers - rank) / (totalRankedUsers - 1)) * 100) 
         : (rank === 1 ? 100 : 0);
 
-    // Format Heatmap Data (Count reports per day)
+    // Format Heatmap Data (Aggregate activity from multiple sources)
     const heatmapDataMap = {};
+    
+    // 1. Interview Reports
     reports.forEach(report => {
-        const dateStr = new Date(report.createdAt).toISOString().split('T')[0];
-        if (heatmapDataMap[dateStr]) {
-            heatmapDataMap[dateStr]++;
-        } else {
-            heatmapDataMap[dateStr] = 1;
-        }
+        const dateStr = formatDateYMD(report.createdAt);
+        if (dateStr) heatmapDataMap[dateStr] = (heatmapDataMap[dateStr] || 0) + 1;
+    });
+
+    // 2. Normal Coding & Contest Submissions (Status: Accepted)
+    const acceptedSubmissions = await Submission.find({ user: userId, status: "Accepted" });
+    acceptedSubmissions.forEach(sub => {
+        const dateStr = formatDateYMD(sub.createdAt);
+        if (dateStr) heatmapDataMap[dateStr] = (heatmapDataMap[dateStr] || 0) + 1;
+    });
+
+    // 3. Coding Assessments
+    const assessments = await CodingAssessmentReport.find({ candidate: userId, status: "completed" });
+    assessments.forEach(ass => {
+        const dateStr = formatDateYMD(ass.submitTime || ass.createdAt);
+        if (dateStr) heatmapDataMap[dateStr] = (heatmapDataMap[dateStr] || 0) + 1;
     });
     
     const heatmapMapList = Object.keys(heatmapDataMap).map(date => ({
@@ -253,6 +316,9 @@ exports.getPublicProfile = async (req, res) => {
       data: {
         userName: user.userName,
         profilePhoto: user.profile ? user.profile.profilePhoto : "",
+        bio: user.profile?.bio || "",
+        resume: user.profile?.resume || "",
+        resumeOriginalName: user.profile?.resumeOriginalName || "",
         profileData: {
             rating,
             rank,
@@ -260,8 +326,15 @@ exports.getPublicProfile = async (req, res) => {
             percentile,
         },
         heatmapData: heatmapMapList,
-        sectorScores,
-        totalInterviews: reportCount
+        totalInterviews: reportCount,
+        contestHistory: contestHistory.map(ch => ({
+            ...ch.toObject(),
+            date: ch.createdAt,
+            rating: ch.rating,
+            contestTitle: ch.contest?.title
+        })),
+        isUnrated: (rating || 0) === 0,
+        sectorScores: sectorScores
         // Explicitly omitting `reports` to hide private interview details on the public profile
       }
     });
@@ -270,3 +343,74 @@ exports.getPublicProfile = async (req, res) => {
     res.status(500).json({ success: false, message: "Server error", error: error.message });
   }
 };
+
+exports.getRecruiterStats = async (req, res) => {
+    try {
+        const recruiterId = req.user._id;
+
+        // 1. Fetch Job Stats
+        const activeJobsCount = await Job.countDocuments({ created_by: recruiterId, status: 'active' });
+        const inactiveJobsCount = await Job.countDocuments({ created_by: recruiterId, status: 'inactive' });
+
+        // 2. Fetch Total Applicants (Across all jobs by this recruiter)
+        const recruiterJobs = await Job.find({ created_by: recruiterId }).select('_id');
+        const jobIds = recruiterJobs.map(job => job._id);
+        const totalApplicants = await Application.countDocuments({ job: { $in: jobIds } });
+
+        // 3. Fetch Assessment Stats
+        const activeAssessmentsCount = await Assessment.countDocuments({ recruiter: recruiterId, visibility: 'active' });
+        const closedAssessmentsCount = await Assessment.countDocuments({ recruiter: recruiterId, visibility: 'closed' });
+
+        // 4. Candidates who attempted assessments
+        const recruiterAssessments = await Assessment.find({ recruiter: recruiterId }).select('_id');
+        const assessmentIds = recruiterAssessments.map(a => a._id);
+        const reports = await CodingAssessmentReport.find({ assessment: { $in: assessmentIds } });
+        
+        const totalAttempts = reports.length;
+        const completedReports = reports.filter(r => r.status === 'completed' || r.status === 'submitted');
+        const countCompleted = completedReports.length;
+        
+        // 4.1 Success Rate (Score > 60%)
+        const successfulReports = completedReports.filter(r => (r.totalScore / (r.maxPossibleScore || 1)) >= 0.6);
+        const successRate = totalAttempts > 0 ? Math.round((successfulReports.length / totalAttempts) * 100) : 0;
+
+        // 4.2 Drop-off Rate (Started but not finished)
+        const dropOffCount = reports.filter(r => r.status === 'in-progress').length;
+        const dropOffRate = totalAttempts > 0 ? Math.round((dropOffCount / totalAttempts) * 100) : 0;
+
+        // 4.3 Average Completion Time (in minutes)
+        let totalCompletionTime = 0;
+        let validCompletionCount = 0;
+        completedReports.forEach(r => {
+            if (r.submitTime && r.startTime) {
+                const diff = (new Date(r.submitTime) - new Date(r.startTime)) / 60000;
+                if (diff > 0) {
+                    totalCompletionTime += diff;
+                    validCompletionCount++;
+                }
+            }
+        });
+        const avgCompletionTime = validCompletionCount > 0 ? Math.round(totalCompletionTime / validCompletionCount) : 0;
+
+        res.status(200).json({
+            success: true,
+            stats: {
+                activeJobs: activeJobsCount,
+                inactiveJobs: inactiveJobsCount,
+                totalApplicants,
+                activeAssessments: activeAssessmentsCount,
+                closedAssessments: closedAssessmentsCount,
+                candidatesGivenAssessment: countCompleted,
+                realtimeMetrics: {
+                    successRate,
+                    dropOffRate,
+                    avgCompletionTime
+                }
+            }
+        });
+    } catch (error) {
+        console.error("Recruiter Stats error:", error);
+        res.status(500).json({ success: false, message: "Server error", error: error.message });
+    }
+};
+

@@ -27,8 +27,7 @@ const AdminCodingProblems = () => {
     }
   };
 
-  const handleCreateProblem = async (e) => {
-    e.preventDefault();
+  const handleCreateProblem = async (visibility) => {
     if (!jsonInput.trim()) return setError("Please enter JSON data");
 
     setIsSubmitting(true);
@@ -37,10 +36,13 @@ const AdminCodingProblems = () => {
     try {
       const parsedData = JSON.parse(jsonInput);
       
-      const res = await createCodingProblem(parsedData);
+      // Attach visibilityStatus
+      const payload = { ...parsedData, visibilityStatus: visibility };
+      
+      const res = await createCodingProblem(payload);
       setProblems([...problems, res.problem]);
       setJsonInput("");
-      showSuccess("Coding problem added successfully.");
+      showSuccess(`Problem added to ${visibility} collection.`);
     } catch (err) {
       if (err instanceof SyntaxError) {
         setError("Invalid JSON format. Please check your syntax.");
@@ -123,24 +125,40 @@ const AdminCodingProblems = () => {
             <Code2 size={14} /> Insert Template
           </button>
         </div>
-        <form onSubmit={handleCreateProblem} className="flex flex-col gap-4">
+        <div className="flex flex-col gap-4">
           <textarea
             value={jsonInput}
             onChange={(e) => setJsonInput(e.target.value)}
             placeholder="Paste problem JSON here...\nMust include title, description, difficulty, timeLimit, memoryLimit, and testCases[]"
             className="w-full h-64 bg-gray-950 font-mono text-sm border border-gray-700 rounded-xl p-4 text-green-400 focus:outline-none focus:border-red-500 transition-colors"
           />
-          <div className="flex justify-end">
+          <div className="flex justify-end gap-3">
             <button
-              type="submit"
+              onClick={() => handleCreateProblem("public")}
               disabled={isSubmitting}
-              className="bg-red-600 hover:bg-red-500 disabled:opacity-50 text-white font-bold px-8 py-3 rounded-xl transition-colors flex items-center gap-2"
+              className="bg-emerald-600 hover:bg-emerald-500 disabled:opacity-50 text-white font-bold px-6 py-3 rounded-xl transition-colors flex items-center gap-2"
             >
               {isSubmitting ? <Loader2 size={18} className="animate-spin" /> : <SquareTerminal size={18} />}
-              Save Problem to Database
+              Save to Public
+            </button>
+            <button
+              onClick={() => handleCreateProblem("contest")}
+              disabled={isSubmitting}
+              className="bg-blue-600 hover:bg-blue-500 disabled:opacity-50 text-white font-bold px-6 py-3 rounded-xl transition-colors flex items-center gap-2"
+            >
+              {isSubmitting ? <Loader2 size={18} className="animate-spin" /> : <SquareTerminal size={18} />}
+              Save to Contest
+            </button>
+            <button
+              onClick={() => handleCreateProblem("private")}
+              disabled={isSubmitting}
+              className="bg-red-600 hover:bg-red-500 disabled:opacity-50 text-white font-bold px-6 py-3 rounded-xl transition-colors flex items-center gap-2"
+            >
+              {isSubmitting ? <Loader2 size={18} className="animate-spin" /> : <SquareTerminal size={18} />}
+              Save to Company
             </button>
           </div>
-        </form>
+        </div>
       </div>
 
       <div className="flex justify-between items-center mb-4">

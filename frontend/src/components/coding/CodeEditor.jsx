@@ -13,7 +13,7 @@ const CodeEditor = ({ language, value, onChange, theme = 'vs-dark' }) => {
     }[language] || 'cpp';
 
     return (
-        <div className="flex-1 min-h-0 w-full border-b border-gray-200 dark:border-gray-800">
+        <div className="h-full w-full border-b border-gray-200 dark:border-gray-800">
             <Editor
                 height="100%"
                 language={monacoLanguage}

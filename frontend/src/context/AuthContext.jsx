@@ -2,6 +2,7 @@ import React, { createContext, useContext, useState, useEffect } from 'react';
 import { getCurrentUser, logout as authLogout } from '../services/authServices';
 import { useDispatch } from 'react-redux';
 import { setUser as setReduxUser } from '../redux/authSlice';
+import api from '../services/api';
 
 const AuthContext = createContext(null);
 
@@ -18,6 +19,21 @@ export const AuthProvider = ({ children }) => {
     if (storedUser) {
       setUser(storedUser);
       dispatch(setReduxUser(storedUser));
+
+      // Refresh user data from backend to ensure hasPassword and other fields are up to date
+      const refreshUser = async () => {
+        try {
+          const { data } = await api.get('/auth/profile');
+          if (data.success) {
+            setUser(data.user);
+            dispatch(setReduxUser(data.user));
+            localStorage.setItem('user', JSON.stringify(data.user));
+          }
+        } catch (err) {
+          console.error("Failed to refresh user data:", err);
+        }
+      };
+      refreshUser();
     } else {
       dispatch(setReduxUser(null));
     }

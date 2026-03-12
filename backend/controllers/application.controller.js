@@ -50,7 +50,7 @@ exports.applyJob = async (req, res) => {
 exports.getAppliedJobs = async (req, res) => {
     try {
         const userId = req.id;
-        const application = await Application.find({ applicant: userId }).sort({ createdAt: -1 }).populate({
+        const applications = await Application.find({ applicant: userId }).sort({ createdAt: -1 }).populate({
             path: 'job',
             options: { sort: { createdAt: -1 } },
             populate: {
@@ -58,14 +58,47 @@ exports.getAppliedJobs = async (req, res) => {
                 options: { sort: { createdAt: -1 } },
             }
         });
-        if (!application) {
-            return res.status(404).json({
-                message: "No Applications",
-                success: false
+
+        if (!applications || applications.length === 0) {
+            return res.status(200).json({
+                application: [],
+                success: true
             });
         }
+
+        // Fetch associated assessments for these jobs
+        const jobIds = applications.map(app => app.job?._id).filter(id => id);
+        const Assessment = require("../models/assessment.model");
+        const assessments = await Assessment.find({ job: { $in: jobIds }, visibility: 'active' });
+
+        // Fetch reports to check if already submitted
+        const CodingAssessmentReport = require("../models/codingAssessmentReport.model");
+        const reports = await CodingAssessmentReport.find({ 
+            candidate: userId, 
+            assessment: { $in: assessments.map(a => a._id) } 
+        });
+
+        // Map assessments to applications
+        const applicationsWithAssessments = applications.map(app => {
+            const appObj = app.toObject();
+            if (app.job) {
+                const assessment = assessments.find(a => a.job.toString() === app.job._id.toString());
+                if (assessment) {
+                    const report = reports.find(r => r.assessment.toString() === assessment._id.toString());
+                    appObj.assessment = {
+                        _id: assessment._id,
+                        startTime: assessment.startTime,
+                        endTime: assessment.endTime,
+                        duration: assessment.duration,
+                        isSubmitted: !!report
+                    };
+                }
+            }
+            return appObj;
+        });
+
         return res.status(200).json({
-            application,
+            application: applicationsWithAssessments,
             success: true
         });
     } catch (error) {

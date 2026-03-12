@@ -21,3 +21,7 @@ export const postJob = async (data) => {
 export const updateJobStatus = async (id, status) => {
     return await api.put(`${JOB_API_END_POINT}/status/${id}`, { status });
 };
+
+export const deleteJob = async (id) => {
+    return await api.delete(`${JOB_API_END_POINT}/delete/${id}`);
+};

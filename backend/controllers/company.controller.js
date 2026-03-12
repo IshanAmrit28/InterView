@@ -1,6 +1,5 @@
 const Company = require("../models/company.js");
-const getDataUri = require("../utils/datauri.js");
-const cloudinary = require("../utils/cloudinary.js");
+const { uploadToS3 } = require("../utils/s3.js");
 
 const getRole = (user) => (user?.userType || "").toLowerCase().trim();
 
@@ -74,8 +73,7 @@ exports.updateCompany = async (req, res) => {
 
         let logo;
         if (file) {
-            const fileUri = getDataUri(file);
-            const cloudResponse = await cloudinary.uploader.upload(fileUri.content);
+            const cloudResponse = await uploadToS3(file, "company_logos");
             logo = cloudResponse.secure_url;
         }
     

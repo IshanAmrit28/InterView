@@ -36,7 +36,12 @@ const submissionSchema = new mongoose.Schema({
         compile_output: String
     }],
     totalTime: Number,
-    totalMemory: Number
+    totalMemory: Number,
+    contest: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Contest',
+        required: false
+    }
 }, { 
     timestamps: true 
 });

@@ -9,6 +9,12 @@ import CodeEditor from '../../components/coding/CodeEditor';
 import ConsolePanel from '../../components/coding/ConsolePanel';
 import codingService from '../../services/coding.service';
 
+const defaultTemplates = {
+    cpp: "#include <iostream>\n\nint main() {\n    // solve here\n    return 0;\n}",
+    java: "import java.util.*;\n\npublic class Main {\n    public static void main(String[] args) {\n        // solve here\n    }\n}",
+    python: "def solve():\n    # solve here\n    pass\n\nif __name__ == \"__main__\":\n    solve()"
+};
+
 const CodingInterface = () => {
     const { problemId } = useParams();
     const navigate = useNavigate();
@@ -45,9 +51,18 @@ const CodingInterface = () => {
     useEffect(() => {
         if (problem) {
             const savedCode = localStorage.getItem(`code_${problemId}_${language}`);
-            setCode(savedCode || problem.templates[language]);
+            const templateCode = problem.templates?.[language] || defaultTemplates[language];
+            setCode(savedCode || templateCode);
         }
-    }, [language, problem]);
+    }, [language, problem, problemId]);
+
+    const handleReset = () => {
+        if (window.confirm("Reset current code?")) {
+            const templateCode = problem?.templates?.[language] || defaultTemplates[language];
+            setCode(templateCode);
+            localStorage.removeItem(`code_${problemId}_${language}`);
+        }
+    };
 
     // Autosave functionality
     useEffect(() => {
@@ -57,7 +72,7 @@ const CodingInterface = () => {
             }, 1000);
             return () => clearTimeout(timer);
         }
-    }, [code, problemId, language]);
+    }, [code, problemId, language]); // Restored language dependency to prevent saving to wrong key
 
     const handleRun = async () => {
         setIsRunning(true);
@@ -102,27 +117,37 @@ const CodingInterface = () => {
     return (
         <div className="flex flex-col h-screen bg-gray-50 dark:bg-[#0a0a0a] text-gray-900 dark:text-gray-100 overflow-hidden">
             {/* Header */}
-            <header className="h-14 flex items-center justify-between px-4 border-b border-gray-200 dark:border-gray-800 bg-white dark:bg-[#121212] z-20">
-                <div className="flex items-center gap-4">
+            <header className="h-16 flex items-center justify-between px-6 border-b border-gray-200 dark:border-gray-800 bg-white dark:bg-[#121212] z-20">
+                <div className="flex items-center gap-4 w-1/3">
                     <button 
                         onClick={() => navigate(-1)}
-                        className="p-1.5 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-md transition-colors"
+                        className="p-2 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-xl transition-all border border-gray-200 dark:border-gray-700"
                     >
                         <ChevronLeft className="w-5 h-5" />
                     </button>
-                    <div className="flex items-center gap-2">
-                        <Book className="w-4 h-4 text-blue-500" />
-                        <span className="font-semibold text-sm truncate max-w-[200px]">
+                    <div className="flex flex-col">
+                        <span className="text-[10px] uppercase tracking-widest text-blue-500 font-bold">Practice</span>
+                        <span className="font-bold text-sm truncate max-w-[180px]">
                             {problem?.title || "Loading..."}
                         </span>
                     </div>
                 </div>
 
-                <div className="flex items-center gap-3">
+                {/* Center: Title Placeholder (Empty) */}
+                <div className="flex-1" />
+
+                <div className="flex items-center justify-end gap-3 w-1/3">
                     <select 
                         value={language}
-                        onChange={(e) => setLanguage(e.target.value)}
-                        className="bg-gray-100 dark:bg-gray-800 border-none rounded-md px-3 py-1.5 text-xs font-medium focus:ring-1 focus:ring-blue-500 outline-none"
+                        onChange={(e) => {
+                            const newLang = e.target.value;
+                            // Explicitly save before switching
+                            if (code && problemId) {
+                                localStorage.setItem(`code_${problemId}_${language}`, code);
+                            }
+                            setLanguage(newLang);
+                        }}
+                        className="bg-gray-100 dark:bg-gray-800 border-none rounded-lg px-3 py-2 text-xs font-semibold focus:ring-2 focus:ring-blue-500 outline-none cursor-pointer"
                     >
                         <option value="cpp">C++</option>
                         <option value="java">Java</option>
@@ -132,18 +157,26 @@ const CodingInterface = () => {
                     <select 
                         value={theme}
                         onChange={(e) => setTheme(e.target.value)}
-                        className="bg-gray-100 dark:bg-gray-800 border-none rounded-md px-3 py-1.5 text-xs font-medium focus:ring-1 focus:ring-blue-500 outline-none"
+                        className="bg-gray-100 dark:bg-gray-800 border-none rounded-lg px-3 py-2 text-xs font-semibold focus:ring-2 focus:ring-blue-500 outline-none cursor-pointer"
                     >
                         <option value="vs-dark">Dark Theme</option>
                         <option value="light">Light Theme</option>
                     </select>
 
-                    <div className="h-6 w-px bg-gray-200 dark:bg-gray-800 mx-1" />
+                    <div className="h-8 w-px bg-gray-200 dark:bg-gray-800 mx-1" />
+
+                    <button 
+                        onClick={handleReset}
+                        className="p-2 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg text-gray-400 transition-colors border border-transparent hover:border-gray-200 dark:hover:border-gray-700"
+                        title="Reset code"
+                    >
+                        <Settings size={14} />
+                    </button>
 
                     <button 
                         onClick={handleRun}
                         disabled={isRunning || !problem}
-                        className="flex items-center gap-2 px-4 py-1.5 bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 disabled:opacity-50 rounded-md text-xs font-bold transition-all"
+                        className="flex items-center gap-2 px-4 py-2 bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 disabled:opacity-50 rounded-xl text-xs font-bold transition-all border border-gray-200 dark:border-gray-700"
                     >
                         <Play className="w-3.5 h-3.5" /> Run
                     </button>
@@ -151,7 +184,7 @@ const CodingInterface = () => {
                     <button 
                         onClick={handleSubmit}
                         disabled={isRunning || !problem}
-                        className="flex items-center gap-2 px-4 py-1.5 bg-blue-600 hover:bg-blue-700 disabled:opacity-50 text-white rounded-md text-xs font-bold shadow-lg shadow-blue-500/20 transition-all"
+                        className="flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 disabled:opacity-50 text-white rounded-xl text-xs font-bold transition-all shadow-lg shadow-blue-500/20"
                     >
                         <Send className="w-3.5 h-3.5" /> Submit
                     </button>
@@ -175,8 +208,9 @@ const CodingInterface = () => {
                         <PanelGroup direction="vertical" className="h-full w-full">
                             
                             {/* Top Right: Code Editor */}
-                            <Panel defaultSize={70} minSize={20} className="flex flex-col min-h-0">
+                            <Panel defaultSize={70} minSize={20} className="h-full flex flex-col min-h-0">
                                 <CodeEditor 
+                                    key={`${problemId}-${language}`} // Force fresh re-render on switch
                                     language={language}
                                     value={code}
                                     onChange={setCode}
@@ -189,7 +223,7 @@ const CodingInterface = () => {
                             </PanelResizeHandle>
 
                             {/* Bottom Right: Console Panel */}
-                            <Panel defaultSize={30} minSize={10} className="flex flex-col min-h-0">
+                            <Panel defaultSize={30} minSize={10} className="h-full flex flex-col min-h-0">
                                 <div className="px-4 py-1.5 bg-gray-100 dark:bg-gray-800 border-b border-gray-200 dark:border-gray-800 flex items-center gap-4 shrink-0">
                                     <label className="flex items-center gap-2 text-xs font-semibold text-gray-600 dark:text-gray-400 cursor-pointer">
                                         <input 
@@ -223,24 +257,6 @@ const CodingInterface = () => {
                 </PanelGroup>
             </main>
             
-            {/* Footer / Status Bar */}
-            <footer className="h-6 flex items-center justify-between px-4 bg-gray-100 dark:bg-[#121212] border-t border-gray-200 dark:border-gray-800 text-[10px] text-gray-500 uppercase tracking-wider">
-                <div className="flex items-center gap-4">
-                    <span className="flex items-center gap-1.5">
-                        <Settings className="w-3 h-3" /> Ready
-                    </span>
-                    <span className="flex items-center gap-1.5">
-                        <Terminal className="w-3 h-3" /> Judge0 Connected
-                    </span>
-                </div>
-                <div className="flex items-center gap-3">
-                    <span className="flex items-center gap-1">
-                        <Save className="w-3 h-3" /> Autosaved
-                    </span>
-                    <span>UTF-8</span>
-                    <span>Line 1, Col 1</span>
-                </div>
-            </footer>
         </div>
     );
 };

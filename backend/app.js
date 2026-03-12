@@ -22,7 +22,10 @@ const jobBoardRouter = require("./routes/job.route");
 const applicationRouter = require("./routes/application.route");
 const codingProblemRouter = require("./routes/codingProblem.route");
 const executionRouter = require("./routes/execution.route");
+const contestRouter = require("./routes/contest.route");
+const assessmentRouter = require("./routes/assessment.route");
 const errorsController = require("./controllers/errors");
+const { startCleanupTask } = require("./utils/cleanupTask");
 
 // FATAL STARTUP VALIDATION
 if (!process.env.JWT_SECRET || process.env.JWT_SECRET.trim() === "") {
@@ -74,6 +77,25 @@ app.use("/job-tracker", jobTrackerRoutes);
 app.use("/chat", chatRouter);
 app.use("/coding-problems", codingProblemRouter);
 app.use("/execute", executionRouter);
+app.use("/contests", contestRouter);
+app.use("/assessments", assessmentRouter);
+
+// Debug Auth Route
+const { protect: debugProtect } = require("./middleware/authMiddleware");
+app.get("/api/debug/auth", debugProtect, (req, res) => {
+  res.json({
+    success: true,
+    message: "Auth debug info",
+    id: req.id,
+    user: {
+      id: req.user?._id,
+      userName: req.user?.userName,
+      userType: req.user?.userType,
+      role: req.user?.role
+    },
+    headers: req.headers
+  });
+});
 
 // ERROR HANDLING
 app.use(errorsController.pageNotFound);
@@ -93,6 +115,7 @@ mongoose
   .connect(MONGO_URL)
   .then(() => {
     console.log("MongoDB Connected");
+    startCleanupTask();
     app.listen(PORT, () => {
       console.log(`Server: http://localhost:${PORT}`);
     });

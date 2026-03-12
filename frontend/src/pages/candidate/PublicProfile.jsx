@@ -2,11 +2,20 @@ import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import api from '../../services/api';
 import { useAuth } from '../../context/AuthContext';
-import { Loader2, ArrowLeft, Trophy, Target, Calendar as CalendarIcon } from 'lucide-react';
-import { ResponsiveContainer, BarChart, CartesianGrid, XAxis, YAxis, Tooltip as RechartsTooltip, Bar, Cell } from 'recharts';
+import { 
+  Loader2, 
+  ArrowLeft, 
+  Trophy, 
+  Calendar as CalendarIcon, 
+  TrendingUp, 
+  Star,
+  FileText
+} from 'lucide-react';
+import DocumentViewer from '../../components/shared/DocumentViewer';
 import CalendarHeatmap from 'react-calendar-heatmap';
 import 'react-calendar-heatmap/dist/styles.css';
 import './UserDashboard.css';
+import ProgressGraph from '../../components/ProgressGraph';
 
 const PublicProfile = () => {
   const { id } = useParams();
@@ -16,6 +25,18 @@ const PublicProfile = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [profileData, setProfileData] = useState(null);
+
+  // Resume Viewer State
+  const [viewerOpen, setViewerOpen] = useState(false);
+  const [selectedResume, setSelectedResume] = useState({ url: '', name: '' });
+
+  const openResume = (e) => {
+    e.preventDefault();
+    if (profileData.resume) {
+      setSelectedResume({ url: profileData.resume, name: profileData.resumeOriginalName || 'Resume.pdf' });
+      setViewerOpen(true);
+    }
+  };
 
   useEffect(() => {
     if (authLoading) return;
@@ -75,18 +96,8 @@ const PublicProfile = () => {
     );
   }
 
-  const { userName, profileData: stats, heatmapData, sectorScores, totalInterviews } = profileData;
+  const { userName, profileData: stats, heatmapData, bio, resume, resumeOriginalName } = profileData || {};
   
-  // Performance rating scale colors
-  const getRatingColor = (rating) => {
-    if (rating >= 2000) return 'text-yellow-400 drop-shadow-[0_0_15px_rgba(250,204,21,0.5)]'; // Tier 1
-    if (rating >= 1800) return 'text-purple-400 drop-shadow-[0_0_15px_rgba(192,132,252,0.5)]'; // Tier 2
-    if (rating >= 1500) return 'text-blue-400 drop-shadow-[0_0_15px_rgba(96,165,250,0.5)]'; // Tier 3
-    if (rating >= 1200) return 'text-emerald-400 drop-shadow-[0_0_15px_rgba(52,211,153,0.5)]'; // Tier 4
-    return 'text-gray-400'; // Base
-  };
-
-  const barColors = ['#8b5cf6', '#3b82f6', '#10b981'];
   const endDate = new Date();
   const startDate = new Date();
   startDate.setFullYear(endDate.getFullYear() - 1);
@@ -99,6 +110,12 @@ const PublicProfile = () => {
     return 'color-scale-4';
   };
 
+  const isUnrated = (stats?.rating || 0) === 0;
+  const ratingColors = isUnrated ? 'text-gray-500' :
+                       stats.rating >= 2000 ? 'text-yellow-400 drop-shadow-[0_0_8px_rgba(250,204,21,0.4)]' :
+                       stats.rating >= 1500 ? 'text-indigo-400 drop-shadow-[0_0_8px_rgba(129,140,248,0.4)]' :
+                       'text-gray-700 dark:text-gray-300';
+
   return (
     <div className="min-h-screen bg-[#09090b] text-white pt-24 px-4 md:px-8 pb-12 font-sans overflow-x-hidden relative">
       <div className="fixed top-[-20%] left-[-10%] w-[60%] h-[60%] rounded-full bg-indigo-900/10 blur-[120px] pointer-events-none" />
@@ -108,142 +125,133 @@ const PublicProfile = () => {
         
         <button onClick={() => navigate('/candidate/leaderboard')} className="flex items-center gap-2 text-gray-400 hover:text-white transition group w-max">
             <ArrowLeft className="w-5 h-5 group-hover:-translate-x-1 transition-transform" />
-            <span className="font-medium">Leaderboard</span>
+            <span className="font-medium">Back to Standings</span>
         </button>
 
-        {/* Header section with Ranking */}
-        <div className="bg-gradient-to-br from-gray-900/60 to-gray-800/40 border border-gray-800 rounded-3xl p-8 backdrop-blur-md shadow-xl flex flex-col md:flex-row items-center gap-8 lg:gap-12 relative overflow-hidden">
-             
-             <div className="flex-shrink-0 relative">
-               <div className="w-24 h-24 md:w-32 md:h-32 rounded-full bg-gradient-to-br from-indigo-500/50 via-purple-500/50 to-pink-500/50 p-1 flex items-center justify-center overflow-hidden">
-                 <div className="w-full h-full bg-gray-900 rounded-full flex items-center justify-center text-3xl font-extrabold uppercase tracking-widest text-transparent bg-clip-text bg-gradient-to-br from-indigo-100 to-purple-200 overflow-hidden">
-                   {profileData.profilePhoto ? (
-                     <img src={profileData.profilePhoto} alt="Profile" className="w-full h-full object-cover" />
-                   ) : (
-                     userName?.substring(0, 2) || "U"
-                   )}
-                 </div>
-               </div>
-               {stats.rank === 1 && (
-                  <div className="absolute -top-3 -right-3 bg-yellow-500/20 p-2.5 rounded-full border border-yellow-500/50 backdrop-blur-sm shadow-[0_0_20px_rgba(234,179,8,0.3)]">
-                     <Trophy className="w-6 h-6 text-yellow-400" />
-                  </div>
-               )}
-             </div>
-
-             <div className="text-center md:text-left z-10 w-full">
-                <div className="flex flex-col md:flex-row md:items-baseline md:justify-between mb-6 border-b border-gray-800 pb-6 w-full gap-4">
-                    <div>
-                        <h1 className="text-3xl md:text-4xl font-extrabold mb-1 tracking-tight">{userName}</h1>
-                        <p className="text-gray-400 text-sm">Public Candidate Profile</p>
-                    </div>
-                    <div className="text-center md:text-right bg-gray-800/50 px-6 py-3 rounded-2xl border border-gray-700/50">
-                        <div className="text-xs text-gray-400 uppercase tracking-widest mb-1 font-semibold">Global Rank</div>
-                        <div className="text-2xl font-bold flex items-baseline justify-center md:justify-end gap-1">
-                           <span className="text-white">#{stats.rank}</span>
-                           <span className="text-sm text-gray-500 font-normal">/ {stats.totalRankedUsers}</span>
-                        </div>
-                    </div>
-                </div>
-                
-                <div className="flex flex-wrap items-center justify-center md:justify-start gap-8 md:gap-12 w-full">
-                   <div>
-                     <div className="text-xs text-gray-400 mb-1 uppercase tracking-wider font-semibold">Performance Rating</div>
-                     <div className={`text-4xl font-black tracking-tight ${getRatingColor(stats.rating)}`}>
-                        {stats.rating}
-                     </div>
-                   </div>
-                   
-                   <div className="h-10 w-px bg-gray-700/50 hidden md:block"></div>
-                   
-                   <div>
-                     <div className="text-xs text-gray-400 mb-1 uppercase tracking-wider font-semibold">Total Interviews</div>
-                     <div className="text-3xl font-bold text-gray-200">{totalInterviews}</div>
-                   </div>
-                </div>
-             </div>
-        </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {/* Sectional Mastery */}
-            <div className="bg-gray-900/40 border border-gray-800 rounded-3xl p-6 md:p-8 backdrop-blur-md shadow-xl flex flex-col justify-center">
-                <div className="flex items-center gap-3 mb-6">
-                    <Target className="w-5 h-5 text-purple-400" />
-                    <h2 className="text-sm uppercase tracking-wider font-bold text-gray-300">Public Section Mastery</h2>
-                </div>
-                
-                <div className="h-40 w-full relative">
-                   {sectorScores.length === 0 ? (
-                      <div className="absolute inset-0 flex flex-col items-center justify-center text-gray-500 text-sm border border-dashed border-gray-700/50 rounded-xl">
-                        <p>No section data found.</p>
+        <div className="flex flex-col gap-8 w-full">
+              
+              {/* Header section with Ranking */}
+              <div className="bg-[#111b27]/60 border border-slate-800 rounded-3xl p-6 md:p-8 backdrop-blur-md shadow-2xl flex flex-col md:flex-row items-center gap-6 relative overflow-hidden">
+                 {/* Decorative glow */}
+                 <div className="absolute top-0 right-0 w-64 h-64 bg-indigo-500/10 rounded-full blur-[80px]" />
+                 
+                 <div className="flex-shrink-0 relative">
+                    <div className="w-24 h-24 md:w-32 md:h-32 rounded-full bg-gradient-to-br from-indigo-500 via-purple-500 to-pink-500 p-1 flex items-center justify-center overflow-hidden">
+                      <div className="w-full h-full bg-white dark:bg-gray-900 rounded-full flex items-center justify-center text-3xl font-extrabold uppercase tracking-widest text-transparent bg-clip-text bg-gradient-to-br from-indigo-600 to-purple-600 dark:from-indigo-300 dark:to-purple-300 overflow-hidden">
+                        {profileData.profilePhoto ? (
+                          <img src={profileData.profilePhoto} alt="Profile" className="w-full h-full object-cover" />
+                        ) : (
+                          userName?.substring(0, 2) || "U"
+                        )}
                       </div>
-                   ) : (
-                     <ResponsiveContainer width="100%" height="100%">
-                       <BarChart data={sectorScores} margin={{ top: 10, right: 10, left: -25, bottom: 0 }} barSize={30}>
-                         <CartesianGrid strokeDasharray="3 3" stroke="#374151" vertical={false} opacity={0.2} />
-                         <XAxis dataKey="subject" stroke="#9ca3af" fontSize={11} tickLine={false} axisLine={false} dy={5} />
-                         <YAxis stroke="#9ca3af" fontSize={11} tickLine={false} axisLine={false} domain={[0, 100]} />
-                         <RechartsTooltip 
-                            cursor={{ fill: '#374151', opacity: 0.2 }} 
-                            content={({ active, payload }) => {
-                              if (active && payload && payload.length) {
-                                 return (
-                                   <div className="bg-gray-800 border border-gray-700 p-3 rounded-xl shadow-xl backdrop-blur-sm">
-                                     <p className="text-indigo-400 font-bold text-sm">{payload[0].payload.subject}</p>
-                                     <p className="text-gray-200 text-xs">Average: {payload[0].value}%</p>
-                                   </div>
-                                 );
-                              }
-                              return null;
-                            }}
-                         />
-                         <Bar dataKey="score" radius={[4, 4, 0, 0]} animationDuration={1000}>
-                           {sectorScores.map((entry, index) => (
-                             <Cell key={`cell-${index}`} fill={barColors[index % barColors.length]} />
-                           ))}
-                         </Bar>
-                       </BarChart>
-                     </ResponsiveContainer>
-                   )}
-                </div>
-            </div>
+                    </div>
+                    {stats?.rank === 1 && (
+                       <div className="absolute -top-3 -right-3 bg-yellow-500/20 p-2.5 rounded-full border border-yellow-500/50 backdrop-blur-sm animate-pulse">
+                          <Trophy className="w-6 h-6 text-yellow-400" />
+                       </div>
+                    )}
+                 </div>
 
-            {/* Activity Heatmap */}
-            <div className="bg-gray-900/40 border border-gray-800 rounded-3xl p-6 md:p-8 backdrop-blur-md shadow-xl overflow-hidden flex flex-col justify-center">
-               <div className="flex items-center justify-between w-full mb-4">
-                  <div className="flex items-center gap-3">
-                     <CalendarIcon className="w-5 h-5 text-pink-400" />
-                     <div>
-                        <h2 className="text-sm uppercase tracking-wider font-bold text-gray-300">Activity Grid</h2>
-                        <p className="text-xs text-gray-400">1-Year History</p>
-                     </div>
-                  </div>
-                  <div className="flex items-center gap-1.5 text-[9px] text-gray-400 bg-slate-800/40 px-3 py-1.5 rounded-full border border-slate-700/50">
-                     <span>Less</span>
-                     <div className="w-2 h-2 rounded-[1px] bg-[#1e293b]"></div>
-                     <div className="w-2 h-2 rounded-[1px] bg-[#3730a3]"></div>
-                     <div className="w-2 h-2 rounded-[1px] bg-[#4338ca]"></div>
-                     <div className="w-2 h-2 rounded-[1px] bg-[#6366f1]"></div>
-                     <div className="w-2 h-2 rounded-[1px] bg-[#a5b4fc]"></div>
-                     <span>More</span>
-                  </div>
-               </div>
+                 <div className="text-center md:text-left z-10 w-full">
+                    <h1 className="text-2xl md:text-4xl font-extrabold mb-1">{userName}</h1>
+                    <p className="text-gray-600 dark:text-gray-400 flex items-center justify-center md:justify-start gap-2 text-sm mb-6">
+                        <Star className="w-4 h-4" /> Global Talent Profile
+                    </p>
 
-               <div className="w-full overflow-x-auto heatmap-compact-wrapper">
-                  <div className="min-w-[700px]">
-                     <CalendarHeatmap
-                        startDate={startDate}
-                        endDate={endDate}
-                        values={heatmapData}
-                        classForValue={getHeatmapClassForValue}
-                        showWeekdayLabels={true}
-                     />
-                  </div>
-               </div>
-            </div>
+                    {bio && (
+                      <div className="max-w-xl mb-6">
+                        <p className="text-gray-400 text-sm italic leading-relaxed">
+                          "{bio}"
+                        </p>
+                      </div>
+                    )}
+
+                    <div className="flex flex-wrap items-center justify-center md:justify-start gap-6 mb-6">
+                       <div className="flex flex-col gap-1">
+                          <span className="text-gray-500 dark:text-gray-400 text-[10px] uppercase tracking-tighter font-bold">CareerByte Rating</span>
+                          <div className={`text-3xl md:text-4xl font-black tracking-tighter ${ratingColors}`}>
+                             {isUnrated ? "Unrated" : stats?.rating?.toFixed(1) || "0.0"}
+                          </div>
+                       </div>
+
+                       <div className="flex flex-col gap-1 pl-6 border-l border-slate-200 dark:border-slate-800">
+                          <span className="text-gray-500 dark:text-gray-400 text-[10px] uppercase tracking-tighter font-bold">Global Rank</span>
+                          <div className="flex items-center gap-2">
+                             <div className="text-2xl md:text-3xl font-black text-gray-100 italic">
+                                {isUnrated ? "-" : `#${stats?.rank || 0}`}
+                             </div>
+                             {!isUnrated && (
+                             <div className="text-[10px] text-indigo-400 font-bold px-2 py-0.5 bg-indigo-500/10 rounded-full border border-indigo-500/20">
+                                Top {stats?.percentile || 0}%
+                             </div>
+                             )}
+                          </div>
+                       </div>
+                    </div>
+
+                    {resume && (
+                      <div className="mt-6 flex justify-center md:justify-start">
+                         <button 
+                            onClick={openResume}
+                            className="flex items-center gap-2 px-6 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-sm font-bold transition-all hover:scale-105 active:scale-95 shadow-lg shadow-indigo-500/20"
+                         >
+                            <FileText className="w-4 h-4" />
+                            View Candidate Resume
+                         </button>
+                      </div>
+                    )}
+                 </div>
+              </div>
+
+              {/* Performance Area Chart */}
+              <div className="bg-[#111b27]/40 border border-slate-800 rounded-3xl p-6 md:p-8 backdrop-blur-md shadow-xl">
+                 <div className="flex items-center justify-between mb-2">
+                    <div className="flex items-center gap-3">
+                        <TrendingUp className="w-5 h-5 text-indigo-400" />
+                        <h2 className="text-lg font-bold">Performance History</h2>
+                    </div>
+                 </div>
+                 
+                 <div className="w-full">
+                    <ProgressGraph 
+                        contestHistory={profileData.contestHistory} 
+                        currentRating={stats?.rating || 0}
+                    />
+                 </div>
+              </div>
+
+              {/* Activity Heatmap */}
+              <div className="bg-[#111b27]/40 border border-slate-800 rounded-3xl p-6 md:p-8 backdrop-blur-md shadow-xl overflow-hidden flex flex-col justify-center">
+                 <div className="flex items-center justify-between w-full mb-6">
+                    <div className="flex items-center gap-3">
+                       <CalendarIcon className="w-5 h-5 text-pink-400" />
+                       <div>
+                          <h2 className="text-sm uppercase tracking-wider font-bold text-gray-300">Activity Grid</h2>
+                          <p className="text-xs text-gray-400">1-Year History</p>
+                       </div>
+                    </div>
+                 </div>
+
+                 <div className="w-full heatmap-stretched-wrapper">
+                    <div className="text-xs">
+                       <CalendarHeatmap
+                          startDate={startDate}
+                          endDate={endDate}
+                          values={heatmapData || []}
+                          classForValue={getHeatmapClassForValue}
+                          showWeekdayLabels={true}
+                       />
+                    </div>
+                 </div>
+              </div>
         </div>
-
       </div>
+      <DocumentViewer 
+        isOpen={viewerOpen} 
+        onClose={() => setViewerOpen(false)} 
+        fileUrl={selectedResume.url} 
+        fileName={selectedResume.name} 
+      />
     </div>
   );
 };

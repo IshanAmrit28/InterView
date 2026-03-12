@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useMemo } from 'react'
 import * as DialogPrimitive from "@radix-ui/react-dialog"
 import { X, ChevronLeft, ChevronRight, ZoomIn, ZoomOut, Download, Loader2, FileText } from "lucide-react"
 import { Document, Page, pdfjs } from 'react-pdf'
@@ -38,6 +38,11 @@ const DocumentViewer = ({ isOpen, onClose, fileUrl, fileName, fileType }) => {
             handleDocxLoad();
         }
     }, [isOpen, fileUrl]);
+
+    const pdfOptions = useMemo(() => ({
+        cMapUrl: `https://unpkg.com/pdfjs-dist@${pdfjs.version}/cmaps/`,
+        cMapPacked: true,
+    }), []);
 
     const handleDocxLoad = async () => {
         try {
@@ -180,15 +185,11 @@ const DocumentViewer = ({ isOpen, onClose, fileUrl, fileName, fileType }) => {
                         {!error && isPdf && (
                             <div className={cn("pdf-document-wrapper shadow-2xl overflow-visible", loading ? "opacity-0" : "opacity-100")}>
                                 <Document
-                                    file={fileUrl}
+                                    file={{ url: fileUrl }}
                                     onLoadSuccess={onDocumentLoadSuccess}
                                     onLoadError={onDocumentLoadError}
                                     loading={null}
-                                    options={{
-                                        workerSrc: `https://unpkg.com/pdfjs-dist@${pdfjs.version}/build/pdf.worker.min.mjs`,
-                                        cMapUrl: `https://unpkg.com/pdfjs-dist@${pdfjs.version}/cmaps/`,
-                                        cMapPacked: true,
-                                    }}
+                                    options={pdfOptions}
                                 >
                                     <Page 
                                         pageNumber={pageNumber} 

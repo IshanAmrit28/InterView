@@ -5,16 +5,14 @@
   font-size: 10px;
 }
 
-.heatmap-compact-wrapper text {
+.heatmap-stretched-wrapper text {
   fill: #9ca3af;
-  font-size: 8px;
+  font-size: 11px;
 }
 
-.heatmap-compact-wrapper .react-calendar-heatmap rect {
-   width: 8px !important;
-   height: 8px !important;
-   rx: 2px !important;
-   ry: 2px !important;
+.heatmap-stretched-wrapper .react-calendar-heatmap rect {
+   rx: 3px !important;
+   ry: 3px !important;
 }
 
 .react-calendar-heatmap .color-empty {

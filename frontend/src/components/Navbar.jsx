@@ -30,6 +30,7 @@ function Navbar() {
     { name: "AI Chat", path: "/candidate/chat" },
     { name: "Interview", path: "/candidate/practice" },
     { name: "Coding", path: "/candidate/coding-problems" },
+    { name: "Contests", path: "/candidate/contests" },
     { name: "Video Feed", path: "/candidate/video-feed" },
     { name: "Notes", path: "/candidate/notes" },
     { name: "Quiz", path: "/candidate/quiz" },

@@ -9,17 +9,27 @@ const protect = async (req, res, next) => {
         token = req.cookies.token;
     }
 
-    if (!token) return res.status(401).json({ success: false, message: "No token provided" });
-
+    if (!token) {
+        console.log("[AUTH] No token found in headers or cookies");
+        return res.status(401).json({ success: false, message: "No token provided" });
+    }
     try {
         const decoded = jwt.verify(token, process.env.JWT_SECRET);
         const userId = decoded.id || decoded.userId;
         req.user = await User.findById(userId).select("-password");
         req.id = userId;
 
-        if (!req.user) return res.status(401).json({ success: false, message: "User not found" });
+        if (!req.user) {
+            console.log("[AUTH] User not found for ID:", userId);
+            return res.status(401).json({ success: false, message: "User not found" });
+        }
+
+        // Background heartbeat: Update updatedAt without blocking the request
+        User.updateOne({ _id: userId }, { $set: { updatedAt: new Date() } }).catch(err => console.error("Heartbeat error:", err));
+
         next();
     } catch (error) {
+        console.log("[AUTH] Token verification failed:", error.message);
         return res.status(401).json({ success: false, message: "Invalid token" });
     }
 };

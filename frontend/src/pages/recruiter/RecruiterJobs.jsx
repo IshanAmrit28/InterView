@@ -5,7 +5,6 @@ import { Button } from '../../components/ui/button'
 import { useNavigate } from 'react-router-dom' 
 import { useDispatch } from 'react-redux' 
 import AdminJobsTable from '../../components/recruiter/RecruiterJobsTable'
-import TeamMembers from '../../components/recruiter/TeamMembers'
 import useGetAllAdminJobs from '../../hooks/useGetAllAdminJobs'
 import { setSearchJobByText } from '../../redux/jobSlice'
 
@@ -33,13 +32,8 @@ const AdminJobs = () => {
           <Button onClick={() => navigate("/recruiter/jobs/create")} className="bg-indigo-600 hover:bg-indigo-700 text-white">New Jobs</Button>
         </div>
         
-        <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
-            <div className="lg:col-span-3 bg-gray-900/60 border border-gray-800 rounded-3xl p-6 backdrop-blur-md shadow-2xl">
-                <AdminJobsTable />
-            </div>
-            <div className="lg:col-span-1 bg-gray-900/40 border border-gray-800 rounded-3xl p-6 backdrop-blur-md shadow-2xl h-fit">
-                <TeamMembers />
-            </div>
+        <div className="bg-gray-900/60 border border-gray-800 rounded-3xl p-6 backdrop-blur-md shadow-2xl">
+            <AdminJobsTable />
         </div>
       </div>
     </div>

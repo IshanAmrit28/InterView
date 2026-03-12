@@ -1,6 +1,9 @@
 const CodingProblem = require("../models/codingProblem");
 const Submission = require("../models/submission");
+const Contest = require("../models/contest.model");
+const ContestRanking = require("../models/contestRanking.model");
 const { executeBatch, getStatusMessage, LANGUAGE_MAP } = require("../utils/judge0");
+const { canUserAccessProblem } = require("../utils/visibilityHelper");
 
 /**
  * Common logic to process results from Judge0
@@ -54,6 +57,15 @@ const runCode = async (req, res) => {
         const problem = await CodingProblem.findById(problemId);
         if (!problem) {
             return res.status(404).json({ success: false, message: "Problem not found" });
+        }
+
+        // Check visibility access
+        const hasAccess = await canUserAccessProblem(problem, req.user);
+        if (!hasAccess) {
+            return res.status(403).json({ 
+                success: false, 
+                message: "Access denied. You do not have permission to run code for this problem." 
+            });
         }
 
         // Prepare submissions
@@ -118,6 +130,15 @@ const submitCode = async (req, res) => {
             return res.status(404).json({ success: false, message: "Problem not found" });
         }
 
+        // Check visibility access
+        const hasAccess = await canUserAccessProblem(problem, req.user);
+        if (!hasAccess) {
+            return res.status(403).json({ 
+                success: false, 
+                message: "Access denied. You do not have permission to submit code for this problem." 
+            });
+        }
+
         const submissionsToRun = problem.testCases.map(tc => ({
             source_code: code,
             language_id: LANGUAGE_MAP[language],
@@ -150,8 +171,50 @@ const submitCode = async (req, res) => {
             status: finalStatus,
             results: results.map(r => ({ ...r, stdout: r.isHidden ? null : r.stdout })),
             totalTime,
-            totalMemory
+            totalMemory,
+            contest: req.body.contestId || null
         });
+
+        // Update contest rankings if applicable
+        if (req.body.contestId && finalStatus === "Accepted") {
+            try {
+                const contest = await Contest.findById(req.body.contestId);
+                if (contest) {
+                    const now = new Date();
+                    const penalty = Math.floor((now - new Date(contest.startTime)) / 1000);
+                    
+                    let ranking = await ContestRanking.findOne({ contest: contest._id, user: req.user._id });
+                    if (!ranking) {
+                        ranking = new ContestRanking({
+                            contest: contest._id,
+                            user: req.user._id,
+                            solvedProblems: [],
+                            totalPoints: 0,
+                            totalTime: 0
+                        });
+                    }
+
+                    // Check if problem already solved to avoid double counting
+                    const alreadySolved = ranking.solvedProblems.find(p => p.problem.toString() === problemId);
+                    if (!alreadySolved) {
+                        const problemPoints = problem.points || (problem.difficulty === 'Easy' ? 10 : problem.difficulty === 'Medium' ? 30 : 50);
+                        
+                        ranking.solvedProblems.push({
+                            problem: problemId,
+                            points: problemPoints,
+                            submittedAt: now,
+                            penalty: penalty
+                        });
+                        
+                        ranking.totalPoints += problemPoints;
+                        ranking.totalTime += penalty;
+                        await ranking.save();
+                    }
+                }
+            } catch (err) {
+                console.error("CONTEST_RANKING_UPDATE_ERROR:", err);
+            }
+        }
 
         res.status(201).json({
             success: true,

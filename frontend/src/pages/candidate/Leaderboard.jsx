@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import api from '../../services/api';
 import { useAuth } from '../../context/AuthContext';
-import { Loader2, Trophy, Search, ChevronLeft, ChevronRight } from 'lucide-react';
+import { ArrowLeft, Loader2, Trophy, Search, ChevronLeft, ChevronRight } from 'lucide-react';
 
 const Leaderboard = () => {
   const { user, loading: authLoading } = useAuth();
@@ -70,6 +70,14 @@ const Leaderboard = () => {
       <div className="fixed bottom-[-20%] right-[-10%] w-[50%] h-[50%] rounded-full bg-purple-900/10 blur-[120px] pointer-events-none" />
       
       <div className="max-w-5xl mx-auto relative z-10">
+         <button 
+           onClick={() => navigate('/candidate/profile')} 
+           className="flex items-center gap-2 text-gray-400 hover:text-indigo-400 transition-all group mb-8 w-fit bg-white/5 px-4 py-2 rounded-xl border border-white/10 hover:border-indigo-500/30 shadow-lg"
+         >
+            <ArrowLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform" />
+            <span className="font-bold text-sm uppercase tracking-wider">Back to Dashboard</span>
+         </button>
+
          <div className="flex flex-col md:flex-row justify-between items-center mb-8 gap-4">
             <div>
                <h1 className="text-3xl font-extrabold flex items-center gap-3">
@@ -105,8 +113,7 @@ const Leaderboard = () => {
                    <tr className="bg-slate-900/80 border-b border-slate-800">
                      <th className="px-6 py-4 font-semibold text-gray-300 w-24">Rank</th>
                      <th className="px-6 py-4 font-semibold text-gray-300">Candidate</th>
-                     <th className="px-6 py-4 font-semibold text-gray-300 text-center">Total Interviews</th>
-                     <th className="px-6 py-4 font-semibold text-gray-300 text-right">Rating</th>
+                     <th className="px-6 py-4 font-semibold text-gray-300 text-right">Contest Rating</th>
                    </tr>
                  </thead>
                  <tbody>
@@ -127,10 +134,11 @@ const Leaderboard = () => {
                              <span className="ml-3 text-xs bg-indigo-500/20 text-indigo-300 px-2 py-0.5 rounded-full border border-indigo-500/30">You</span>
                           )}
                        </td>
-                       <td className="px-6 py-4 text-gray-400 text-center">{u.totalInterviews}</td>
-                       <td className={`px-6 py-4 text-right tracking-wide ${getRatingColor(u.rating)}`}>
-                          {u.rating}
-                       </td>
+                        <td className="px-6 py-4 text-right tracking-wide">
+                          <span className={`px-3 py-1 bg-indigo-500/10 rounded-lg ${getRatingColor(u.rating)}`}>
+                             {u.rating?.toFixed(1) || '0.0'}
+                          </span>
+                        </td>
                      </tr>
                    ))}
                  </tbody>

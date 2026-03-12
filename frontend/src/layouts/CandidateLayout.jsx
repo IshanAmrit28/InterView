@@ -4,8 +4,11 @@ import Navbar from "../components/Navbar";
 const CandidateLayout = () => {
   const location = useLocation();
 
-  const isInterview = location.pathname.startsWith("/interview");
-  const hideNavbar = isInterview;
+  const hideNavbar = [
+    "/practice/",
+    "/solve/",
+    "/interview"
+  ].some(path => location.pathname.includes(path));
 
   return (
     <>

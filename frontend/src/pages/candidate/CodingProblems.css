@@ -214,6 +214,19 @@
     border: 1px solid;
 }
 
+.solved-badge {
+    background: rgba(34, 197, 94, 0.1);
+    color: #22c55e;
+    border: 1px solid rgba(34, 197, 94, 0.2);
+    padding: 0.2rem 0.75rem;
+    border-radius: 9999px;
+    font-weight: 700;
+    font-size: 0.75rem;
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+}
+
 .solve-button {
     display: flex;
     align-items: center;

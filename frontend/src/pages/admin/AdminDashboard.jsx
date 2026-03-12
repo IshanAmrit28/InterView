@@ -1,6 +1,6 @@
 import React from "react";
 import { Outlet, NavLink, useLocation } from "react-router-dom";
-import { Users, Database, Building2, SquareTerminal } from "lucide-react";
+import { Users, Database, Building2, SquareTerminal, Trophy } from "lucide-react";
 import AnimatedBackground from "../../components/AnimatedBackground";
 
 const AdminDashboard = () => {
@@ -11,6 +11,7 @@ const AdminDashboard = () => {
     { id: "questions", label: "Question Database", icon: Database, path: "/admin/questions" },
     { id: "companies", label: "Company Management", icon: Building2, path: "/admin/companies" },
     { id: "coding-problems", label: "Coding Problems", icon: SquareTerminal, path: "/admin/coding-problems" },
+    { id: "contests", label: "Contests", icon: Trophy, path: "/admin/contests" },
   ];
 
   return (

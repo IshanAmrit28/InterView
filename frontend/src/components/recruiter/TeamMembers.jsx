@@ -46,7 +46,7 @@ const TeamMembers = () => {
                     {members.length}
                 </Badge>
             </h2>
-            <div className="grid gap-3">
+            <div className="grid gap-3 overflow-y-auto pr-1 custom-scrollbar max-h-[350px]">
                 {members.length === 0 ? (
                     <p className="text-gray-500 text-sm italic">No other members yet.</p>
                 ) : (

@@ -13,4 +13,10 @@ router.get("/profile", protect, dashboardController.getDashboardData);
 // @access  Private
 router.get("/public/:id", protect, dashboardController.getPublicProfile);
 
+// @route   GET /api/dashboard/recruiter/stats
+// @desc    Get recruiter metrics
+// @access  Private (Recruiter)
+const { isRecruiter } = require("../middleware/authMiddleware");
+router.get("/recruiter/stats", protect, isRecruiter, dashboardController.getRecruiterStats);
+
 module.exports = router;

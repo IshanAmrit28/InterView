@@ -108,6 +108,8 @@ exports.login = async (req, res) => {
       phoneNumber: user.phoneNumber,
       profile: user.profile,
       company: user.company,
+      authProvider: user.authProvider,
+      hasPassword: user.hasPassword || !!user.password,
       // Use user.get('report') to bypass IDE TypeScript strict checking for virtuals
       report: user.get('report'),
       createdAt: user.createdAt,
@@ -138,8 +140,7 @@ exports.updateProfile = async (req, res) => {
     const { fullname, email, phoneNumber, bio, skills, userName } = req.body;
 
     const files = req.files;
-    const getDataUri = require("../utils/datauri.js");
-    const cloudinary = require("../utils/cloudinary.js");
+    const { uploadToS3 } = require("../utils/s3.js");
 
     const userId = req.id || req.user.id; // middleware authentication
     let user = await User.findById(userId);
@@ -158,22 +159,14 @@ exports.updateProfile = async (req, res) => {
     // Handle Profile Photo Upload
     if (files && files.profilePhoto) {
       const profilePhotoFile = files.profilePhoto[0];
-      const fileUri = getDataUri(profilePhotoFile);
-      const cloudResponse = await cloudinary.uploader.upload(fileUri.content, {
-        folder: "profile_photos",
-        resource_type: "image"
-      });
+      const cloudResponse = await uploadToS3(profilePhotoFile, "profile_photos");
       user.profile.profilePhoto = cloudResponse.secure_url;
     }
 
     // Handle Resume Upload (Field name "resume")
     if (files && files.resume) {
       const resumeFile = files.resume[0];
-      const fileUri = getDataUri(resumeFile);
-      const cloudResponse = await cloudinary.uploader.upload(fileUri.content, {
-        folder: "resumes",
-        resource_type: "raw"
-      });
+      const cloudResponse = await uploadToS3(resumeFile, "resumes");
       user.profile.resume = cloudResponse.secure_url;
       user.profile.resumeOriginalName = resumeFile.originalname;
     }
@@ -181,12 +174,7 @@ exports.updateProfile = async (req, res) => {
     // Handle Legacy File Upload (Field name "file")
     if (files && files.file) {
       const legacyFile = files.file[0];
-      const fileUri = getDataUri(legacyFile);
-      // Determine if it's an image or a document based on mimetype
-      const isImage = legacyFile.mimetype.startsWith('image/');
-      const cloudResponse = await cloudinary.uploader.upload(fileUri.content, {
-        resource_type: isImage ? "image" : "raw"
-      });
+      const cloudResponse = await uploadToS3(legacyFile, isImage ? "profile_photos" : "resumes");
       if (isImage) {
         user.profile.profilePhoto = cloudResponse.secure_url;
       } else {
@@ -245,12 +233,9 @@ exports.register = async (req, res) => {
       });
     }
     const file = req.file;
-    let cloudResponse;
+    const { uploadToS3 } = require("../utils/s3.js");
     if (file) {
-      const getDataUri = require("../utils/datauri.js");
-      const cloudinary = require("../utils/cloudinary.js");
-      const fileUri = getDataUri(file);
-      cloudResponse = await cloudinary.uploader.upload(fileUri.content);
+      cloudResponse = await uploadToS3(file, "profile_photos");
     }
 
     const existingUser = await User.findOne({ email });
@@ -272,6 +257,8 @@ exports.register = async (req, res) => {
       password: hashedPassword,
       userType: role,
       company: role === 'recruiter' ? req.body.company : undefined,
+      authProvider: 'local',
+      hasPassword: true,
       profile: {
         profilePhoto: cloudResponse ? cloudResponse.secure_url : "",
       }
@@ -443,7 +430,7 @@ exports.googleLogin = async (req, res) => {
       role: user.userType,
       profile: user.profile,
       authProvider: user.authProvider,
-      hasPassword: user.hasPassword,
+      hasPassword: user.hasPassword || !!user.password,
       createdAt: user.createdAt,
     };
 

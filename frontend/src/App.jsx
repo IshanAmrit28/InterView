@@ -5,6 +5,7 @@ import {
   useLocation,
 } from "react-router-dom";
 import { useEffect } from "react";
+import { Toaster } from "react-hot-toast";
 
 import AnimatedBackground from "./components/AnimatedBackground";
 import { AuthProvider } from "./context/AuthContext";
@@ -64,6 +65,7 @@ function AppContent() {
           minHeight: "100vh",
         }}
       >
+        <Toaster position="top-right" reverseOrder={false} />
         <Routes>
           {/* Public Auth & Landing Routes */}
           <Route element={<CandidateLayout />}>

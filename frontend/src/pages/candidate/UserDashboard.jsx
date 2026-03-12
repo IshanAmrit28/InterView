@@ -10,8 +10,11 @@ import {
   Loader2,
   ChevronLeft,
   ChevronRight,
-  Search
+  Search,
+  Eye,
+  FileText
 } from 'lucide-react';
+import DocumentViewer from '../../components/shared/DocumentViewer';
 import CalendarHeatmap from 'react-calendar-heatmap';
 import 'react-calendar-heatmap/dist/styles.css';
 import './UserDashboard.css';
@@ -38,6 +41,9 @@ const UserDashboard = () => {
   const [leaderboardPage, setLeaderboardPage] = useState(1);
   const [leaderboardLoading, setLeaderboardLoading] = useState(true);
   const [leaderboardError, setLeaderboardError] = useState(null);
+  // Resume Viewer State
+  const [viewerOpen, setViewerOpen] = useState(false);
+  const [selectedResume, setSelectedResume] = useState({ url: '', name: '' });
 
   useEffect(() => {
     if (authLoading) return;
@@ -160,290 +166,323 @@ const UserDashboard = () => {
     return 'text-gray-600 dark:text-gray-400 font-medium'; // Base
   };
 
-  const { profileData, heatmapData, sectorScores } = dashboardData;
-  const ratingColors = profileData.rating >= 2000 ? 'text-yellow-400 drop-shadow-[0_0_8px_rgba(250,204,21,0.4)]' :
+  if (!dashboardData) return null;
+  const { profileData, heatmapData, sectorScores, isUnrated } = dashboardData;
+
+  // Resume Viewer Logic (Moved here to have access to profileData)
+  const openResume = (e) => {
+    e.preventDefault();
+    if (profileData.resume) {
+      setSelectedResume({ url: profileData.resume, name: profileData.resumeOriginalName || 'Resume.pdf' });
+      setViewerOpen(true);
+    }
+  };
+
+  const ratingColors = isUnrated ? 'text-gray-500' :
+                       profileData.rating >= 2000 ? 'text-yellow-400 drop-shadow-[0_0_8px_rgba(250,204,21,0.4)]' :
                        profileData.rating >= 1500 ? 'text-indigo-400 drop-shadow-[0_0_8px_rgba(129,140,248,0.4)]' :
                        'text-gray-700 dark:text-gray-300';
                        
-  // Generate bar colors dynamically to make it beautiful
-  const barColors = ['#8b5cf6', '#3b82f6', '#10b981'];
+   const barColors = ['#8b5cf6', '#3b82f6', '#10b981'];
 
-  return (
+   // Calculate Heatmap Stats (Streak & Contributions)
+   const totalContributions = heatmapData?.reduce((acc, curr) => acc + (curr.count || 0), 0) || 0;
+   const longestStreak = (() => {
+       if (!heatmapData || heatmapData.length === 0) return 0;
+       let max = 0;
+       let current = 0;
+       // Sort by date to calculate streak accurately
+       const sorted = [...heatmapData].sort((a,b) => new Date(a.date) - new Date(b.date));
+       sorted.forEach(d => {
+           if (d.count > 0) {
+               current++;
+               if (current > max) max = current;
+           } else {
+               current = 0;
+           }
+       });
+       return max;
+   })();
+
+   return (
     <div className="min-h-screen bg-[#09090b] text-white pt-24 px-4 md:px-8 pb-12 font-sans overflow-x-hidden relative">
       <div className="fixed top-[-20%] left-[-10%] w-[60%] h-[60%] rounded-full bg-indigo-900/10 blur-[80px] opacity-70 dark:opacity-100 pointer-events-none" />
       <div className="fixed bottom-[-20%] right-[-10%] w-[50%] h-[50%] rounded-full bg-purple-900/10 blur-[80px] opacity-70 dark:opacity-100 pointer-events-none" />
       
-      <div className="max-w-6xl mx-auto relative z-10 space-y-8">
-
-        <div className="grid grid-cols-1 xl:grid-cols-3 gap-6 lg:gap-8 items-start">
-           {/* Main Left Content Area */}
-           <div className="xl:col-span-2 flex flex-col gap-6 lg:gap-8">
+      <div className="max-w-[1440px] mx-auto relative z-10 space-y-8">
+        {/* --- HERO SECTION: PROFILE & RANKINGS (Merged) --- */}
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-stretch">
+           {/* Profile Card - 8/12 */}
+           <div className="lg:col-span-8 bg-[#111b27]/60 border border-slate-800 rounded-3xl p-6 md:p-8 backdrop-blur-md shadow-2xl flex flex-col items-center gap-6 relative overflow-hidden">
+              {/* Decorative glow */}
+              <div className="absolute top-0 right-0 w-64 h-64 bg-indigo-500/10 rounded-full blur-[80px]" />
               
-              {/* Header section with Ranking */}
-              <div className="bg-[#111b27]/60 border border-slate-800 rounded-3xl p-6 md:p-8 backdrop-blur-md shadow-2xl flex flex-col md:flex-row items-center gap-6 relative overflow-hidden">
-                 {/* Decorative glow */}
-                 <div className="absolute top-0 right-0 w-64 h-64 bg-indigo-500/10 rounded-full blur-[80px]" />
-                 
-                 <div className="flex-shrink-0 relative">
-                   <div className="w-24 h-24 md:w-32 md:h-32 rounded-full bg-gradient-to-br from-indigo-500 via-purple-500 to-pink-500 p-1 flex items-center justify-center overflow-hidden">
-                     <div className="w-full h-full bg-white dark:bg-gray-900 rounded-full flex items-center justify-center text-3xl font-extrabold uppercase tracking-widest text-transparent bg-clip-text bg-gradient-to-br from-indigo-600 to-purple-600 dark:from-indigo-300 dark:to-purple-300 overflow-hidden">
-                       {user?.profile?.profilePhoto ? (
-                         <img src={user.profile.profilePhoto} alt="Profile" className="w-full h-full object-cover" />
-                       ) : (
-                         user?.userName?.substring(0, 2) || "U"
-                       )}
-                     </div>
+              <div className="flex-shrink-0 relative">
+                <div className="w-24 h-24 md:w-32 md:h-32 rounded-full bg-gradient-to-br from-indigo-500 via-purple-500 to-pink-500 p-1 flex items-center justify-center overflow-hidden shadow-lg">
+                  <div className="w-full h-full bg-white dark:bg-gray-900 rounded-full flex items-center justify-center text-3xl font-extrabold uppercase tracking-widest text-transparent bg-clip-text bg-gradient-to-br from-indigo-600 to-purple-600 dark:from-indigo-300 dark:to-purple-300 overflow-hidden">
+                    {user?.profile?.profilePhoto ? (
+                      <img src={user.profile.profilePhoto} alt="Profile" className="w-full h-full object-cover" />
+                    ) : (
+                      user?.userName?.substring(0, 2) || "U"
+                    )}
+                  </div>
+                </div>
+                {profileData.rank <= 3 && profileData.rank > 0 && (
+                   <div className={`absolute -top-3 -right-3 p-2.5 rounded-full border backdrop-blur-sm animate-bounce shadow-xl ${
+                      profileData.rank === 1 ? 'bg-yellow-500/20 border-yellow-500/50' : 
+                      profileData.rank === 2 ? 'bg-gray-300/20 border-gray-300/50' : 
+                      'bg-amber-700/20 border-amber-700/50'
+                   }`}>
+                      <Trophy className={`w-6 h-6 ${
+                        profileData.rank === 1 ? 'text-yellow-400' : 
+                        profileData.rank === 2 ? 'text-gray-300' : 
+                        'text-amber-600'
+                      }`} />
                    </div>
-                   {profileData.rank === 1 && (
-                      <div className="absolute -top-3 -right-3 bg-yellow-500/20 p-2.5 rounded-full border border-yellow-500/50 backdrop-blur-sm animate-pulse">
-                         <Trophy className="w-6 h-6 text-yellow-400" />
-                      </div>
-                   )}
-                 </div>
-
-                 <div className="text-center md:text-left z-10 w-full">
-                    <h1 className="text-2xl md:text-4xl font-extrabold mb-1">{user?.userName}</h1>
-                    <div className="flex flex-col md:flex-row items-center justify-center md:justify-start gap-4 mb-6">
-                      <p className="text-gray-600 dark:text-gray-400 flex items-center justify-center md:justify-start gap-2 text-sm mb-0">
-                        <Star className="w-4 h-4" /> Global Talent Profile
-                      </p>
-                      <button
-                        onClick={() => navigate('/candidate/profile/edit')}
-                        className="flex items-center gap-2 px-4 py-1.5 bg-indigo-500/10 hover:bg-indigo-500/20 text-indigo-400 border border-indigo-500/30 rounded-full text-sm font-medium transition-colors cursor-pointer"
-                      >
-                        Edit Profile
-                      </button>
-                    </div>
-                    
-                    <div className="flex flex-wrap items-center justify-center md:justify-start gap-6">
-                       <div className="group relative">
-                         <div className="text-xs text-gray-600 dark:text-gray-400 mb-1 uppercase tracking-wider font-semibold">CareerByte Rating</div>
-                         <div className={`text-4xl font-black ${ratingColors}`}>
-                            {profileData.rating}
-                         </div>
-                       </div>
-                       
-                       <div className="h-10 w-px bg-gray-700/50 hidden md:block"></div>
-                       
-                       <div>
-                         <div className="text-xs text-gray-600 dark:text-gray-400 mb-1 uppercase tracking-wider font-semibold">Global Rank</div>
-                         <div className="text-2xl font-bold flex items-baseline gap-1">
-                            <span className="text-gray-900 dark:text-white">#{profileData.rank}</span>
-                            <span className="text-sm text-gray-500 font-normal">/ {profileData.totalRankedUsers}</span>
-                         </div>
-                         <div className="text-xs text-indigo-400 font-medium mt-1 bg-indigo-500/10 inline-block px-2 py-0.5 rounded border border-indigo-500/20">
-                            Top {100 - profileData.percentile}%
-                         </div>
-                       </div>
-                    </div>
-                 </div>
+                )}
               </div>
 
-              {/* Smaller Analytics Row (Quick Stats + Mastery side by side) */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  {/* Quick Stats side cards inside 1 box */}
-                  <div className="grid grid-cols-2 gap-4">
-                     <div className="bg-[#111b27]/40 border border-slate-800 rounded-2xl p-5 backdrop-blur-md shadow-xl flex flex-col justify-center text-center items-center">
-                        <div className="flex items-center gap-2 text-gray-600 dark:text-gray-400 mb-2">
-                           <Activity className="w-4 h-4 text-blue-400" />
-                           <h3 className="font-semibold text-xs uppercase tracking-wider">Interviews</h3>
-                        </div>
-                        <div className="text-3xl font-black text-gray-900 dark:text-gray-100">{dashboardData.reports.length}</div>
-                     </div>
-                     
-                     <div className="bg-[#111b27]/40 border border-slate-800 rounded-2xl p-5 backdrop-blur-md shadow-xl flex flex-col justify-center text-center items-center">
-                        <div className="flex items-center gap-2 text-gray-600 dark:text-gray-400 mb-2">
-                           <Target className="w-4 h-4 text-emerald-400" />
-                           <h3 className="font-semibold text-xs uppercase tracking-wider">Top Section</h3>
-                        </div>
-                        {sectorScores.length > 0 ? (() => {
-                          const topSector = [...sectorScores].sort((a,b) => b.score - a.score)[0];
-                          return (
-                            <div className="w-full">
-                              <div className="text-lg font-bold text-gray-900 dark:text-gray-100 truncate w-full">{topSector.subject}</div>
-                              <div className="text-xs text-emerald-400 mt-1">{topSector.score}% Acc</div>
-                            </div>
-                          );
-                        })() : (
-                          <div className="text-gray-500 text-sm italic">No data</div>
-                        )}
-                     </div>
-                  </div>
-
-                  {/* Shrunken Section Mastery Bar Chart */}
-                  <div className="bg-[#111b27]/40 border border-slate-800 rounded-2xl p-5 backdrop-blur-md shadow-xl">
-                     <div className="flex items-center gap-2 mb-4">
-                        <Target className="w-4 h-4 text-purple-400" />
-                        <h2 className="text-sm uppercase tracking-wider font-bold text-gray-700 dark:text-gray-300">Section Mastery</h2>
-                     </div>
-                     
-                     <div className="h-28 w-full relative">
-                       {sectorScores.length === 0 ? (
-                          <div className="absolute inset-0 flex flex-col items-center justify-center text-gray-500 text-xs text-center border border-dashed border-gray-300 dark:border-gray-700/50 rounded-lg">
-                            <p>No section data found.</p>
-                          </div>
-                       ) : (
-                         <ResponsiveContainer width="100%" height="100%">
-                           <BarChart data={sectorScores} margin={{ top: 5, right: 5, left: -25, bottom: 0 }} barSize={20}>
-                             <CartesianGrid strokeDasharray="3 3" stroke="#374151" vertical={false} opacity={0.2} />
-                             <XAxis dataKey="subject" stroke="#9ca3af" fontSize={10} tickLine={false} axisLine={false} dy={5} />
-                             <YAxis stroke="#9ca3af" fontSize={10} tickLine={false} axisLine={false} domain={[0, 100]} />
-                             <RechartsTooltip content={<CustomTooltipBar active={false} payload={[]} />} cursor={{ fill: '#374151', opacity: 0.2 }} />
-                             <Bar dataKey="score" radius={[4, 4, 0, 0]} animationDuration={1000}>
-                               {sectorScores.map((entry, index) => (
-                                 <Cell key={entry.subject} fill={barColors[index % barColors.length]} />
-                               ))}
-                             </Bar>
-                           </BarChart>
-                         </ResponsiveContainer>
-                       )}
-                     </div>
-                  </div>
-              </div>
-
-              {/* Performance Area Chart */}
-              <div className="bg-[#111b27]/40 border border-slate-800 rounded-3xl p-6 md:p-8 backdrop-blur-md shadow-xl">
-                 <div className="flex items-center justify-between mb-6">
-                    <div className="flex items-center gap-3">
-                        <TrendingUp className="w-5 h-5 text-indigo-400" />
-                        <h2 className="text-lg font-bold">Performance History</h2>
+              <div className="text-center z-10 w-full flex-grow">
+                 <div className="flex flex-col items-center justify-center gap-4 mb-6">
+                    <div>
+                        <h1 className="text-3xl md:text-4xl font-black mb-1 tracking-tight">{user?.userName}</h1>
+                        <p className="text-gray-400 flex items-center justify-center gap-2 text-sm font-medium">
+                          <Star className="w-4 h-4 text-yellow-500" /> Top {profileData.percentile}% Candidates
+                        </p>
                     </div>
+                    <button
+                      onClick={() => navigate('/candidate/profile/edit')}
+                      className="px-6 py-2 bg-indigo-500/10 hover:bg-indigo-500/20 text-indigo-400 border border-indigo-500/30 rounded-xl text-sm font-bold transition-all hover:scale-105 active:scale-95"
+                    >
+                      Update Profile
+                    </button>
                  </div>
                  
-                 <div className="-mx-4 md:mx-0">
-                    <ProgressGraph reports={dashboardData.reports} />
-                 </div>
-              </div>
+                  {profileData.bio && (
+                    <div className="max-w-2xl text-center mb-8 px-4">
+                      <p className="text-gray-400 text-sm leading-relaxed italic">
+                        "{profileData.bio}"
+                      </p>
+                    </div>
+                  )}
 
-              {/* Applied Jobs Table */}
-              <div className="bg-[#111b27]/40 border border-slate-800 rounded-3xl p-6 md:p-8 backdrop-blur-md shadow-xl overflow-hidden mt-8">
-                 <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-6 gap-4">
-                     <div className="flex items-center gap-3">
-                        <Activity className="w-5 h-5 text-blue-400" />
-                        <h2 className="text-lg font-bold">Applied Jobs</h2>
-                     </div>
-                     <button 
-                       onClick={() => navigate('/candidate/applied-jobs')}
-                       className="py-1.5 px-4 bg-blue-500/10 hover:bg-blue-500/20 text-blue-500 hover:text-blue-400 text-sm font-medium rounded-lg transition-colors flex items-center justify-center gap-2 border border-blue-500/20 whitespace-nowrap"
-                     >
-                       View All
-                       <ChevronRight className="w-4 h-4" />
-                     </button>
-                 </div>
-                 <div className="w-full overflow-x-auto">
-                    <AppliedJobTable limit={5} />
-                 </div>
-              </div>
-
-              {/* Activity Heatmap */}
-              <div className="bg-[#111b27]/40 border border-slate-800 rounded-3xl p-6 md:p-8 backdrop-blur-md shadow-xl overflow-hidden mt-8">
-                 <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4 border-b border-gray-200 dark:border-gray-800/50 pb-4">
-                    <div className="flex items-center gap-3">
-                       <CalendarIcon className="w-5 h-5 text-pink-400" />
-                       <div>
-                          <h2 className="text-lg font-bold">Activity Grid</h2>
-                          <p className="text-xs text-gray-600 dark:text-gray-400">1-Year History</p>
+                  {profileData.resume && (
+                    <div className="mb-8">
+                       <button 
+                          onClick={openResume}
+                          className="flex items-center gap-2 px-6 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-sm font-bold transition-all hover:scale-105 active:scale-95 shadow-lg shadow-indigo-500/20"
+                       >
+                          <FileText className="w-4 h-4" />
+                          View My Resume
+                       </button>
+                    </div>
+                  )}
+                  
+                  <div className="grid grid-cols-3 gap-6 pt-6 border-t border-white/5 w-full">
+                    <div className="flex flex-col items-center gap-1">
+                       <span className="text-gray-500 text-[10px] uppercase tracking-widest font-black">Current Rating</span>
+                       <div className={`text-3xl font-black tracking-tighter ${ratingColors}`}>
+                          {isUnrated ? "Unrated" : profileData.rating.toFixed(1)}
                        </div>
                     </div>
-                    <div className="flex items-center gap-1.5 text-[10px] text-gray-400 bg-slate-800/50 px-3 py-1.5 rounded-full border border-slate-700">
-                       <span>Less</span>
-                       <div className="w-2.5 h-2.5 rounded-[2px] bg-[#1e293b]"></div>
-                       <div className="w-2.5 h-2.5 rounded-[2px] bg-[#3730a3]"></div>
-                       <div className="w-2.5 h-2.5 rounded-[2px] bg-[#4338ca]"></div>
-                       <div className="w-2.5 h-2.5 rounded-[2px] bg-[#6366f1]"></div>
-                       <div className="w-2.5 h-2.5 rounded-[2px] bg-[#a5b4fc]"></div>
-                       <span>More</span>
-                    </div>
-                 </div>
 
-                 {/* Compact Heatmap Container */}
-                 <div className="w-full overflow-x-auto heatmap-compact-wrapper">
-                    <div className="min-w-[700px] text-xs">
-                       <CalendarHeatmap
-                          startDate={startDate}
-                          endDate={endDate}
-                          values={heatmapData}
-                          classForValue={getHeatmapClassForValue}
-                          showWeekdayLabels={true}
-                       />
+                    <div className="flex flex-col items-center gap-1 border-l border-white/5">
+                       <span className="text-gray-500 text-[10px] uppercase tracking-widest font-black">Global Standing</span>
+                       <div className="text-3xl font-black text-white italic drop-shadow-md">
+                          {isUnrated ? "-" : `#${profileData.rank}`}
+                       </div>
+                    </div>
+
+                    <div className="flex flex-col items-center gap-1 border-l border-white/5">
+                       <span className="text-gray-500 text-[10px] uppercase tracking-widest font-black">Skill Percentile</span>
+                       <div className="text-3xl font-black text-indigo-400">
+                          {isUnrated ? "0%" : `${(100 - profileData.percentile).toFixed(0)}%`}
+                       </div>
                     </div>
                  </div>
               </div>
-
            </div>
 
-           {/* Vertical Right Side Panel (Leaderboard Widget) */}
-           <div className="xl:col-span-1 border border-slate-800 bg-[#111b27]/50 rounded-3xl backdrop-blur-md shadow-2xl overflow-hidden flex flex-col h-fit">
-              <div className="p-6 border-b border-slate-800 bg-[#111b27]/80 flex flex-col gap-1">
-                 <div className="flex items-center justify-between">
-                    <h2 className="text-xl font-bold flex items-center gap-2">
-                      <Trophy className="w-5 h-5 text-yellow-500" />
-                      Top 10 Rankings
+           {/* Rankings Card - 4/12 */}
+           <div className="lg:col-span-4 border border-slate-800 bg-[#111b27]/50 rounded-3xl backdrop-blur-md shadow-2xl overflow-hidden flex flex-col h-full">
+              <div className="p-6 border-b border-slate-800 bg-[#111b27]/80 flex items-center justify-between">
+                 <div>
+                    <h2 className="text-lg font-bold flex items-center gap-2">
+                      <TrendingUp className="w-5 h-5 text-indigo-400" />
+                      Global Top 10
                     </h2>
+                    <p className="text-[10px] text-gray-500 uppercase tracking-widest font-bold">Real-time Standings</p>
                  </div>
-                 <p className="text-xs text-gray-600 dark:text-gray-400">Global Standings</p>
-              </div>
-
-              <div className="overflow-y-auto custom-scrollbar p-2 max-h-[380px]">
-                  {leaderboardError ? (
-                     <div className="text-red-400 p-6 text-center text-sm">{leaderboardError}</div>
-                  ) : leaderboardLoading && leaderboardData.leaderboard.length === 0 ? (
-                     <div className="flex justify-center items-center h-48">
-                        <Loader2 className="w-6 h-6 animate-spin text-indigo-500" />
-                     </div>
-                  ) : (
-                     <div className="flex flex-col gap-1">
-                        {leaderboardData.leaderboard.map((u) => {
-                           const isCurrentUser = user && u.email === user.email;
-                           return (
-                             <div 
-                               key={u._id}
-                               onClick={() => { if (!isCurrentUser) navigate(`/candidate/profile/${u._id}`); }} 
-                               className={`flex items-center justify-between p-3 rounded-xl transition-colors ${
-                                  isCurrentUser ? 'bg-indigo-900/20 border border-indigo-500/30' : 'hover:bg-slate-800/40 cursor-pointer border border-transparent'
-                               }`}
-                             >
-                                <div className="flex items-center gap-3">
-                                   <div className={`w-8 h-8 rounded-full flex items-center justify-center font-bold text-sm ${
-                                      u.rank === 1 ? 'bg-yellow-500/20 text-yellow-400 border border-yellow-500/40 shadow-[0_0_10px_rgba(234,179,8,0.2)]' : 
-                                      u.rank === 2 ? 'bg-gray-300/20 text-gray-700 dark:text-gray-300 border border-gray-300/40' :
-                                      u.rank === 3 ? 'bg-amber-700/20 text-amber-600 border border-amber-700/40' :
-                                      'bg-white dark:bg-gray-800 text-gray-500'
-                                   }`}>
-                                      {u.rank}
-                                   </div>
-                                   <div>
-                                      <div className={`font-medium text-sm flex items-center gap-2 ${getRatingColor(u.rating)}`}>
-                                         <span className="truncate max-w-[120px]">{u.userName}</span>
-                                         {isCurrentUser && <span className="text-[10px] bg-indigo-500/20 text-indigo-300 px-1.5 py-0.5 rounded border border-indigo-500/30">You</span>}
-                                      </div>
-                                      <div className="text-xs text-gray-500 mt-0.5">{u.totalInterviews} mock sessions</div>
-                                   </div>
-                                </div>
-                                <div className={`text-sm font-black tracking-wide ${getRatingColor(u.rating)} bg-[#09090b]/50 px-2.5 py-1 rounded-lg border border-slate-800 shadow-inner`}>
-                                   {u.rating}
-                                </div>
-                             </div>
-                           );
-                        })}
-                     </div>
-                  )}
-              </div>
-
-              {/* Link to Full Leaderboard */}
-              <div className="bg-[#111b27]/80 border-t border-slate-800 p-3 flex justify-center items-center">
                  <button 
                    onClick={() => navigate('/candidate/leaderboard')}
-                   className="w-full py-2.5 bg-indigo-600/10 hover:bg-indigo-600/20 text-indigo-300 hover:text-indigo-200 text-sm font-semibold rounded-lg border border-indigo-500/20 transition-colors flex items-center justify-center gap-2"
+                   className="p-2 hover:bg-white/5 rounded-lg transition-colors group"
+                   title="View Full Leaderboard"
                  >
-                   View Full Leaderboard
-                   <ChevronRight className="w-4 h-4 text-indigo-400" />
+                   <ChevronRight className="w-5 h-5 text-gray-500 group-hover:text-indigo-400" />
                  </button>
+              </div>
+
+              <div className="flex-grow overflow-y-auto custom-scrollbar p-3 space-y-1">
+                  {leaderboardError ? (
+                     <div className="text-red-400 p-6 text-center text-xs">{leaderboardError}</div>
+                  ) : (
+                     leaderboardData.leaderboard.slice(0, 5).map((u) => {
+                        const isCurrentUser = user && u.email === user.email;
+                        return (
+                          <div 
+                            key={u._id}
+                            className={`flex items-center justify-between p-2.5 rounded-xl transition-all border ${
+                               isCurrentUser ? 'bg-indigo-900/30 border-indigo-500/40 shadow-lg' : 'hover:bg-white/5 border-transparent'
+                            }`}
+                          >
+                             <div className="flex items-center gap-3">
+                                <div className={`w-7 h-7 rounded-lg flex items-center justify-center font-black text-xs ${
+                                   u.rank === 1 ? 'bg-yellow-500/20 text-yellow-400' : 
+                                   u.rank === 2 ? 'bg-gray-300/20 text-gray-300' :
+                                   u.rank === 3 ? 'bg-amber-700/20 text-amber-600' :
+                                   'bg-white/5 text-gray-500'
+                                }`}>
+                                   {u.rank}
+                                </div>
+                                <div className={`font-bold text-xs truncate max-w-[100px] ${getRatingColor(u.rating)}`}>
+                                   {u.userName}
+                                </div>
+                             </div>
+                             <div className="text-[11px] font-black text-indigo-300 bg-indigo-500/10 px-2 py-0.5 rounded border border-indigo-500/20">
+                                {u.rating.toFixed(0)}
+                             </div>
+                          </div>
+                        );
+                     })
+                  )}
               </div>
            </div>
         </div>
 
+
+
+        {/* --- INSIGHTS SECTION: PERFORMANCE & JOBS (Side-by-Side) --- */}
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-stretch">
+           {/* Performance Journey - 8/12 */}
+           <div className="lg:col-span-8 bg-[#111b27]/40 border border-slate-800 rounded-3xl p-6 md:p-8 backdrop-blur-md shadow-xl overflow-hidden relative">
+              <div className="flex items-center justify-between mb-8">
+                 <div className="flex items-center gap-3">
+                     <TrendingUp className="w-5 h-5 text-indigo-400" />
+                     <div>
+                        <h2 className="text-lg font-bold">Performance History</h2>
+                        <p className="text-[10px] text-gray-500 uppercase tracking-widest font-bold">Rating progression</p>
+                     </div>
+                 </div>
+                 {!isUnrated && (
+                    <div className="text-right">
+                       <div className="text-xs text-gray-500 mb-0.5">Peak Rating</div>
+                       <div className="text-lg font-black text-indigo-400">
+                          {Math.max(...dashboardData.contestHistory.map(h => h.rating), profileData.rating).toFixed(0)}
+                       </div>
+                    </div>
+                 )}
+              </div>
+              
+              <div className="w-full h-[280px]">
+                 <ProgressGraph 
+                     contestHistory={dashboardData.contestHistory} 
+                     isUnrated={isUnrated}
+                     currentRating={profileData.rating}
+                 />
+              </div>
+           </div>
+
+           {/* Compact Job Tracking - 4/12 */}
+           <div className="lg:col-span-4 bg-[#111b27]/40 border border-slate-800 rounded-3xl p-6 backdrop-blur-md shadow-xl overflow-hidden flex flex-col">
+              <div className="flex items-center justify-between mb-6">
+                 <div className="flex items-center gap-3">
+                    <Activity className="w-5 h-5 text-blue-400" />
+                    <div>
+                       <h2 className="text-lg font-bold">Job Tracking</h2>
+                       <p className="text-[10px] text-gray-500 uppercase tracking-widest font-bold">Apply Status</p>
+                    </div>
+                 </div>
+                 <button 
+                   onClick={() => navigate('/candidate/applied-jobs')}
+                   className="p-1.5 hover:bg-white/5 rounded-lg transition-colors group"
+                 >
+                   <ChevronRight className="w-4 h-4 text-gray-500 group-hover:text-blue-400" />
+                 </button>
+              </div>
+
+              <div className="flex-grow">
+                 <AppliedJobTable limit={4} variant="sidebar" />
+              </div>
+
+              <button 
+                 onClick={() => navigate('/candidate/applied-jobs')}
+                 className="mt-4 w-full py-2.5 bg-blue-500/5 hover:bg-blue-500/10 text-blue-400 text-xs font-black uppercase tracking-widest rounded-xl border border-blue-500/20 transition-all active:scale-95"
+              >
+                 Detailed History
+              </button>
+           </div>
+        </div>
+
+        {/* --- BOTTOM SECTION: FULL WIDTH ACTIVITY GRID --- */}
+        <div className="bg-[#111b27]/40 border border-slate-800 rounded-3xl p-6 md:p-8 backdrop-blur-md shadow-xl overflow-hidden">
+           <div className="flex flex-col md:flex-row items-start md:items-center justify-between mb-8 gap-4 border-b border-white/5 pb-6">
+              <div className="flex items-center gap-3">
+                 <CalendarIcon className="w-5 h-5 text-pink-400" />
+                 <div>
+                    <h2 className="text-xl font-bold">Activity Grid</h2>
+                    <p className="text-[10px] text-gray-500 uppercase tracking-widest font-bold">Your annual engagement record</p>
+                 </div>
+              </div>
+           </div>
+
+           <div className="w-full flex justify-center py-4">
+              <div className="w-full max-w-[1240px] heatmap-stretched-wrapper">
+                 <div className="text-xs">
+                    <CalendarHeatmap
+                       startDate={startDate}
+                       endDate={endDate}
+                       values={heatmapData}
+                       classForValue={getHeatmapClassForValue}
+                       showWeekdayLabels={true}
+                    />
+                 </div>
+              </div>
+           </div>
+
+           {/* Legend & Stats Focused Area */}
+           <div className="mt-8 flex flex-col sm:flex-row items-center justify-between gap-6 border-t border-white/5 pt-6">
+              <div className="flex items-center gap-8">
+                 <div className="flex flex-col">
+                    <span className="text-[9px] text-gray-500 uppercase font-black tracking-widest mb-0.5">Total Contributions</span>
+                    <span className="text-lg font-black text-indigo-400">{totalContributions}</span>
+                 </div>
+                 <div className="flex flex-col px-8 border-l border-white/5">
+                    <span className="text-[9px] text-gray-500 uppercase font-black tracking-widest mb-0.5">Longest Streak</span>
+                    <span className="text-lg font-black text-pink-400">{longestStreak} Days</span>
+                 </div>
+              </div>
+
+              <div className="flex flex-col items-end gap-2">
+                 <div className="text-[10px] text-gray-600 uppercase font-black tracking-widest">Consistency Legend</div>
+                 <div className="flex items-center gap-2 text-[10px] text-gray-400 bg-white/5 dark:bg-black/20 px-4 py-2 rounded-full border border-white/10">
+                    <span className="opacity-60 font-bold">Less</span>
+                    <div className="w-2.5 h-2.5 rounded-sm bg-[#1e293b]"></div>
+                    <div className="w-2.5 h-2.5 rounded-sm bg-[#3730a3]"></div>
+                    <div className="w-2.5 h-2.5 rounded-sm bg-[#4338ca]"></div>
+                    <div className="w-2.5 h-2.5 rounded-sm bg-[#6366f1]"></div>
+                    <div className="w-2.5 h-2.5 rounded-sm bg-[#a5b4fc]"></div>
+                    <span className="opacity-60 font-bold">More</span>
+                 </div>
+              </div>
+           </div>
+        </div>
       </div>
+      <DocumentViewer 
+        isOpen={viewerOpen} 
+        onClose={() => setViewerOpen(false)} 
+        fileUrl={selectedResume.url} 
+        fileName={selectedResume.name} 
+      />
     </div>
   );
 };

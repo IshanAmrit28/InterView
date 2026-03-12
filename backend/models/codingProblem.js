@@ -58,6 +58,20 @@ const codingProblemSchema = new mongoose.Schema({
         type: mongoose.Schema.Types.ObjectId,
         ref: 'User',
         required: true
+    },
+    visibilityStatus: {
+        type: String,
+        enum: ['public', 'contest', 'private'],
+        default: 'public'
+    },
+    ownerId: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'User',
+        description: 'Used for private questions added by recruiters'
+    },
+    points: {
+        type: Number,
+        default: 0
     }
 }, { 
     timestamps: true 

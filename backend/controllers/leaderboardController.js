@@ -17,7 +17,7 @@ const getLeaderboard = async (req, res) => {
 
     // 2. Fetch paginated, sorted users directly from indexed DB
     const rankedCandidates = await User.find({ userType: "candidate" })
-      .select("_id userName email profileUrl rating")
+      .select("_id userName email profile rating")
       .sort({ rating: -1 })
       .skip(skip)
       .limit(limit)

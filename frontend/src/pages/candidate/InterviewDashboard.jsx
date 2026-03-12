@@ -1,8 +1,13 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Play, FileText, ChevronRight, Loader2 } from "lucide-react";
+import { Play, FileText, ChevronRight, Loader2, Activity, Target, TrendingUp } from "lucide-react";
+import { 
+  BarChart, Bar, Cell, CartesianGrid, XAxis, YAxis, Tooltip as RechartsTooltip, ResponsiveContainer
+} from 'recharts';
+import ProgressGraph from "../../components/ProgressGraph";
 import { getUserReports } from "../../services/interviewService";
 import { useAuth } from "../../context/AuthContext";
+import api from "../../services/api";
 
 const InterviewDashboard = () => {
   const navigate = useNavigate();
@@ -10,19 +15,47 @@ const InterviewDashboard = () => {
   const [reports, setReports] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [stats, setStats] = useState({ sectorScores: [], reportCount: 0 });
+
+  const barColors = ['#8b5cf6', '#3b82f6', '#10b981'];
+
+  const CustomTooltipBar = ({ active, payload }) => {
+    if (active && payload && payload.length) {
+      return (
+        <div className="bg-[#09090b] dark:bg-slate-900 border border-slate-800 p-3 rounded-xl shadow-md dark:shadow-xl backdrop-blur-sm">
+          <p className="text-indigo-400 font-bold">{payload[0].payload.subject}</p>
+          <p className="text-gray-200">Score: {payload[0].value}%</p>
+        </div>
+      );
+    }
+    return null;
+  };
 
   useEffect(() => {
-    const fetchReports = async () => {
+    const fetchData = async () => {
       try {
-        const data = await getUserReports();
-        setReports(data.reports || []);
+        setLoading(true);
+        // Fetch both reports and dashboard stats
+        const [reportsRes, dashboardRes] = await Promise.all([
+          getUserReports(),
+          api.get('/dashboard/profile')
+        ]);
+        
+        setReports(reportsRes.reports || []);
+        
+        if (dashboardRes.data.success) {
+          setStats({
+            sectorScores: dashboardRes.data.data.sectorScores,
+            reportCount: dashboardRes.data.data.reports.length
+          });
+        }
       } catch (err) {
-        setError(err.message || "Failed to load past interviews.");
+        setError(err.message || "Failed to load dashboard data.");
       } finally {
         setLoading(false);
       }
     };
-    fetchReports();
+    fetchData();
   }, []);
 
   const formatDate = (dateString) => {
@@ -63,7 +96,62 @@ const InterviewDashboard = () => {
           </button>
         </div>
 
-        {/* Progress Graph Removed */}
+        {/* Quick Stats and Analytics Row */}
+        {!loading && !error && (
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
+            <div className="lg:col-span-1 grid grid-cols-2 gap-4">
+                <div className="bg-gray-900/40 border border-gray-800 rounded-3xl p-6 backdrop-blur-md shadow-xl flex flex-col justify-center items-center text-center">
+                    <Activity className="w-5 h-5 text-blue-400 mb-3" />
+                    <h3 className="text-xs font-bold uppercase tracking-widest text-gray-500 mb-1">Total Mock</h3>
+                    <div className="text-3xl font-black">{stats.reportCount}</div>
+                </div>
+                
+                <div className="bg-gray-900/40 border border-gray-800 rounded-3xl p-6 backdrop-blur-md shadow-xl flex flex-col justify-center items-center text-center">
+                    <Target className="w-5 h-5 text-emerald-400 mb-3" />
+                    <h3 className="text-xs font-bold uppercase tracking-widest text-gray-500 mb-1">Top Area</h3>
+                    {stats.sectorScores.length > 0 ? (() => {
+                        const top = [...stats.sectorScores].sort((a,b) => b.score - a.score)[0];
+                        return (
+                           <div className="truncate w-full font-bold text-gray-200">{top.subject}</div>
+                        );
+                    })() : <div className="text-gray-500">-</div>}
+                </div>
+            </div>
+
+            <div className="lg:col-span-2 bg-gray-900/40 border border-gray-800 rounded-3xl p-6 backdrop-blur-md shadow-xl">
+                <div className="flex items-center gap-2 mb-6">
+                    <Target className="w-5 h-5 text-purple-400" />
+                    <h2 className="text-sm font-bold uppercase tracking-widest text-gray-400">Skill Distribution</h2>
+                </div>
+                <div className="h-32 w-full">
+                    {stats.sectorScores.length > 0 ? (
+                        <ResponsiveContainer width="100%" height="100%" minWidth={0} debounce={50}>
+                            <BarChart data={stats.sectorScores} margin={{ top: 0, right: 0, left: -20, bottom: 0 }}>
+                                <CartesianGrid strokeDasharray="3 3" stroke="#374151" vertical={false} opacity={0.1} />
+                                <XAxis dataKey="subject" stroke="#6b7280" fontSize={10} axisLine={false} tickLine={false} />
+                                <YAxis stroke="#6b7280" fontSize={10} axisLine={false} tickLine={false} domain={[0, 100]} />
+                                <RechartsTooltip content={<CustomTooltipBar />} cursor={{ fill: 'rgba(255,255,255,0.05)' }} />
+                                <Bar dataKey="score" radius={[4, 4, 0, 0]} barSize={30}>
+                                    {stats.sectorScores.map((entry, index) => (
+                                        <Cell key={`cell-${index}`} fill={barColors[index % barColors.length]} />
+                                    ))}
+                                </Bar>
+                            </BarChart>
+                        </ResponsiveContainer>
+                    ) : (
+                        <div className="h-full flex items-center justify-center text-gray-600 text-xs italic">No interview data available</div>
+                    )}
+                </div>
+            </div>
+        </div>
+        )}
+
+        {/* Performance Graph Section for Mock Interviews */}
+        {!loading && !error && reports.length > 0 && (
+            <div className="mb-12">
+                <ProgressGraph reports={reports} />
+            </div>
+        )}
 
         {/* History Section */}
         <div className="bg-gray-900/40 border border-gray-800/80 rounded-3xl overflow-hidden shadow-2xl backdrop-blur-md">
