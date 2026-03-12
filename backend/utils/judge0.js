@@ -1,5 +1,4 @@
 const axios = require("axios");
-console.log("Judge0 URL:", process.env.JUDGE0_URL);
 const JUDGE0_URL = (process.env.JUDGE0_URL).trim().replace(/\/$/, "");
 
 
@@ -78,7 +77,7 @@ const executeBatch = async (submissions) => {
 
             // The response in GET /submissions/batch?tokens=... returns { submissions: [ ... ] }
             finalResults = statusResponse.data.submissions || statusResponse.data;
-            console.log("Polling Judge0:", finalResults.map(r => r?.status?.id));
+
 
             // Check if all submissions have a status > 2 (1 = In Queue, 2 = Processing)
             allFinished = finalResults.every(res => res && res.status && res.status.id > 2);

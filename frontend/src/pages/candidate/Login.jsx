@@ -144,26 +144,21 @@ const Login = () => {
               <div className="border-t border-gray-800 w-full"></div>
             </div>
 
-            <div className="flex justify-center">
-              <GoogleLogin
-                onSuccess={async (credentialResponse) => {
-                  try {
-                    const response = await googleLogin(credentialResponse.credential);
-                    if (response.success) {
-                      loginUser(response.user);
-                      navigate("/candidate/dashboard");
-                    }
-                  } catch (err) {
-                    setError("Google Login Failed. Please try again.");
-                  }
+            <div className="flex justify-center w-full">
+              <button
+                type="button"
+                onClick={() => {
+                  window.location.href = `${import.meta.env.VITE_BACKEND_API_BASE_URL}/auth/google`;
                 }}
-                onError={() => {
-                  setError("Google Login Failed");
-                }}
-                theme="dark"
-                shape="pill"
-                width="400"
-              />
+                className="flex items-center justify-center gap-3 bg-[#1a1a1a] border border-gray-800 text-white font-medium py-3 rounded-lg hover:bg-gray-800 transition-all duration-200 w-full max-w-md shadow-lg"
+              >
+                <img 
+                  src="https://www.gstatic.com/images/branding/product/1x/gsa_512dp.png" 
+                  alt="Google Logo" 
+                  className="w-5 h-5"
+                />
+                Login with Google
+              </button>
             </div>
           </form>
 

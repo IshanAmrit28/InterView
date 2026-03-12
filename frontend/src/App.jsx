@@ -22,6 +22,7 @@ import AdminRoutes from "./routes/AdminRoutes";
 import Landing from "./pages/candidate/Landing";
 import Login from "./pages/candidate/Login";
 import Signup from "./pages/candidate/Signup";
+import LoginSuccess from "./pages/candidate/LoginSuccess";
 
 import Dashboard from "./pages/candidate/Home";
 import Profile from "./pages/candidate/UserDashboard";
@@ -69,6 +70,7 @@ function AppContent() {
             <Route path="/" element={<Landing />} />
             <Route path="/login" element={<Login />} />
             <Route path="/signup" element={<Signup />} />
+            <Route path="/login-success" element={<LoginSuccess />} />
             
             {/* Candidate Role Protected Routes */}
             <Route path="/candidate/*" element={<CandidateRoutes />} />

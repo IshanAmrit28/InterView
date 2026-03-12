@@ -9,8 +9,6 @@ import { persistStore } from 'redux-persist';
 import { PersistGate } from 'redux-persist/integration/react';
 import { ThemeProvider } from 'next-themes';
 
-import { GoogleOAuthProvider } from '@react-oauth/google';
-
 const persistor = persistStore(store);
 
 ReactDOM.createRoot(document.getElementById("root")).render(
@@ -18,10 +16,8 @@ ReactDOM.createRoot(document.getElementById("root")).render(
     <Provider store={store}>
       <PersistGate loading={null} persistor={persistor}>
         <ThemeProvider attribute="class" defaultTheme="dark" enableSystem>
-          <GoogleOAuthProvider clientId={import.meta.env.VITE_GOOGLE_CLIENT_ID}>
-            <App />
-            <Toaster />
-          </GoogleOAuthProvider>
+          <App />
+          <Toaster />
         </ThemeProvider>
       </PersistGate>
     </Provider>

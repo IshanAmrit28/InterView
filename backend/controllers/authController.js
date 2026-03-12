@@ -311,7 +311,85 @@ exports.getCompanyMembers = async (req, res) => {
     }
 };
 
-// ==================== GOOGLE LOGIN ====================
+// ==================== GOOGLE AUTH (Backend Driven) ====================
+// Step 1: Redirect to Google
+exports.googleAuth = (req, res) => {
+  const oauth2Client = new OAuth2Client(
+    process.env.GOOGLE_CLIENT_ID,
+    process.env.GOOGLE_CLIENT_SECRET,
+    process.env.GOOGLE_REDIRECT_URI
+  );
+
+  const url = oauth2Client.generateAuthUrl({
+    access_type: "offline",
+    scope: ["profile", "email"],
+  });
+
+  res.redirect(url);
+};
+
+// Step 2: Handle Callback from Google
+exports.googleAuthCallback = async (req, res) => {
+  const { code } = req.query;
+
+  if (!code) {
+    return res.redirect(`${process.env.FRONTEND_URL}/login?error=no_code`);
+  }
+
+  try {
+    const oauth2Client = new OAuth2Client(
+      process.env.GOOGLE_CLIENT_ID,
+      process.env.GOOGLE_CLIENT_SECRET,
+      process.env.GOOGLE_REDIRECT_URI
+    );
+
+    const { tokens } = await oauth2Client.getToken(code);
+    oauth2Client.setCredentials(tokens);
+
+    // Verify the ID Token to get user information
+    const ticket = await oauth2Client.verifyIdToken({
+      idToken: tokens.id_token,
+      audience: process.env.GOOGLE_CLIENT_ID,
+    });
+
+    const payload = ticket.getPayload();
+    const { sub: googleId, email, name, picture } = payload;
+
+    let user = await User.findOne({ email });
+
+    if (user) {
+      if (!user.googleId) {
+        user.googleId = googleId;
+        user.authProvider = user.authProvider === 'local' ? 'local' : 'google';
+        await user.save();
+      }
+    } else {
+      user = await User.create({
+        userName: name,
+        fullname: name,
+        email,
+        googleId,
+        authProvider: 'google',
+        hasPassword: false,
+        userType: 'candidate',
+        profile: {
+          profilePhoto: picture || ""
+        }
+      });
+    }
+
+    const token = generateToken(user);
+    
+    // Redirect back to frontend with the token
+    // Using simple URL params for now (alternative: HTTP-only cookie if shared domain)
+    res.redirect(`${process.env.FRONTEND_URL}/login-success?token=${token}`);
+  } catch (error) {
+    console.error("Google verify error:", error);
+    res.redirect(`${process.env.FRONTEND_URL}/login?error=auth_failed`);
+  }
+};
+
+// ==================== GOOGLE LOGIN (Legacy - Keep for now or delete if confident) ====================
 exports.googleLogin = async (req, res) => {
   const { idToken } = req.body;
 

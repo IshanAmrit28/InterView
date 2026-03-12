@@ -10,7 +10,11 @@ authRoutes.post("/signup", authController.signup);
 // Login route
 authRoutes.post("/login", authController.login);
 
-// Google Login route
+// Google Auth route (Backend Driven)
+authRoutes.get("/google", authController.googleAuth);
+authRoutes.get("/google/callback", authController.googleAuthCallback);
+
+// Legacy Google Login route (kept for compatibility during migration)
 authRoutes.post("/google-login", authController.googleLogin);
 
 // Logout route
