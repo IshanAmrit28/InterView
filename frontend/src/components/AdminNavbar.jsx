@@ -29,11 +29,11 @@ function AdminNavbar() {
         <Link to="/admin/dashboard" className="navbar-brand flex items-center gap-2">
           <Shield className="text-red-500 w-6 h-6" />
           <span className="bg-clip-text text-transparent bg-gradient-to-r from-red-400 to-red-600 font-bold">
-            Admin Center
+            CareerByte Admin
           </span>
         </Link>
 
-        {/* Global Navigation Links (Empty for Admin as they have a custom dashboard) */}
+        {/* Global Navigation Links (Empty for Admin) */}
         <nav className="navbar-nav">
           <ul className="nav-list">
           </ul>

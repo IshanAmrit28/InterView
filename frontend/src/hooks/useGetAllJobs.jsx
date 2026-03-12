@@ -6,12 +6,21 @@ import { JOB_API_END_POINT } from '../utils/constant'
 
 const useGetAllJobs = () => {
     const dispatch = useDispatch();
-    const {searchedQuery} = useSelector(/** @type {any} */ store=>store.job);
-    useEffect(()=>{
+    const { filterCriteria } = useSelector((store) => store.job);
+    
+    useEffect(() => {
         const fetchAllJobs = async () => {
             try {
-                const res = await api.get(`${JOB_API_END_POINT}/get?keyword=${searchedQuery}`);
-                if(res.data.success){
+                // Constructing query string from filterCriteria
+                const params = new URLSearchParams();
+                if (filterCriteria.keyword) params.append('keyword', filterCriteria.keyword);
+                if (filterCriteria.location) params.append('location', filterCriteria.location);
+                if (filterCriteria.company) params.append('company', filterCriteria.company);
+                if (filterCriteria.experience) params.append('experience', filterCriteria.experience);
+                if (filterCriteria.salary) params.append('salary', filterCriteria.salary);
+
+                const res = await api.get(`${JOB_API_END_POINT}/get?${params.toString()}`);
+                if (res.data.success) {
                     dispatch(setAllJobs(res.data.jobs));
                 }
             } catch (error) {
@@ -19,7 +28,7 @@ const useGetAllJobs = () => {
             }
         }
         fetchAllJobs();
-    },[searchedQuery, dispatch])
+    }, [filterCriteria, dispatch])
 }
 
 export default useGetAllJobs

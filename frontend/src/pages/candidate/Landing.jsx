@@ -45,7 +45,7 @@ function Landing() {
                     </h1>
 
                     <p className="hero-description-modern">
-                        Stop guessing what they'll ask. InterVerse provides AI-driven mock interviews, interactive coding challenges, and a smart study system to land your dream role in tech.
+                        Stop guessing what they'll ask. CareerByte provides AI-driven mock interviews, interactive coding challenges, and a smart study system to land your dream role in tech.
                     </p>
 
                     <div className="hero-actions">

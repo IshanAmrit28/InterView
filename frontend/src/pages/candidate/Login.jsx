@@ -43,7 +43,7 @@ const Login = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-black text-white px-4 font-sans min-w-[1024px]">
+    <div className="min-h-screen flex items-center justify-center text-white px-4 font-sans min-w-[1024px]">
       <div className="flex flex-row items-center bg-black rounded-3xl overflow-hidden shadow-2xl max-w-6xl w-full border border-gray-800">
         {/* Left Form Section */}
         <div className="w-1/2 flex flex-col justify-center px-16 py-16 items-center">
@@ -184,11 +184,11 @@ const Login = () => {
             />
           </div>
           <div className="absolute bottom-8 left-8 right-8 bg-[#111b27]/80 text-white rounded-2xl p-6 backdrop-blur-md shadow-lg border border-slate-700/50">
-            <h2 className="text-xl font-bold mb-2">AI-Powered Interviewer</h2>
-            <p className="text-sm leading-relaxed text-gray-800 font-medium">
-              Transform recruitment with our cutting-edge AI Interviewer
-              platform—designed to analyze resumes intelligently and conduct
-              personalized virtual interviews.
+            <h2 className="text-xl font-bold mb-2">One Stop Career Prep</h2>
+            <p className="text-sm leading-relaxed text-gray-200 font-medium">
+              From AI-driven mock interviews to smart coding challenges, 
+              CareerByte is your ultimate companion to master every step 
+              of your professional journey.
             </p>
           </div>
         </div>

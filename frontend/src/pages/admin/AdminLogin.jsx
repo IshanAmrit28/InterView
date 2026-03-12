@@ -10,7 +10,7 @@ const AdminLogin = () => {
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
-  
+
   const navigate = useNavigate();
   const { loginUser } = useAuth();
 
@@ -34,9 +34,9 @@ const AdminLogin = () => {
     setLoading(true);
     try {
       const data = await adminLogin(formData);
-      
+
       if (data.user.userType !== "admin") {
-          throw new Error("Unauthorized account access. Super Admin only.");
+        throw new Error("Unauthorized account access. Super Admin only.");
       }
 
       loginUser(data.user, data.token);
@@ -78,7 +78,7 @@ const AdminLogin = () => {
               value={formData.email}
               onChange={handleChange}
               className="w-full bg-gray-800/50 border border-gray-700 text-white rounded-xl px-4 py-3.5 focus:outline-none focus:ring-2 focus:ring-red-500/50 focus:border-red-500 transition-all"
-              placeholder="admin@interverse.com"
+              placeholder="admin@CareerByte.com"
             />
           </div>
 
@@ -106,9 +106,8 @@ const AdminLogin = () => {
           <button
             type="submit"
             disabled={loading}
-            className={`w-full bg-gradient-to-r from-red-600 to-red-700 hover:from-red-500 hover:to-red-600 text-white font-bold py-4 rounded-xl transition-all shadow-lg shadow-red-600/30 flex items-center justify-center ${
-              loading ? "opacity-70 cursor-not-allowed" : "hover:-translate-y-1"
-            }`}
+            className={`w-full bg-gradient-to-r from-red-600 to-red-700 hover:from-red-500 hover:to-red-600 text-white font-bold py-4 rounded-xl transition-all shadow-lg shadow-red-600/30 flex items-center justify-center ${loading ? "opacity-70 cursor-not-allowed" : "hover:-translate-y-1"
+              }`}
           >
             {loading ? <Loader2 className="animate-spin mr-2" /> : "Authenticate"}
           </button>

@@ -50,7 +50,7 @@ const Signup = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-black text-white px-4 font-sans min-w-[1024px]">
+    <div className="min-h-screen flex items-center justify-center text-white px-4 font-sans min-w-[1024px]">
       <div className="flex flex-row items-center bg-black rounded-3xl overflow-hidden shadow-2xl max-w-6xl w-full border border-gray-800">
         
         {/* Left Form Section */}
@@ -200,10 +200,11 @@ const Signup = () => {
             />
           </div>
           <div className="absolute bottom-8 left-8 right-8 bg-[#111b27]/80 text-white rounded-2xl p-6 backdrop-blur-md shadow-lg border border-slate-700/50">
-            <h2 className="text-xl font-bold mb-2">Join the InterVerse</h2>
-            <p className="text-sm leading-relaxed text-gray-800 font-medium">
-              Start your journey today. Experience a new way of hiring where 
-              AI helps bridge the gap between talent and opportunity.
+            <h2 className="text-xl font-bold mb-2">One Stop Career Prep</h2>
+            <p className="text-sm leading-relaxed text-gray-200 font-medium">
+              Level up your career with CareerByte. Experience a new way 
+              of preparing where AI helps bridge the gap between your 
+              potential and your dream role.
             </p>
           </div>
         </div>

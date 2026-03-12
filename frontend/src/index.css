@@ -35,7 +35,7 @@
 
 @layer base {
   :root {
-    --background: 240 10% 3.9%; /* #09090b equivalent in HSL */
+    --background: 0 0% 0%; /* Pure Black */
     --foreground: 222.2 84% 4.9%;
 
     --card: 0 0% 100%;
@@ -67,7 +67,7 @@
   }
  
   .dark, [data-theme="dark"] {
-    --background: 240 10% 3.9%;
+    --background: 0 0% 0%;
     --foreground: 210 40% 98%;
  
     --card: 222.2 84% 4.9%;
@@ -140,7 +140,7 @@
 /* Deep Dark Theme (Default) */
 :root {
   /* Backgrounds */
-  --bg-main: #09090b; /* Updated to requested color */
+  --bg-main: #000000; /* Pure Black */
   --bg-surface: #111b27; /* Dark Navy - Main card surfaces */
   --bg-secondary: #1e293b; /* Slate-800 - Subtle backgrounds */
   --bg-subtle: #1e293b; /* Slate-800 */
@@ -189,7 +189,7 @@ body {
 body {
   margin: 0;
   font-family: var(--font-sans);
-  background: var(--bg-main);
+  background-color: #000000 !important;
   color: var(--text-main);
   line-height: 1.5;
   font-size: 14px;
@@ -213,6 +213,7 @@ body {
   min-height: 100vh;
   display: flex;
   flex-direction: column;
+  background-color: #000000;
 }
 
 /* Layout Utilities included in index for global use */

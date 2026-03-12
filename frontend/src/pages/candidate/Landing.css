@@ -1,4 +1,4 @@
-/* Premium Landing Page Styles - InterVerse */
+/* Premium Landing Page Styles - CareerByte */
 
 :root {
     --brand-primary: #4F46E5;
@@ -9,7 +9,7 @@
     --surface-border: rgba(255, 255, 255, 0.08);
     --text-pure: #FFFFFF;
     --text-dim: #A1A1AA;
-    
+
     /* Bento Colors */
     --bento-ai-color: linear-gradient(135deg, #4F46E5, #7C3AED);
     --bento-code-color: linear-gradient(135deg, #EC4899, #F43F5E);
@@ -49,8 +49,8 @@
     position: absolute;
     inset: 0;
     background: radial-gradient(circle at 50% 0%, rgba(79, 70, 229, 0.15) 0%, transparent 70%),
-                radial-gradient(circle at 100% 50%, rgba(124, 58, 237, 0.1) 0%, transparent 50%),
-                radial-gradient(circle at 0% 100%, rgba(16, 185, 129, 0.1) 0%, transparent 50%);
+        radial-gradient(circle at 100% 50%, rgba(124, 58, 237, 0.1) 0%, transparent 50%),
+        radial-gradient(circle at 0% 100%, rgba(16, 185, 129, 0.1) 0%, transparent 50%);
     filter: blur(40px);
 }
 
@@ -100,8 +100,13 @@
 }
 
 @keyframes float {
-    0% { transform: translate(0, 0) scale(1); }
-    100% { transform: translate(30px, -50px) scale(1.1); }
+    0% {
+        transform: translate(0, 0) scale(1);
+    }
+
+    100% {
+        transform: translate(30px, -50px) scale(1.1);
+    }
 }
 
 .hero-bottom-fade {
@@ -168,7 +173,9 @@
 }
 
 @keyframes shineText {
-    to { background-position: 200% center; }
+    to {
+        background-position: 200% center;
+    }
 }
 
 .hero-description-modern {
@@ -208,21 +215,21 @@
 .btn-primary-glow {
     background: var(--brand-primary);
     color: #fff;
-    box-shadow: 0 0 0 1px rgba(255,255,255,0.1) inset, 0 8px 20px rgba(79, 70, 229, 0.4);
+    box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.1) inset, 0 8px 20px rgba(79, 70, 229, 0.4);
 }
 
 .btn-primary-glow::before {
     content: '';
     position: absolute;
     inset: 0;
-    background: linear-gradient(to bottom, rgba(255,255,255,0.15) 0%, transparent 100%);
+    background: linear-gradient(to bottom, rgba(255, 255, 255, 0.15) 0%, transparent 100%);
     opacity: 0;
     transition: opacity 0.3s ease;
 }
 
 .btn-primary-glow:hover {
     transform: translateY(-2px);
-    box-shadow: 0 0 0 1px rgba(255,255,255,0.2) inset, 0 12px 30px rgba(79, 70, 229, 0.6);
+    box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.2) inset, 0 12px 30px rgba(79, 70, 229, 0.6);
 }
 
 .btn-primary-glow:hover::before {
@@ -242,9 +249,18 @@
     transform: translateY(-2px);
 }
 
-.btn-icon-right { margin-left: 8px; transition: transform 0.3s ease; }
-.btn-modern:hover .btn-icon-right { transform: translateX(4px); }
-.btn-icon-left { margin-right: 8px; }
+.btn-icon-right {
+    margin-left: 8px;
+    transition: transform 0.3s ease;
+}
+
+.btn-modern:hover .btn-icon-right {
+    transform: translateX(4px);
+}
+
+.btn-icon-left {
+    margin-right: 8px;
+}
 
 /* Social Proof */
 .hero-social-proof {
@@ -269,10 +285,22 @@
     background: linear-gradient(135deg, #1f2937, #374151);
 }
 
-.avatar:nth-child(1) { margin-left: 0; background-color: #EF4444; }
-.avatar:nth-child(2) { background-color: #3B82F6; }
-.avatar:nth-child(3) { background-color: #10B981; }
-.avatar:nth-child(4) { background-color: #F59E0B; }
+.avatar:nth-child(1) {
+    margin-left: 0;
+    background-color: #EF4444;
+}
+
+.avatar:nth-child(2) {
+    background-color: #3B82F6;
+}
+
+.avatar:nth-child(3) {
+    background-color: #10B981;
+}
+
+.avatar:nth-child(4) {
+    background-color: #F59E0B;
+}
 
 .avatar-more {
     width: 36px;
@@ -297,8 +325,15 @@
 }
 
 @keyframes fadeUp {
-    from { opacity: 0; transform: translateY(30px); }
-    to { opacity: 1; transform: translateY(0); }
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }
 
 /* --- BENTO GRID SECTION --- */
@@ -359,7 +394,7 @@
 
 .bento-card:hover {
     border-color: rgba(255, 255, 255, 0.2);
-    box-shadow: 0 20px 40px rgba(0,0,0,0.4);
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
     transform: translateY(-4px);
 }
 
@@ -367,7 +402,7 @@
     content: '';
     position: absolute;
     inset: 0;
-    background: radial-gradient(800px circle at var(--mouse-x) var(--mouse-y), rgba(255,255,255,0.06), transparent 40%);
+    background: radial-gradient(800px circle at var(--mouse-x) var(--mouse-y), rgba(255, 255, 255, 0.06), transparent 40%);
     opacity: 0;
     transition: opacity 0.3s;
     pointer-events: none;
@@ -395,14 +430,14 @@
     justify-content: center;
     color: white;
     margin-bottom: 24px;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
 }
 
 .bento-icon-wrapper.mini {
     width: 48px;
     height: 48px;
     background: rgba(255, 255, 255, 0.05);
-    border: 1px solid rgba(255,255,255,0.1);
+    border: 1px solid rgba(255, 255, 255, 0.1);
     box-shadow: none;
 }
 
@@ -448,8 +483,8 @@
     position: absolute;
     right: -20px;
     bottom: -20px;
-    background: rgba(255,255,255,0.02);
-    border: 1px solid rgba(255,255,255,0.05);
+    background: rgba(255, 255, 255, 0.02);
+    border: 1px solid rgba(255, 255, 255, 0.05);
     border-radius: 16px;
     pointer-events: none;
 }
@@ -473,8 +508,8 @@
     right: 20px;
     height: 20px;
     border-radius: 10px;
-    background: rgba(255,255,255,0.1);
-    box-shadow: 0 30px 0 rgba(255,255,255,0.05), 0 60px 0 rgba(255,255,255,0.05);
+    background: rgba(255, 255, 255, 0.1);
+    box-shadow: 0 30px 0 rgba(255, 255, 255, 0.05), 0 60px 0 rgba(255, 255, 255, 0.05);
 }
 
 .visual-code {
@@ -484,6 +519,7 @@
     right: 20px;
     background: #1e1e1e;
 }
+
 .visual-code::before {
     content: '</>';
     position: absolute;
@@ -513,7 +549,7 @@
         grid-template-columns: repeat(2, 1fr);
         grid-template-rows: auto;
     }
-    
+
     .bento-large {
         grid-column: span 2;
         grid-row: span 1;
@@ -530,13 +566,17 @@
     .bento-grid {
         grid-template-columns: 1fr;
     }
-    
-    .bento-large, .bento-medium, .bento-small {
+
+    .bento-large,
+    .bento-medium,
+    .bento-small {
         grid-column: span 1;
         min-height: auto;
     }
 
-    .visual-ai, .visual-code, .visual-path {
+    .visual-ai,
+    .visual-code,
+    .visual-path {
         display: none;
     }
 }
@@ -587,13 +627,13 @@
     padding: 20px 48px;
     background: var(--text-pure);
     color: var(--surface-dark);
-    box-shadow: 0 10px 30px rgba(255,255,255,0.1);
+    box-shadow: 0 10px 30px rgba(255, 255, 255, 0.1);
 }
 
 .btn-cta-massive:hover {
     background: #f4f4f5;
     transform: translateY(-3px) scale(1.02);
-    box-shadow: 0 15px 40px rgba(255,255,255,0.2);
+    box-shadow: 0 15px 40px rgba(255, 255, 255, 0.2);
 }
 
 .btn-cta-massive .btn-icon-right {

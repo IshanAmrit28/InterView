@@ -1,4 +1,5 @@
 const Job = require("../models/job.js");
+const Company = require("../models/company.js");
 
 // admin post krega job
 exports.postJob = async (req, res) => {
@@ -38,24 +39,53 @@ exports.postJob = async (req, res) => {
 // student k liye
 exports.getAllJobs = async (req, res) => {
     try {
-        const keyword = req.query.keyword || "";
-        const query = {
-            status: "active",
-            $or: [
+        const { keyword, location, company, experience, salary } = req.query;
+        
+        const query = { status: "active" };
+
+        // Keyword Search (Title, Description, Location)
+        if (keyword) {
+            query.$or = [
                 { title: { $regex: keyword, $options: "i" } },
                 { description: { $regex: keyword, $options: "i" } },
                 { location: { $regex: keyword, $options: "i" } },
-            ]
-        };
+            ];
+        }
+
+        // Location Filter (Now expecting single string, but keeping split just in case)
+        if (location) {
+            const locations = location.split(",");
+            query.location = { $in: locations.map(loc => new RegExp(loc, "i")) };
+        }
+
+        // Company Filter (Expecting Object IDs as comma-separated string)
+        if (company) {
+            const companies = company.split(",");
+            query.company = { $in: companies };
+        }
+
+        // Experience Level Filter
+        if (experience) {
+            query.experienceLevel = { $regex: experience, $options: "i" };
+        }
+
+        // Salary Filter (Basic string match or range if needed)
+        if (salary) {
+            query.salary = { $regex: salary, $options: "i" };
+        }
+
         const jobs = await Job.find(query).populate({
             path: "company"
         }).sort({ createdAt: -1 });
-        if (!jobs) {
-            return res.status(404).json({
-                message: "Jobs not found.",
-                success: false
+
+        if (!jobs || jobs.length === 0) {
+            return res.status(200).json({
+                jobs: [],
+                message: "No jobs found matching your criteria.",
+                success: true
             });
         }
+
         return res.status(200).json({
             jobs,
             success: true
@@ -143,6 +173,30 @@ exports.updateJobStatus = async (req, res) => {
             message: `Job status updated to ${status}.`,
             success: true
         });
+    } catch (error) {
+        console.log(error);
+        return res.status(500).json({ message: "Internal server error", success: false });
+    }
+};
+
+// Get all unique locations for active jobs
+exports.getUniqueLocations = async (req, res) => {
+    try {
+        const locations = await Job.distinct("location", { status: "active" });
+        return res.status(200).json({ locations, success: true });
+    } catch (error) {
+        console.log(error);
+        return res.status(500).json({ message: "Internal server error", success: false });
+    }
+};
+
+// Get all unique companies for active jobs
+exports.getUniqueCompanies = async (req, res) => {
+    try {
+        // Fetch all companies from the database
+        const companies = await Company.find({ status: "active" }).select('name _id logo');
+        
+        return res.status(200).json({ companies, success: true });
     } catch (error) {
         console.log(error);
         return res.status(500).json({ message: "Internal server error", success: false });

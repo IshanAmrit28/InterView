@@ -53,12 +53,12 @@ const AdminSignup = () => {
     try {
       // adminSignup automatically sets userType to "admin"
       const data = await adminSignup({
-          userName: formData.userName,
-          email: formData.email,
-          password: formData.password,
-          confirmPassword: formData.confirmPassword
+        userName: formData.userName,
+        email: formData.email,
+        password: formData.password,
+        confirmPassword: formData.confirmPassword
       });
-      
+
       loginUser(data.user, data.token);
       navigate("/admin/dashboard");
     } catch (err) {
@@ -110,7 +110,7 @@ const AdminSignup = () => {
               value={formData.email}
               onChange={handleChange}
               className="w-full bg-gray-800/50 border border-gray-700 text-white rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-red-500/50 focus:border-red-500 transition-all"
-              placeholder="admin@interverse.com"
+              placeholder="admin@CareerByte.com"
             />
           </div>
 
@@ -152,9 +152,8 @@ const AdminSignup = () => {
           <button
             type="submit"
             disabled={loading}
-            className={`w-full bg-gradient-to-r from-red-600 to-red-700 hover:from-red-500 hover:to-red-600 text-white font-bold py-4 rounded-xl transition-all shadow-lg shadow-red-600/30 flex items-center justify-center mt-4 ${
-              loading ? "opacity-70 cursor-not-allowed" : "hover:-translate-y-1"
-            }`}
+            className={`w-full bg-gradient-to-r from-red-600 to-red-700 hover:from-red-500 hover:to-red-600 text-white font-bold py-4 rounded-xl transition-all shadow-lg shadow-red-600/30 flex items-center justify-center mt-4 ${loading ? "opacity-70 cursor-not-allowed" : "hover:-translate-y-1"
+              }`}
           >
             {loading ? <Loader2 className="animate-spin mr-2" /> : "Authorize & Create"}
           </button>

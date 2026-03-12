@@ -34,12 +34,12 @@ function RecruiterNavbar() {
   return (
     <header className="minimal-navbar">
       <div className="navbar-container">
-        
+
         {/* Brand Logo - Text Only */}
         <Link to="/recruiter/companies" className="navbar-brand">
-          InterVerse Recruiter
+          CareerByte Recruiter
         </Link>
-
+        
         {/* Global Navigation Links */}
         <nav className="navbar-nav">
           <ul className="nav-list">

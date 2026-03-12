@@ -10,9 +10,9 @@
 }
 
 .navbar-container {
-  max-width: var(--max-width);
-  margin: 0 auto;
-  padding: 0 var(--sp-6);
+  max-width: 100%; /* Expanded to full width */
+  margin: 0;
+  padding: 0 var(--sp-4);
   height: 100%;
   display: flex;
   align-items: center;
@@ -207,7 +207,7 @@
 
 @media (max-width: 600px) {
   .navbar-container {
-    padding: 0 var(--sp-3);
+    padding: 0 var(--sp-2);
   }
   .navbar-brand {
     font-size: 1rem;

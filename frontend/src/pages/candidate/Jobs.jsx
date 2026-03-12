@@ -10,40 +10,29 @@ import useGetAppliedJobs from '../../hooks/useGetAppliedJobs';
 const Jobs = () => {
     useGetAllJobs();
     useGetAppliedJobs();
-    const { allJobs, searchedQuery } = useSelector(store => store.job);
-    const [filterJobs, setFilterJobs] = useState(allJobs);
-
-    useEffect(() => {
-        if (searchedQuery) {
-            const filteredJobs = allJobs.filter((job) => {
-                return job.title.toLowerCase().includes(searchedQuery.toLowerCase()) ||
-                    job.description.toLowerCase().includes(searchedQuery.toLowerCase()) ||
-                    job.location.toLowerCase().includes(searchedQuery.toLowerCase())
-            })
-            setFilterJobs(filteredJobs)
-        } else {
-            setFilterJobs(allJobs)
-        }
-    }, [allJobs, searchedQuery]);
+    const { allJobs = [] } = useSelector(store => store.job || {});
 
     return (
-        <div>
-
-            <div className='max-w-7xl mx-auto mt-5'>
-                <div className='flex gap-5'>
-                    <div className='w-20%'>
+        <div className="min-h-screen">
+            <div className='max-w-7xl mx-auto pt-5 pb-10 px-4'>
+                <div className='flex flex-col md:flex-row gap-8'>
+                    <div className='w-full md:w-1/4'>
                         <FilterCard />
                     </div>
                     {
-                        filterJobs.length <= 0 ? <span>Job not found</span> : (
-                            <div className='flex-1 h-[88vh] overflow-y-auto pb-5'>
-                                <div className='grid grid-cols-3 gap-4'>
+                        allJobs.length <= 0 ? (
+                            <div className='flex-1 flex flex-col items-center justify-center h-[60vh] text-slate-500'>
+                                <span className='text-xl font-semibold text-slate-300'>Sorry, no jobs available currently.</span>
+                                <p className='text-md mt-2'>Try adjusting your filters to find what you're looking for.</p>
+                            </div>
+                        ) : (
+                            <div className='flex-1 h-[80vh] overflow-y-auto pb-10 pr-2 custom-scrollbar'>
+                                <div className='grid grid-cols-1 xl:grid-cols-2 gap-6'>
                                     {
-                                        filterJobs.map((job) => (
+                                        allJobs.map((job) => (
                                             <motion.div
-                                                initial={{ opacity: 0, x: 100 }}
-                                                animate={{ opacity: 1, x: 0 }}
-                                                exit={{ opacity: 0, x: -100 }}
+                                                initial={{ opacity: 0, scale: 0.95 }}
+                                                animate={{ opacity: 1, scale: 1 }}
                                                 transition={{ duration: 0.3 }}
                                                 key={job?._id}>
                                                 <Job job={job} />
@@ -56,8 +45,6 @@ const Jobs = () => {
                     }
                 </div>
             </div>
-
-
         </div>
     )
 }

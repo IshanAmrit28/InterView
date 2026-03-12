@@ -217,7 +217,7 @@ const UserDashboard = () => {
                     
                     <div className="flex flex-wrap items-center justify-center md:justify-start gap-6">
                        <div className="group relative">
-                         <div className="text-xs text-gray-600 dark:text-gray-400 mb-1 uppercase tracking-wider font-semibold">InterVerse Rating</div>
+                         <div className="text-xs text-gray-600 dark:text-gray-400 mb-1 uppercase tracking-wider font-semibold">CareerByte Rating</div>
                          <div className={`text-4xl font-black ${ratingColors}`}>
                             {profileData.rating}
                          </div>

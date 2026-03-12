@@ -41,7 +41,7 @@ function Navbar() {
         
         {/* Brand Logo - Text Only */}
         <Link to="/" className="navbar-brand">
-          InterVerse
+          CareerByte
         </Link>
 
         {/* Global Navigation Links */}
@@ -112,19 +112,19 @@ function Navbar() {
             </>
           ) : (
             <div className="flex items-center gap-4">
-  <Link 
-    to="/login" 
-    className={`px-4 py-2 rounded-xl transition-all ${isActive("/login")}`}
-  >
-    Log In
-  </Link>
-  <Link
-    to="/signup"
-    className={`px-4 py-2 rounded-xl transition-all ${isActive("/signup")}`}
-  >
-    Sign Up
-  </Link>
-</div>
+              <Link 
+                to="/login" 
+                className={`px-4 py-2 rounded-xl transition-all ${isActive("/login")}`}
+              >
+                Log In
+              </Link>
+              <Link
+                to="/signup"
+                className={`px-4 py-2 rounded-xl transition-all ${isActive("/signup")}`}
+              >
+                Sign Up
+              </Link>
+            </div>
           )}
         </div>
 
