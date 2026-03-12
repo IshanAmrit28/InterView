@@ -34,16 +34,6 @@ export const getCurrentUser = () => {
     return null;
 };
 
-// Google Login service
-export const googleLogin = async (idToken) => {
-  const response = await api.post('/auth/google-login', { idToken });
-  if (response.data.token) {
-    localStorage.setItem('token', response.data.token);
-    localStorage.setItem('user', JSON.stringify(response.data.user)); 
-  }
-  return response.data;
-};
-
 // Set Password service
 export const setPassword = async (data) => {
   const response = await api.post('/user/set-password', data);

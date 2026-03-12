@@ -91,7 +91,7 @@ exports.login = async (req, res) => {
 
     // Jobboard checks role
     if (role && role !== user.userType) {
-        return res.status(400).json({ message: "Account doesn't exist with current role.", success: false });
+      return res.status(400).json({ message: "Account doesn't exist with current role.", success: false });
     }
 
     const token = generateToken(user);
@@ -109,7 +109,7 @@ exports.login = async (req, res) => {
       profile: user.profile,
       company: user.company,
       // Use user.get('report') to bypass IDE TypeScript strict checking for virtuals
-      report: user.get('report'), 
+      report: user.get('report'),
       createdAt: user.createdAt,
       updatedAt: user.updatedAt,
     };
@@ -135,180 +135,180 @@ exports.logout = (req, res) => {
 // ==================== UPDATE PROFILE ====================
 exports.updateProfile = async (req, res) => {
   try {
-      const { fullname, email, phoneNumber, bio, skills, userName } = req.body;
-      
-      const files = req.files;
-      const getDataUri = require("../utils/datauri.js");
-      const cloudinary = require("../utils/cloudinary.js");
+    const { fullname, email, phoneNumber, bio, skills, userName } = req.body;
 
-      const userId = req.id || req.user.id; // middleware authentication
-      let user = await User.findById(userId);
+    const files = req.files;
+    const getDataUri = require("../utils/datauri.js");
+    const cloudinary = require("../utils/cloudinary.js");
 
-      if (!user) {
-          return res.status(400).json({
-              message: "User not found.",
-              success: false
-          });
-      }
+    const userId = req.id || req.user.id; // middleware authentication
+    let user = await User.findById(userId);
 
-      if(!user.profile) {
-          user.profile = { skills: [], profilePhoto: "" };
-      }
-
-      // Handle Profile Photo Upload
-      if (files && files.profilePhoto) {
-          const profilePhotoFile = files.profilePhoto[0];
-          const fileUri = getDataUri(profilePhotoFile);
-          const cloudResponse = await cloudinary.uploader.upload(fileUri.content, {
-              folder: "profile_photos",
-              resource_type: "image"
-          });
-          user.profile.profilePhoto = cloudResponse.secure_url;
-      }
-
-      // Handle Resume Upload (Field name "resume")
-      if (files && files.resume) {
-          const resumeFile = files.resume[0];
-          const fileUri = getDataUri(resumeFile);
-          const cloudResponse = await cloudinary.uploader.upload(fileUri.content, {
-              folder: "resumes",
-              resource_type: "raw"
-          });
-          user.profile.resume = cloudResponse.secure_url;
-          user.profile.resumeOriginalName = resumeFile.originalname;
-      }
-
-      // Handle Legacy File Upload (Field name "file")
-      if (files && files.file) {
-        const legacyFile = files.file[0];
-        const fileUri = getDataUri(legacyFile);
-        // Determine if it's an image or a document based on mimetype
-        const isImage = legacyFile.mimetype.startsWith('image/');
-        const cloudResponse = await cloudinary.uploader.upload(fileUri.content, {
-            resource_type: isImage ? "image" : "raw"
-        });
-        if (isImage) {
-            user.profile.profilePhoto = cloudResponse.secure_url;
-        } else {
-            user.profile.resume = cloudResponse.secure_url;
-            user.profile.resumeOriginalName = legacyFile.originalname;
-        }
+    if (!user) {
+      return res.status(400).json({
+        message: "User not found.",
+        success: false
+      });
     }
 
-      let skillsArray;
-      if(skills){
-          skillsArray = skills.split(",");
-      }
-      
-      // updating data
-      if(fullname) user.fullname = fullname;
-      if(userName) user.userName = userName.trim();
-      if(email) user.email = email;
-      if(phoneNumber)  user.phoneNumber = phoneNumber;
-      if(bio) user.profile.bio = bio;
-      if(skills) user.profile.skills = skillsArray;
-    
-      await user.save();
+    if (!user.profile) {
+      user.profile = { skills: [], profilePhoto: "" };
+    }
 
-      const userResponse = {
-          _id: user._id,
-          id: user._id,
-          fullname: user.fullname,
-          userName: user.userName,
-          email: user.email,
-          phoneNumber: user.phoneNumber,
-          role: user.userType,
-          userType: user.userType,
-          profile: user.profile
-      };
-
-      return res.status(200).json({
-          message: "Profile updated successfully.",
-          user: userResponse,
-          success: true
+    // Handle Profile Photo Upload
+    if (files && files.profilePhoto) {
+      const profilePhotoFile = files.profilePhoto[0];
+      const fileUri = getDataUri(profilePhotoFile);
+      const cloudResponse = await cloudinary.uploader.upload(fileUri.content, {
+        folder: "profile_photos",
+        resource_type: "image"
       });
+      user.profile.profilePhoto = cloudResponse.secure_url;
+    }
+
+    // Handle Resume Upload (Field name "resume")
+    if (files && files.resume) {
+      const resumeFile = files.resume[0];
+      const fileUri = getDataUri(resumeFile);
+      const cloudResponse = await cloudinary.uploader.upload(fileUri.content, {
+        folder: "resumes",
+        resource_type: "raw"
+      });
+      user.profile.resume = cloudResponse.secure_url;
+      user.profile.resumeOriginalName = resumeFile.originalname;
+    }
+
+    // Handle Legacy File Upload (Field name "file")
+    if (files && files.file) {
+      const legacyFile = files.file[0];
+      const fileUri = getDataUri(legacyFile);
+      // Determine if it's an image or a document based on mimetype
+      const isImage = legacyFile.mimetype.startsWith('image/');
+      const cloudResponse = await cloudinary.uploader.upload(fileUri.content, {
+        resource_type: isImage ? "image" : "raw"
+      });
+      if (isImage) {
+        user.profile.profilePhoto = cloudResponse.secure_url;
+      } else {
+        user.profile.resume = cloudResponse.secure_url;
+        user.profile.resumeOriginalName = legacyFile.originalname;
+      }
+    }
+
+    let skillsArray;
+    if (skills) {
+      skillsArray = skills.split(",");
+    }
+
+    // updating data
+    if (fullname) user.fullname = fullname;
+    if (userName) user.userName = userName.trim();
+    if (email) user.email = email;
+    if (phoneNumber) user.phoneNumber = phoneNumber;
+    if (bio) user.profile.bio = bio;
+    if (skills) user.profile.skills = skillsArray;
+
+    await user.save();
+
+    const userResponse = {
+      _id: user._id,
+      id: user._id,
+      fullname: user.fullname,
+      userName: user.userName,
+      email: user.email,
+      phoneNumber: user.phoneNumber,
+      role: user.userType,
+      userType: user.userType,
+      profile: user.profile
+    };
+
+    return res.status(200).json({
+      message: "Profile updated successfully.",
+      user: userResponse,
+      success: true
+    });
   } catch (error) {
-      console.log(error);
-      return res.status(500).json({ success: false, message: "Internal server error" });
+    console.log(error);
+    return res.status(500).json({ success: false, message: "Internal server error" });
   }
 };
 
 // ==================== REGISTER (Job board compatibility) ====================
 exports.register = async (req, res) => {
-    try {
-        const { fullname, email, phoneNumber, password, role } = req.body;
-         
-        if (!fullname || !email || !phoneNumber || !password || !role) {
-            return res.status(400).json({
-                message: "Something is missing",
-                success: false
-            });
-        }
-        const file = req.file;
-        let cloudResponse;
-        if(file) {
-            const getDataUri = require("../utils/datauri.js");
-            const cloudinary = require("../utils/cloudinary.js");
-            const fileUri = getDataUri(file);
-            cloudResponse = await cloudinary.uploader.upload(fileUri.content);
-        }
+  try {
+    const { fullname, email, phoneNumber, password, role } = req.body;
 
-        const existingUser = await User.findOne({ email });
-        if (existingUser) {
-            return res.status(400).json({
-                message: 'User already exist with this email.',
-                success: false,
-            });
-        }
-        
-        const bcrypt = require("bcryptjs");
-        const hashedPassword = await bcrypt.hash(password, 12);
-
-        await User.create({
-            fullname,
-            userName: fullname, // Map fullname to userName for main app compatibility
-            email,
-            phoneNumber,
-            password: hashedPassword,
-            userType: role,
-            company: role === 'recruiter' ? req.body.company : undefined,
-            profile:{
-                profilePhoto: cloudResponse ? cloudResponse.secure_url : "",
-            }
-        });
-
-        return res.status(201).json({
-            message: "Account created successfully.",
-            success: true
-        });
-    } catch (error) {
-        console.log(error);
-        return res.status(500).json({ message: "Internal server error", success: false });
+    if (!fullname || !email || !phoneNumber || !password || !role) {
+      return res.status(400).json({
+        message: "Something is missing",
+        success: false
+      });
     }
+    const file = req.file;
+    let cloudResponse;
+    if (file) {
+      const getDataUri = require("../utils/datauri.js");
+      const cloudinary = require("../utils/cloudinary.js");
+      const fileUri = getDataUri(file);
+      cloudResponse = await cloudinary.uploader.upload(fileUri.content);
+    }
+
+    const existingUser = await User.findOne({ email });
+    if (existingUser) {
+      return res.status(400).json({
+        message: 'User already exist with this email.',
+        success: false,
+      });
+    }
+
+    const bcrypt = require("bcryptjs");
+    const hashedPassword = await bcrypt.hash(password, 12);
+
+    await User.create({
+      fullname,
+      userName: fullname, // Map fullname to userName for main app compatibility
+      email,
+      phoneNumber,
+      password: hashedPassword,
+      userType: role,
+      company: role === 'recruiter' ? req.body.company : undefined,
+      profile: {
+        profilePhoto: cloudResponse ? cloudResponse.secure_url : "",
+      }
+    });
+
+    return res.status(201).json({
+      message: "Account created successfully.",
+      success: true
+    });
+  } catch (error) {
+    console.log(error);
+    return res.status(500).json({ message: "Internal server error", success: false });
+  }
 };
 // ==================== GET COMPANY MEMBERS ====================
 exports.getCompanyMembers = async (req, res) => {
-    try {
-        const companyId = req.user.company;
-        if (!companyId) {
-            return res.status(400).json({
-                message: "No company associated with this account.",
-                success: false
-            });
-        }
-
-        const members = await User.find({ 
-            company: companyId
-        }).select("userName fullname email profile.profilePhoto updatedAt");
-
-        return res.status(200).json({
-            success: true,
-            members
-        });
-    } catch (error) {
-        console.error("fetch members error:", error);
-        return res.status(500).json({ message: "Internal server error", success: false });
+  try {
+    const companyId = req.user.company;
+    if (!companyId) {
+      return res.status(400).json({
+        message: "No company associated with this account.",
+        success: false
+      });
     }
+
+    const members = await User.find({
+      company: companyId
+    }).select("userName fullname email profile.profilePhoto updatedAt");
+
+    return res.status(200).json({
+      success: true,
+      members
+    });
+  } catch (error) {
+    console.error("fetch members error:", error);
+    return res.status(500).json({ message: "Internal server error", success: false });
+  }
 };
 
 // ==================== GOOGLE AUTH (Backend Driven) ====================
@@ -379,7 +379,7 @@ exports.googleAuthCallback = async (req, res) => {
     }
 
     const token = generateToken(user);
-    
+
     // Redirect back to frontend with the token
     // Using simple URL params for now (alternative: HTTP-only cookie if shared domain)
     res.redirect(`${process.env.FRONTEND_URL}/login-success?token=${token}`);
@@ -432,7 +432,7 @@ exports.googleLogin = async (req, res) => {
     }
 
     const token = generateToken(user);
-    
+
     const userResponse = {
       id: user._id,
       _id: user._id,
