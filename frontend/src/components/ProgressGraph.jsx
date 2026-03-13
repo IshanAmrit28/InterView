@@ -33,7 +33,7 @@ const CustomTooltip = (props) => {
   return null;
 };
 
-const ProgressGraph = ({ reports, contestHistory, currentRating }) => {
+const ProgressGraph = ({ reports, contestHistory, currentRating, variant = "card", hideHeader = false }) => {
   const data = useMemo(() => {
     // If contest history is available, prioritize it (overall rating)
     if (contestHistory && contestHistory.length > 0) {
@@ -88,11 +88,11 @@ const ProgressGraph = ({ reports, contestHistory, currentRating }) => {
         type: "Interview"
       };
     });
-  }, [reports, contestHistory]);
+  }, [reports, contestHistory, currentRating]);
 
   if (!data || data.length === 0) {
     return (
-      <div className="bg-[#111b27]/40 border border-slate-800 rounded-3xl p-12 text-center backdrop-blur-md">
+      <div className={`${variant === "card" ? "bg-[#111b27]/40 border border-slate-800 rounded-3xl p-12 shadow-2xl backdrop-blur-md" : ""} text-center`}>
         <p className="text-gray-500 italic">No contest data available to generate progress history.</p>
       </div>
     );
@@ -110,38 +110,40 @@ const ProgressGraph = ({ reports, contestHistory, currentRating }) => {
   const tierColor = data[0].type === 'Contest' ? getTierColor(latestScore) : "#818cf8";
 
   return (
-    <div className="bg-[#111b27]/40 border border-slate-800 rounded-3xl p-6 md:p-8 mb-12 shadow-2xl backdrop-blur-md transition-all hover:bg-[#111b27]/60">
-      <div className="mb-8 flex flex-col md:flex-row justify-between items-start md:items-center">
-        <div>
-          <h2 className="text-2xl font-bold text-gray-100 flex items-center gap-2">
-            Performance Journey
-          </h2>
-          <p className="text-gray-400 text-sm mt-1">
-            {data[0]?.type === 'Contest' ? 'CareerByte Rating progress through contests' : 'Interview performance progression'}
-          </p>
+    <div className={variant === "card" ? "bg-[#111b27]/40 border border-slate-800 rounded-3xl p-6 md:p-8 mb-12 shadow-2xl backdrop-blur-md transition-all hover:bg-[#111b27]/60" : "w-full h-full"}>
+      {!hideHeader && (
+        <div className="mb-8 flex flex-col md:flex-row justify-between items-start md:items-center">
+          <div>
+            <h2 className="text-2xl font-bold text-gray-100 flex items-center gap-2">
+              Performance Journey
+            </h2>
+            <p className="text-gray-400 text-sm mt-1">
+              {data[0]?.type === 'Contest' ? 'CareerByte Rating progress through contests' : 'Interview performance progression'}
+            </p>
+          </div>
+          <div className="mt-4 md:mt-0 flex items-center gap-3">
+              <div className={`px-4 py-1.5 rounded-full text-xs font-black uppercase tracking-widest border transition-all duration-500`}
+                   style={{ 
+                      backgroundColor: `${tierColor}10`,
+                      borderColor: `${tierColor}30`,
+                      color: tierColor,
+                      boxShadow: `0 0 15px ${tierColor}15`
+                   }}>
+                  {data[0].type === 'Contest' ? (
+                      latestScore >= 2000 ? 'Master' :
+                      latestScore >= 1800 ? 'Expert' :
+                      latestScore >= 1500 ? 'Knight' :
+                      latestScore >= 1200 ? 'Specialist' : 'Newbie'
+                  ) : 'Progress'}
+              </div>
+              <div className="px-4 py-1.5 bg-gray-800/40 rounded-full border border-gray-700 text-gray-100 text-sm font-bold">
+                  {data[0].type === 'Contest' ? latestScore.toFixed(1) : `${latestScore}%`}
+              </div>
+          </div>
         </div>
-        <div className="mt-4 md:mt-0 flex items-center gap-3">
-            <div className={`px-4 py-1.5 rounded-full text-xs font-black uppercase tracking-widest border transition-all duration-500`}
-                 style={{ 
-                    backgroundColor: `${tierColor}10`,
-                    borderColor: `${tierColor}30`,
-                    color: tierColor,
-                    boxShadow: `0 0 15px ${tierColor}15`
-                 }}>
-                {data[0].type === 'Contest' ? (
-                    latestScore >= 2000 ? 'Master' :
-                    latestScore >= 1800 ? 'Expert' :
-                    latestScore >= 1500 ? 'Knight' :
-                    latestScore >= 1200 ? 'Specialist' : 'Newbie'
-                ) : 'Progress'}
-            </div>
-            <div className="px-4 py-1.5 bg-gray-800/40 rounded-full border border-gray-700 text-gray-100 text-sm font-bold">
-                {data[0].type === 'Contest' ? latestScore.toFixed(1) : `${latestScore}%`}
-            </div>
-        </div>
-      </div>
+      )}
       
-      <div className="h-80 w-full mt-4 min-h-[300px] relative">
+      <div className={`${variant === "card" ? "h-80" : "h-full"} w-full min-h-[300px] relative`}>
           <ResponsiveContainer width="100%" height="100%" minWidth={0} debounce={50}>
             <AreaChart data={data} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
               <defs>

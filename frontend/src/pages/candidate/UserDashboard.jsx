@@ -383,11 +383,13 @@ const UserDashboard = () => {
                  )}
               </div>
               
-              <div className="w-full h-[280px]">
+              <div className="w-full h-[320px]">
                  <ProgressGraph 
                      contestHistory={dashboardData.contestHistory} 
                      isUnrated={isUnrated}
                      currentRating={profileData.rating}
+                     variant="minimal"
+                     hideHeader={true}
                  />
               </div>
            </div>
