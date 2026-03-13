@@ -252,9 +252,10 @@ const ContestCodingInterface = () => {
                                 <td className="px-6 py-4 text-center font-bold text-gray-400">
                                     {rank.solvedProblems.length} / {contest.questions.length}
                                 </td>
-                                <td className="px-6 py-4 text-right font-mono text-gray-500">
-                                    {Math.floor(rank.totalTime / 60)}m {rank.totalTime % 60}s
-                                </td>
+                                 <td className="px-6 py-4 text-right font-mono text-gray-500 text-xs">
+                                    {Math.floor(rank.totalTime / 3600) > 0 && `${Math.floor(rank.totalTime / 3600)}h `}
+                                    {Math.floor((rank.totalTime % 3600) / 60)}m {rank.totalTime % 60}s
+                                 </td>
                             </tr>
                         ))}
                     </tbody>

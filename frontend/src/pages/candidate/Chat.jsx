@@ -9,7 +9,7 @@ function Chat() {
     {
       id: 1,
       sender: "ai",
-      text: "Hello! I am **Naruto Uzumaki**, your Sensei for today. Are you ready for some serious training to land that dream role? Let's give it our all! **Dattebayo!**",
+      text: "Hello! I am your **Elite Career AI**, your personal mentor for today. Are you ready to sharpen your skills and land that dream role? Let's get started!",
     },
   ]);
   const [input, setInput] = useState("");
@@ -143,8 +143,8 @@ function Chat() {
         {/* Header */}
         <div className="chat-header">
           <div className="chat-title-group">
-            <div className="bot-avatar-large">
-              <img src="/naruto-sensei.png" alt="Naruto Sensei" style={{ width: '100%', height: '100%', borderRadius: 'inherit', objectFit: 'cover' }} />
+            <div className="bot-avatar-large flex items-center justify-center bg-indigo-500/10 text-indigo-400 border border-indigo-500/20">
+              <Bot size={32} />
             </div>
             <div>
               <h2
@@ -155,7 +155,7 @@ function Chat() {
                   color: "var(--text-main)",
                 }}
               >
-                Naruto Sensei
+                Elite Career AI
               </h2>
               <div
                 style={{
@@ -178,7 +178,7 @@ function Chat() {
             <div key={msg.id} className={`message-wrapper ${msg.sender}`}>
               <div className="message-avatar overflow-hidden">
                 {msg.sender === "ai" ? (
-                   <img src="/naruto-sensei.png" alt="Naruto" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                 <Bot size={18} className="text-indigo-400" />
                 ) : (
                    <User size={18} />
                 )}
@@ -209,7 +209,7 @@ function Chat() {
           {isLoading && (
             <div className="message-wrapper ai">
               <div className="message-avatar overflow-hidden">
-                <img src="/naruto-sensei.png" alt="Naruto" className="animate-pulse" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                <Bot size={18} className="animate-pulse text-indigo-400" />
               </div>
               <div
                 className="message-bubble"

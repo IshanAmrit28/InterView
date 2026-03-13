@@ -136,8 +136,8 @@
 }
 
 .message-wrapper.user .message-bubble {
-    background: #ff9c00; /* Naruto Orange */
-    color: #000;
+    background: #4f46e5; /* Professional Indigo */
+    color: #fff;
     border-top-right-radius: 0;
     font-weight: 500;
 }
@@ -190,8 +190,8 @@
 
 .voice-btn:hover,
 .send-btn:hover {
-    border-color: #ff9c00;
-    color: #ff9c00;
+    border-color: #6366f1;
+    color: #6366f1;
 }
 
 .voice-btn.listening {
