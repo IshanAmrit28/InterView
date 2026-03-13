@@ -133,6 +133,26 @@ const UserDashboard = () => {
     return null;
   };
 
+  // Re-calculate heatmap data locally to ensure correctly bucketed for user's local day
+  const heatmapData = useMemo(() => {
+    const activityDates = dashboardData?.activityDates;
+    const backendHeatmapData = dashboardData?.heatmapData;
+
+    if (!activityDates || activityDates.length === 0) return backendHeatmapData || [];
+    
+    const localMap = {};
+    activityDates.forEach(dateStr => {
+      const d = new Date(dateStr);
+      const ymd = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+      localMap[ymd] = (localMap[ymd] || 0) + 1;
+    });
+
+    return Object.keys(localMap).map(date => ({
+      date,
+      count: localMap[date]
+    }));
+  }, [dashboardData?.activityDates, dashboardData?.heatmapData]);
+
   if (loading || authLoading) {
     return (
       <div className="min-h-screen bg-[#09090b] flex items-center justify-center text-white">
@@ -167,7 +187,7 @@ const UserDashboard = () => {
   };
 
   if (!dashboardData) return null;
-  const { profileData, heatmapData, sectorScores, isUnrated } = dashboardData;
+  const { profileData, sectorScores, isUnrated } = dashboardData;
 
   // Resume Viewer Logic (Moved here to have access to profileData)
   const openResume = (e) => {

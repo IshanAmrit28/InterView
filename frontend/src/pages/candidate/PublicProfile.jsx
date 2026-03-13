@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useMemo } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import api from '../../services/api';
 import { useAuth } from '../../context/AuthContext';
@@ -71,6 +71,26 @@ const PublicProfile = () => {
     fetchProfile();
   }, [id, user, authLoading, navigate]);
 
+  // Re-calculate heatmap data locally to ensure correctly bucketed for user's local day
+  const heatmapData = useMemo(() => {
+    const activityDates = profileData?.activityDates;
+    const backendHeatmapData = profileData?.heatmapData;
+
+    if (!activityDates || activityDates.length === 0) return backendHeatmapData || [];
+    
+    const localMap = {};
+    activityDates.forEach(dateStr => {
+      const d = new Date(dateStr);
+      const ymd = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+      localMap[ymd] = (localMap[ymd] || 0) + 1;
+    });
+
+    return Object.keys(localMap).map(date => ({
+      date,
+      count: localMap[date]
+    }));
+  }, [profileData?.activityDates, profileData?.heatmapData]);
+
   if (loading || authLoading) {
     return (
       <div className="min-h-screen bg-[#09090b] flex items-center justify-center text-white">
@@ -96,7 +116,7 @@ const PublicProfile = () => {
     );
   }
 
-  const { userName, profileData: stats, heatmapData, bio, resume, resumeOriginalName } = profileData || {};
+  const { userName, profilePhoto: pPhoto, profileData: stats, bio, resume, resumeOriginalName } = profileData || {};
   
   const endDate = new Date();
   const startDate = new Date();

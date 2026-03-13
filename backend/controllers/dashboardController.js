@@ -127,6 +127,13 @@ exports.getDashboardData = async (req, res) => {
         count: heatmapDataMap[date]
     }));
 
+    // Collect raw activity timestamps for frontend to handle local timezone bucketing
+    const activityDates = [
+        ...reports.map(r => r.createdAt),
+        ...acceptedSubmissions.map(s => s.createdAt),
+        ...assessments.map(a => a.submitTime || a.createdAt)
+    ];
+
     // Aggregate Sector Scores
     let totalCoding = 0;
     let totalTechnical = 0;
@@ -191,6 +198,7 @@ exports.getDashboardData = async (req, res) => {
             resumeOriginalName: currentUser.profile?.resumeOriginalName || ""
         },
         heatmapData: heatmapMapList,
+        activityDates,
         sectorScores,
         reports: reports.map(r => ({
             ...r.toObject(),
@@ -326,6 +334,7 @@ exports.getPublicProfile = async (req, res) => {
             percentile,
         },
         heatmapData: heatmapMapList,
+        activityDates,
         totalInterviews: reportCount,
         contestHistory: contestHistory.map(ch => ({
             ...ch.toObject(),

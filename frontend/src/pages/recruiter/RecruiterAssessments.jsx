@@ -162,8 +162,8 @@ const RecruiterAssessments = () => {
 
             {/* Modal */}
             {isModalOpen && (
-                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4">
-                    <div className="bg-gray-900 border border-gray-800 rounded-3xl w-full max-w-xl p-8 shadow-2xl">
+                <div className="fixed inset-0 z-50 flex items-start justify-center bg-black/80 backdrop-blur-sm p-4 overflow-y-auto pt-20 custom-scrollbar">
+                    <div className="bg-gray-900 border border-gray-800 rounded-3xl w-full max-w-xl p-8 shadow-2xl mb-20 relative">
                         <h2 className="text-2xl font-bold mb-6">Create Assessment</h2>
                         <form onSubmit={handleCreate} className="space-y-4">
                             <div>
@@ -193,7 +193,7 @@ const RecruiterAssessments = () => {
                             <div>
                                 <label className="block text-sm font-medium text-gray-400 mb-2">Select Questions</label>
                                 <QuestionSelector 
-                                    allProblems={allProblems}
+                                    allProblems={allProblems.filter(p => p.visibilityStatus !== 'contest')}
                                     selectedIds={newAssessment.questions}
                                     onSelect={(id) => setNewAssessment({
                                         ...newAssessment, 

@@ -207,7 +207,9 @@ exports.updateProfile = async (req, res) => {
       phoneNumber: user.phoneNumber,
       role: user.userType,
       userType: user.userType,
-      profile: user.profile
+      profile: user.profile,
+      authProvider: user.authProvider,
+      hasPassword: user.hasPassword || !!user.password
     };
 
     return res.status(200).json({

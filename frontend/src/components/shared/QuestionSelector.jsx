@@ -87,8 +87,8 @@ const QuestionSelector = ({ allProblems, selectedIds, onSelect, onRemove, themeC
 
                 {/* Results Menu */}
                 {isOpen && (
-                    <div className="absolute z-50 w-full mt-2 bg-[#18181b] border border-gray-800 rounded-2xl shadow-2xl overflow-hidden animate-in slide-in-from-top-2 duration-200">
-                        <div className="max-h-60 overflow-y-auto p-2 space-y-1 custom-scrollbar">
+                    <div className="absolute z-[100] w-full mt-2 bg-gray-950/95 backdrop-blur-xl border border-white/10 rounded-2xl shadow-[0_20px_50px_rgba(0,0,0,0.5)] overflow-hidden animate-in slide-in-from-top-2 duration-300">
+                        <div className="max-h-72 overflow-y-auto p-2 space-y-1 custom-scrollbar">
                             {availableProblems.length === 0 ? (
                                 <div className="p-4 text-center text-gray-500 text-sm">
                                     {searchQuery ? "No matching questions found" : "All questions selected"}
