@@ -19,7 +19,8 @@ const CodingProblems = () => {
     const navigate = useNavigate();
     const [problems, setProblems] = useState([]);
     const [loading, setLoading] = useState(true);
-    const [filter, setFilter] = useState('All');
+    const [difficultyFilter, setDifficultyFilter] = useState('All');
+    const [statusFilter, setStatusFilter] = useState('All');
     const [searchQuery, setSearchQuery] = useState('');
 
     useEffect(() => {
@@ -37,9 +38,14 @@ const CodingProblems = () => {
     }, []);
 
     const filteredProblems = problems.filter(p => {
-        const matchesFilter = filter === 'All' || p.difficulty === filter;
+        const matchesDifficulty = difficultyFilter === 'All' || p.difficulty === difficultyFilter;
+        
+        let matchesStatus = true;
+        if (statusFilter === 'Solved') matchesStatus = p.isSolved === true;
+        else if (statusFilter === 'Unsolved') matchesStatus = !p.isSolved;
+
         const matchesSearch = p.title.toLowerCase().includes(searchQuery.toLowerCase());
-        return matchesFilter && matchesSearch;
+        return matchesDifficulty && matchesStatus && matchesSearch;
     });
 
     const difficultyColors = {
@@ -47,6 +53,26 @@ const CodingProblems = () => {
         'Medium': 'bg-yellow-500/10 text-yellow-500 border-yellow-500/20',
         'Hard': 'bg-red-500/10 text-red-500 border-red-500/20'
     };
+
+    const totalProblems = problems.length;
+    const solvedProblems = problems.filter(p => p.isSolved).length;
+
+    const easyProblems = problems.filter(p => p.difficulty === 'Easy');
+    const easyTotal = easyProblems.length;
+    const easySolved = easyProblems.filter(p => p.isSolved).length;
+
+    const mediumProblems = problems.filter(p => p.difficulty === 'Medium');
+    const mediumTotal = mediumProblems.length;
+    const mediumSolved = mediumProblems.filter(p => p.isSolved).length;
+
+    const hardProblems = problems.filter(p => p.difficulty === 'Hard');
+    const hardTotal = hardProblems.length;
+    const hardSolved = hardProblems.filter(p => p.isSolved).length;
+
+    const circ = 376.99; // 2 * Math.PI * 60
+    const easyLen = totalProblems === 0 ? 0 : (easySolved / totalProblems) * circ;
+    const medLen = totalProblems === 0 ? 0 : (mediumSolved / totalProblems) * circ;
+    const hardLen = totalProblems === 0 ? 0 : (hardSolved / totalProblems) * circ;
 
     return (
         <div className="coding-problems-container">
@@ -61,28 +87,57 @@ const CodingProblems = () => {
                             <p>Solve high-impact DSA problems with our secure development environment.</p>
                         </div>
                     </div>
-                    <div className="stats-section">
-                        <div className="stat-card">
-                            <span className="stat-value">{problems.length}</span>
-                            <span className="stat-label">Total Problems</span>
+                    <div className="leetcode-stats">
+                        <div className="circular-progress-container">
+                            <svg className="progress-ring" width="140" height="140" viewBox="0 0 140 140">
+                                <circle 
+                                    className="progress-ring-bg" 
+                                    cx="70" cy="70" r="60" 
+                                />
+                                <circle 
+                                    className="progress-ring-easy" 
+                                    cx="70" cy="70" r="60" 
+                                    strokeDasharray={`${easyLen} ${circ}`}
+                                    strokeDashoffset="0"
+                                />
+                                <circle 
+                                    className="progress-ring-medium" 
+                                    cx="70" cy="70" r="60" 
+                                    strokeDasharray={`${medLen} ${circ}`}
+                                    strokeDashoffset={-easyLen}
+                                />
+                                <circle 
+                                    className="progress-ring-hard" 
+                                    cx="70" cy="70" r="60" 
+                                    strokeDasharray={`${hardLen} ${circ}`}
+                                    strokeDashoffset={-(easyLen + medLen)}
+                                />
+                            </svg>
+                            <div className="circular-progress-text">
+                                <div className="total-solved-text">
+                                    <span className="solved-count">{totalProblems === 0 ? 0 : solvedProblems}</span>
+                                    <span className="total-count">/{totalProblems}</span>
+                                </div>
+                                <div className="solved-label">
+                                    <CheckCircle2 size={12} className="text-green-500" /> 
+                                    <span>Solved</span>
+                                </div>
+                            </div>
                         </div>
-                        <div className="stat-card">
-                            <span className="stat-value text-green-500">
-                                {problems.filter(p => p.difficulty === 'Easy').length}
-                            </span>
-                            <span className="stat-label">Easy</span>
-                        </div>
-                        <div className="stat-card">
-                            <span className="stat-value text-yellow-500">
-                                {problems.filter(p => p.difficulty === 'Medium').length}
-                            </span>
-                            <span className="stat-label">Medium</span>
-                        </div>
-                        <div className="stat-card">
-                            <span className="stat-value text-red-500">
-                                {problems.filter(p => p.difficulty === 'Hard').length}
-                            </span>
-                            <span className="stat-label">Hard</span>
+
+                        <div className="difficulty-stats">
+                            <div className="diff-stat-card">
+                                <span className="diff-label text-green-500">Easy</span>
+                                <span className="diff-count">{easySolved}/{easyTotal}</span>
+                            </div>
+                            <div className="diff-stat-card">
+                                <span className="diff-label text-yellow-500">Med.</span>
+                                <span className="diff-count">{mediumSolved}/{mediumTotal}</span>
+                            </div>
+                            <div className="diff-stat-card">
+                                <span className="diff-label text-red-500">Hard</span>
+                                <span className="diff-count">{hardSolved}/{hardTotal}</span>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -99,16 +154,29 @@ const CodingProblems = () => {
                             onChange={(e) => setSearchQuery(e.target.value)}
                         />
                     </div>
-                    <div className="filter-tabs">
-                        {['All', 'Easy', 'Medium', 'Hard'].map(f => (
-                            <button 
-                                key={f}
-                                className={`filter-tab ${filter === f ? 'active' : ''}`}
-                                onClick={() => setFilter(f)}
-                            >
-                                {f}
-                            </button>
-                        ))}
+                    <div className="filters-group">
+                        <div className="filter-tabs">
+                            {['All', 'Easy', 'Medium', 'Hard'].map(f => (
+                                <button 
+                                    key={f}
+                                    className={`filter-tab ${difficultyFilter === f ? 'active' : ''}`}
+                                    onClick={() => setDifficultyFilter(f)}
+                                >
+                                    {f}
+                                </button>
+                            ))}
+                        </div>
+                        <div className="filter-tabs">
+                            {['All', 'Solved', 'Unsolved'].map(f => (
+                                <button 
+                                    key={f}
+                                    className={`filter-tab ${statusFilter === f ? 'active' : ''}`}
+                                    onClick={() => setStatusFilter(f)}
+                                >
+                                    {f}
+                                </button>
+                            ))}
+                        </div>
                     </div>
                 </section>
 
