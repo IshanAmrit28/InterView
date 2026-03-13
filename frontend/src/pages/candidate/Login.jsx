@@ -28,7 +28,7 @@ const Login = () => {
       const response = await login(payload);
       loginUser(response.user);
       if (response.user.role === 'recruiter' || response.user.userType === 'recruiter') {
-        navigate("/recruiter/companies");
+        navigate("/recruiter/dashboard");
       } else if (response.user.role === 'admin' || response.user.userType === 'admin') {
         navigate("/admin/dashboard");
       } else {

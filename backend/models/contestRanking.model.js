@@ -18,7 +18,7 @@ const contestRankingSchema = new mongoose.Schema({
         },
         points: Number,
         submittedAt: Date,
-        penalty: Number // time in seconds desde el inicio del concurso
+        penalty: Number // time in seconds since contest start
     }],
     totalPoints: {
         type: Number,
@@ -26,7 +26,7 @@ const contestRankingSchema = new mongoose.Schema({
     },
     totalTime: {
         type: Number,
-        default: 0 // Suma de penalizaciones (tiempo en segundos)
+        default: 0 // Duration from contest start to last accepted submission (in seconds)
     }
 }, { 
     timestamps: true 

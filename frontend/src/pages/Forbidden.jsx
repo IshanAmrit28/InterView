@@ -13,7 +13,7 @@ function Forbidden() {
   const dashboardRoute = user?.userType === "admin" 
     ? "/admin/dashboard" 
     : user?.userType === "recruiter" 
-      ? "/recruiter/companies" 
+      ? "/recruiter/dashboard" 
       : "/dashboard";
 
   return (

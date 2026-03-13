@@ -207,7 +207,7 @@ const submitCode = async (req, res) => {
                         });
                         
                         ranking.totalPoints += problemPoints;
-                        ranking.totalTime += penalty;
+                        ranking.totalTime = Math.max(ranking.totalTime, penalty);
                         await ranking.save();
                     }
                 }

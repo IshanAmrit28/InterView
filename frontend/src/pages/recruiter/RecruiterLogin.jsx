@@ -34,7 +34,7 @@ const RecruiterLogin = () => {
       }
 
       loginUser(response.user);
-      navigate("/recruiter/companies");
+      navigate("/recruiter/dashboard");
     } catch (err) {
       console.error("Login error:", err);
       setError(
