@@ -52,11 +52,11 @@ const getAllProblems = async (req, res) => {
         if (userType === 'admin') {
             query = {}; // All problems
         } else if (userType === 'recruiter') {
-            // Public problems + their own private problems
+            // Public problems + all private problems (cross-company access for recruiters)
             query = {
                 $or: [
                     { visibilityStatus: "public" },
-                    { ownerId: req.user._id }
+                    { visibilityStatus: "private" }
                 ]
             };
         }
