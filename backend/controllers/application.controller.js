@@ -126,8 +126,21 @@ exports.getApplicants = async (req, res) => {
                 success: false
             });
         }
+
+        // Fetch assessment details
+        const Assessment = require("../models/assessment.model");
+        const assessment = await Assessment.findOne({ job: job._id }).lean();
+
+        // Count total attempts for this assessment
+        let totalAttempts = 0;
+        if (assessment) {
+            const CodingAssessmentReport = require("../models/codingAssessmentReport.model");
+            totalAttempts = await CodingAssessmentReport.countDocuments({ assessment: assessment._id });
+        }
+
         return res.status(200).json({
             job,
+            assessment: assessment ? { ...assessment, totalAttempts } : null,
             success: true
         });
     } catch (error) {

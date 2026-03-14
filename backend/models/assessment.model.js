@@ -7,9 +7,17 @@ const assessmentSchema = new mongoose.Schema({
         required: true
     },
     questions: [{
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'CodingProblem'
+        questionId: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: 'CodingProblem'
+        },
+        difficulty: String,
+        score: Number
     }],
+    maxScore: {
+        type: Number,
+        default: 0
+    },
     recruiter: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'User',

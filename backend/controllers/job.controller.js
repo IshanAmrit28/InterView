@@ -4,15 +4,32 @@ const Company = require("../models/company.js");
 // admin post krega job
 exports.postJob = async (req, res) => {
     try {
-        const { title, description, requirements, salary, location, jobType, experience, position, companyId } = req.body;
+        const { title, description, requirements, salary, location, jobType, experience, position, companyId, expiresAt, assessment } = req.body;
         const userId = req.id;
 
-        if (!title || !description || !requirements || !salary || !location || !jobType || !experience || !position || !companyId) {
+        if (!title || !description || !requirements || !salary || !location || !jobType || !experience || !position || !companyId || !expiresAt) {
             return res.status(400).json({
                 message: "Something is missing.",
                 success: false
             });
         }
+
+        // Validation for assessment if enabled
+        if (assessment && assessment.enabled) {
+            if (!assessment.questions || assessment.questions.length === 0) {
+                return res.status(400).json({
+                    message: "At least one question is required for the assessment.",
+                    success: false
+                });
+            }
+            if (assessment.questions.length > 10) {
+                return res.status(400).json({
+                    message: "Maximum 10 questions allowed for the assessment.",
+                    success: false
+                });
+            }
+        }
+
         const job = await Job.create({
             title,
             description,
@@ -22,12 +39,65 @@ exports.postJob = async (req, res) => {
             jobType,
             experienceLevel: experience,
             position,
-            company: req.user.company || companyId, // Prefer recruiter's assigned company
-            created_by: userId
+            company: req.user.company || companyId,
+            created_by: userId,
+            expiresAt
         });
+
+        // Create Assessment if enabled
+        let createdAssessment = null;
+        if (assessment && assessment.enabled) {
+            const Assessment = require("../models/assessment.model");
+            const CodingProblem = require("../models/codingProblem");
+
+            // Fetch question details for snapshots
+            const questionsData = await CodingProblem.find({ _id: { $in: assessment.questions } });
+            
+            let totalMaxScore = 0;
+            const snapshots = assessment.questions.map(qId => {
+                const q = questionsData.find(item => item._id.toString() === qId.toString());
+                let score = 30; // default medium
+                const difficulty = (q?.difficulty || "Medium").toLowerCase();
+                
+                if (difficulty === "easy") score = 15;
+                else if (difficulty === "medium") score = 30;
+                else if (difficulty === "hard") score = 45;
+
+                totalMaxScore += score;
+                return {
+                    questionId: qId,
+                    difficulty: q?.difficulty || "Medium",
+                    score
+                };
+            });
+
+            const endTime = new Date(expiresAt);
+            endTime.setHours(endTime.getHours() + 24);
+
+            createdAssessment = await Assessment.create({
+                job: job._id,
+                questions: snapshots,
+                maxScore: totalMaxScore,
+                duration: assessment.questions.length * 30,
+                recruiter: userId,
+                title: assessment.title || `${title} Assessment`,
+                description: assessment.description || `Assessment for ${title} position`,
+                startTime: job.createdAt,
+                endTime: endTime,
+                visibility: 'active'
+            });
+
+            // Ensure questions are private and owned by recruiter
+            await CodingProblem.updateMany(
+                { _id: { $in: assessment.questions } },
+                { visibilityStatus: 'private', ownerId: userId }
+            );
+        }
+
         return res.status(201).json({
             message: "New job created successfully.",
             job,
+            assessment: createdAssessment,
             success: true
         });
     } catch (error) {

@@ -64,6 +64,9 @@ const getAllProblems = async (req, res) => {
                     { visibilityStatus: "private" }
                 ]
             };
+            // Optimize for recruiters (multi-select needs minimal data)
+            const problems = await CodingProblem.find(query).select("_id title difficulty").lean();
+            return res.status(200).json({ success: true, problems });
         }
 
         const problems = await CodingProblem.find(query).select("-testCases").lean(); 

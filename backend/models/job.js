@@ -48,6 +48,10 @@ const jobSchema = new mongoose.Schema({
         enum: ['active', 'inactive'],
         default: 'active',
         index: true
+    },
+    expiresAt: {
+        type: Date,
+        required: true
     }
 }, { 
     timestamps: true,
