@@ -91,10 +91,7 @@ exports.startInterview = async (req, res) => {
       resumeBasedQuestions: aiOutput.isResume ? aiOutput.questionsData.map((q) => ({
         question: q, // AI questions don't have a questionId
         aiScore: null,
-      })) : [{
-          question: "No resume detected or validation failed. Skipping resume-based questions.",
-          aiScore: 0
-      }], // Add the AI resume analysis
+      })) : [], // Return empty array if no resume detected
       ResumeScore: aiOutput.isResume ? aiOutput.scoreData.resumeScore : 0,
       feedbackOnResume: aiOutput.isResume ? aiOutput.scoreData.feedbackOnResume : {
           strengths: ["N/A"],

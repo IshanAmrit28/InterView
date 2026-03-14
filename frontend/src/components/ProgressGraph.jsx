@@ -179,7 +179,7 @@ const ProgressGraph = ({ reports, contestHistory, currentRating, variant = "card
                 fontSize={11} 
                 tickLine={false} 
                 axisLine={false}
-                domain={[0, (dataMax) => Math.max(dataMax + 100, 1000)]}
+                domain={data[0]?.type === 'Contest' ? [0, 'auto'] : [0, 100]}
                 tickFormatter={(value) => data[0]?.type === 'Contest' ? value.toFixed(0) : `${value}%`}
               />
               <RechartsTooltip 
