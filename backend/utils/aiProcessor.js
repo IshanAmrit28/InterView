@@ -56,11 +56,12 @@ const scoreResume = async (resumeText, jobDescription) => {
 You are an expert technical recruiter. Analyze the candidate's resume against the provided job description.
 Return STRICT JSON with this exact structure:
 {
-  "resumeScore": <A single number from 0-100 representing the resume's fit for the job>,
-  "feedbackOnResume": {
-  	"strengths": ["List 2-3 key strengths as strings in this array"],
-  	"weaknesses": ["List 2-3 key weaknesses or areas for improvement"]
-  }
+  "isResume": <true if the document is a resume, false otherwise>,
+  "resumeScore": <A single number from 0-100 representing the resume's fit for the job>,
+  "feedbackOnResume": {
+  	"strengths": ["List 2-3 key strengths as strings in this array"],
+  	"weaknesses": ["List 2-3 key weaknesses or areas for improvement"]
+  }
 }
 
 
@@ -78,12 +79,12 @@ ${resumeText}
   } catch (err) {
     console.error("AI JSON parse error (Resume Scoring):", err);
     return {
+      isResume: true,
       resumeScore: 0,
       feedbackOnResume: {
         strengths: ["AI analysis failed."],
         weaknesses: ["AI analysis failed."],
       },
-      // hiringChance: "Consider",
     };
   }
 };
@@ -126,8 +127,9 @@ exports.processResume = async (fileBuffer, jobDescription, jobRole) => {
     ]); // This function ONLY returns the data for the /start endpoint
 
     return {
+      isResume: scoreData.isResume,
       scoreData, // Contains { resumeScore, feedbackOnResume, hiringChance }
-      questionsData, // Contains ["Q1", "Q2", ...]
+      questionsData: scoreData.isResume ? questionsData : [], // Contains ["Q1", "Q2", ...]
     };
   } catch (err) {
     console.error("AI processing error:", err);

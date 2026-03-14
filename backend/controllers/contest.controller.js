@@ -70,7 +70,12 @@ exports.getAllContests = async (req, res) => {
 
 exports.getVisibleContests = async (req, res) => {
     try {
-        await performVisibilityCleanup();
+        try {
+            await performVisibilityCleanup();
+        } catch (cleanupError) {
+            console.error("CLEANUP_ERROR_IN_CONTROLLER:", cleanupError);
+            // Non-blocking error
+        }
         // Only return contests that have started or are upcoming
         // For candidates, we might want to hide questions until start time
         const now = new Date();
@@ -81,7 +86,7 @@ exports.getVisibleContests = async (req, res) => {
             contests
         });
     } catch (error) {
-        console.error(error);
+        console.error("GET_VISIBLE_CONTESTS_ERROR:", error);
         res.status(500).json({
             success: false,
             message: "Internal server error"

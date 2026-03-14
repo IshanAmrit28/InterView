@@ -25,6 +25,37 @@ exports.addQuestion = async (req, res) => {
   }
 };
 
+// ✅ Bulk add questions
+exports.bulkAddQuestions = async (req, res) => {
+  try {
+    const { questions, category } = req.body; // questions is an array of strings
+
+    if (!questions || !Array.isArray(questions) || !category) {
+      return res
+        .status(400)
+        .json({ success: false, message: "Questions array and category are required" });
+    }
+
+    const questionObjects = questions
+      .filter(q => q && q.trim())
+      .map(q => ({ question: q.trim(), category }));
+
+    if (questionObjects.length === 0) {
+      return res.status(400).json({ success: false, message: "No valid questions provided" });
+    }
+
+    const createdQuestions = await Question.insertMany(questionObjects);
+
+    res.status(201).json({
+      success: true,
+      message: `${createdQuestions.length} questions added successfully`,
+      data: createdQuestions,
+    });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+};
+
 // ✅ Get all questions (with optional filter)
 exports.getQuestions = async (req, res) => {
   try {

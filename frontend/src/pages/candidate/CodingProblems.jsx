@@ -13,6 +13,7 @@ import {
 } from 'lucide-react';
 import { toast } from 'sonner';
 import codingService from '../../services/coding.service';
+import Pagination from '../../components/shared/Pagination';
 import './CodingProblems.css';
 
 const CodingProblems = () => {
@@ -22,6 +23,10 @@ const CodingProblems = () => {
     const [difficultyFilter, setDifficultyFilter] = useState('All');
     const [statusFilter, setStatusFilter] = useState('All');
     const [searchQuery, setSearchQuery] = useState('');
+
+    // Pagination state
+    const [currentPage, setCurrentPage] = useState(1);
+    const itemsPerPage = 10;
 
     useEffect(() => {
         const fetchProblems = async () => {
@@ -151,7 +156,10 @@ const CodingProblems = () => {
                             type="text" 
                             placeholder="Search problems by name..."
                             value={searchQuery}
-                            onChange={(e) => setSearchQuery(e.target.value)}
+                            onChange={(e) => {
+                                setSearchQuery(e.target.value);
+                                setCurrentPage(1);
+                            }}
                         />
                     </div>
                     <div className="filters-group">
@@ -160,7 +168,10 @@ const CodingProblems = () => {
                                 <button 
                                     key={f}
                                     className={`filter-tab ${difficultyFilter === f ? 'active' : ''}`}
-                                    onClick={() => setDifficultyFilter(f)}
+                                    onClick={() => {
+                                        setDifficultyFilter(f);
+                                        setCurrentPage(1);
+                                    }}
                                 >
                                     {f}
                                 </button>
@@ -171,7 +182,10 @@ const CodingProblems = () => {
                                 <button 
                                     key={f}
                                     className={`filter-tab ${statusFilter === f ? 'active' : ''}`}
-                                    onClick={() => setStatusFilter(f)}
+                                    onClick={() => {
+                                        setStatusFilter(f);
+                                        setCurrentPage(1);
+                                    }}
                                 >
                                     {f}
                                 </button>
@@ -186,43 +200,56 @@ const CodingProblems = () => {
                             <div key={i} className="problem-card skeleton" />
                         ))
                     ) : filteredProblems.length > 0 ? (
-                        filteredProblems.map((problem) => (
-                            <div 
-                                key={problem._id} 
-                                className="problem-card group"
-                                onClick={() => navigate(`/candidate/practice/${problem._id}`)}
-                            >
-                                <div className="problem-main">
-                                    <div className="status-indicator">
-                                        <Code2 size={24} className="text-gray-400 group-hover:text-blue-500 transition-colors" />
-                                    </div>
-                                    <div className="problem-info">
-                                        <h3>{problem.title}</h3>
-                                        <div className="problem-meta">
-                                            <span className={`difficulty-badge ${difficultyColors[problem.difficulty]}`}>
-                                                {problem.difficulty}
-                                            </span>
-                                            <span className="time-limit flex items-center gap-1">
-                                                <Zap size={14} /> {problem.timeLimit}s
-                                            </span>
-                                            <span className="category flex items-center gap-1">
-                                                <BookOpen size={14} /> DSA
-                                            </span>
-                                            {problem.isSolved && (
-                                                <span className="solved-badge">
-                                                    <CheckCircle2 size={14} /> Solved
+                        <>
+                            {filteredProblems
+                                .slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage)
+                                .map((problem) => (
+                                <div 
+                                    key={problem._id} 
+                                    className="problem-card group"
+                                    onClick={() => navigate(`/candidate/practice/${problem._id}`)}
+                                >
+                                    <div className="problem-main">
+                                        <div className="status-indicator">
+                                            <Code2 size={24} className="text-gray-400 group-hover:text-blue-500 transition-colors" />
+                                        </div>
+                                        <div className="problem-info">
+                                            <h3>{problem.title}</h3>
+                                            <div className="problem-meta">
+                                                <span className={`difficulty-badge ${difficultyColors[problem.difficulty]}`}>
+                                                    {problem.difficulty}
                                                 </span>
-                                            )}
+                                                <span className="time-limit flex items-center gap-1">
+                                                    <Zap size={14} /> {problem.timeLimit}s
+                                                </span>
+                                                <span className="category flex items-center gap-1">
+                                                    <BookOpen size={14} /> DSA
+                                                </span>
+                                                {problem.isSolved && (
+                                                    <span className="solved-badge">
+                                                        <CheckCircle2 size={14} /> Solved
+                                                    </span>
+                                                )}
+                                            </div>
                                         </div>
                                     </div>
+                                    <div className="problem-actions">
+                                        <button className="solve-button">
+                                            Solve <ChevronRight size={18} />
+                                        </button>
+                                    </div>
                                 </div>
-                                <div className="problem-actions">
-                                    <button className="solve-button">
-                                        Solve Now <ChevronRight size={18} />
-                                    </button>
-                                </div>
-                            </div>
-                        ))
+                            ))}
+                            
+                            <Pagination 
+                                currentPage={currentPage}
+                                totalPages={Math.ceil(filteredProblems.length / itemsPerPage)}
+                                onPageChange={(page) => {
+                                    setCurrentPage(page);
+                                    window.scrollTo({ top: 0, behavior: 'smooth' });
+                                }}
+                            />
+                        </>
                     ) : (
                         <div className="empty-state">
                             <BookOpen size={48} className="empty-icon" />
@@ -233,14 +260,6 @@ const CodingProblems = () => {
                 </div>
 
                 <aside className="sidebar-info">
-                    <div className="info-card premium-card">
-                        <h4><Trophy className="text-yellow-500" /> Coding Achievement</h4>
-                        <p>Complete 5 problems this week to earn a "Problem Solver" badge on your profile.</p>
-                        <div className="progress-mini">
-                            <div className="progress-bar" style={{ width: '40%' }}></div>
-                        </div>
-                    </div>
-                    
                     <div className="info-card">
                         <h4>💡 Pro Tips</h4>
                         <ul className="tips-list">

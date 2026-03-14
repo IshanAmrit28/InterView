@@ -2,12 +2,8 @@ const Contest = require("../models/contest.model");
 const Assessment = require("../models/assessment.model");
 const CodingProblem = require("../models/codingProblem");
 
-const { internalFinalizeContest } = require("../controllers/contest.controller");
-
-/**
- * Core logic to update visibility status based on ended contests and assessments.
- */
 const performVisibilityCleanup = async () => {
+    const { internalFinalizeContest } = require("../controllers/contest.controller");
     try {
         const now = new Date();
         

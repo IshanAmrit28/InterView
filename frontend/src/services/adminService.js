@@ -72,6 +72,20 @@ export const createQuestion = async (questionData) => {
   return response.json();
 };
 
+// Bulk create questions
+export const bulkCreateQuestions = async (bulkData) => {
+  const response = await fetch(`${API_BASE_URL}/admin/questions/bulk`, {
+    method: "POST",
+    headers: getAuthHeaders(),
+    body: JSON.stringify(bulkData),
+  });
+  if (!response.ok) {
+    const err = await response.json();
+    throw new Error(err.message || "Failed to bulk create questions");
+  }
+  return response.json();
+};
+
 // Delete a question
 export const deleteQuestion = async (id) => {
   const response = await fetch(`${API_BASE_URL}/admin/questions/${id}`, {

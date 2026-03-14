@@ -14,6 +14,7 @@ adminRouter.get("/users", adminController.getAllUsers);
 // ==================== QUESTION MANAGEMENT ====================
 // Add a new question
 adminRouter.post("/questions", adminController.createQuestion);
+adminRouter.post("/questions/bulk", adminController.bulkCreateQuestions);
 
 // Delete a question
 adminRouter.delete("/questions/:id", adminController.deleteQuestion);

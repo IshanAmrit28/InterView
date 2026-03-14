@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import api from "../../services/api";
 import { SquareTerminal, PlusCircle, Trash2, Loader2, XCircle, CheckCircle2, Code2 } from "lucide-react";
 import { toast } from 'react-hot-toast';
+import Pagination from "../../components/shared/Pagination";
 
 const RecruiterQuestions = () => {
   const [problems, setProblems] = useState([]);
@@ -11,6 +12,10 @@ const RecruiterQuestions = () => {
   
   const [jsonInput, setJsonInput] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  // Pagination state
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 10;
 
   useEffect(() => {
     loadProblems();
@@ -176,37 +181,50 @@ const RecruiterQuestions = () => {
             No private questions found. Create one above!
           </div>
         ) : (
-          problems.map((p) => (
-            <div key={p._id} className="flex items-center justify-between bg-gray-900/60 rounded-xl p-4 border border-gray-800 transition-colors group hover:border-gray-700">
-              <div className="flex-1 pr-6 cursor-pointer">
-                <p className="text-indigo-400 font-bold mb-1 font-serif text-lg">{p.title}</p>
-                <div className="flex items-center gap-4 text-xs font-mono text-gray-500">
-                  <span className={`px-2 py-0.5 rounded ${p.difficulty === 'Easy' ? 'bg-green-500/10 text-green-400' : p.difficulty === 'Medium' ? 'bg-yellow-500/10 text-yellow-500' : 'bg-red-500/10 text-red-400'}`}>
-                    {p.difficulty}
-                  </span>
-                  <span>Time: {p.timeLimit}s</span>
-                  <span>Mem: {p.memoryLimit}MB</span>
-                  {p.tags && p.tags.length > 0 && (
-                    <div className="flex gap-1">
-                      {p.tags.map((tag, idx) => (
-                        <span key={idx} className="bg-gray-800 text-gray-400 px-1.5 py-0.5 rounded text-[10px] border border-gray-700">
-                          {tag}
-                        </span>
-                      ))}
+          <>
+            {problems
+              .slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage)
+              .map((p) => (
+                <div key={p._id} className="flex items-center justify-between bg-gray-900/60 rounded-xl p-4 border border-gray-800 transition-colors group hover:border-gray-700">
+                  <div className="flex-1 pr-6 cursor-pointer">
+                    <p className="text-indigo-400 font-bold mb-1 font-serif text-lg">{p.title}</p>
+                    <div className="flex items-center gap-4 text-xs font-mono text-gray-500">
+                      <span className={`px-2 py-0.5 rounded ${p.difficulty === 'Easy' ? 'bg-green-500/10 text-green-400' : p.difficulty === 'Medium' ? 'bg-yellow-500/10 text-yellow-500' : 'bg-red-500/10 text-red-400'}`}>
+                        {p.difficulty}
+                      </span>
+                      <span>Time: {p.timeLimit}s</span>
+                      <span>Mem: {p.memoryLimit}MB</span>
+                      {p.tags && p.tags.length > 0 && (
+                        <div className="flex gap-1">
+                          {p.tags.map((tag, idx) => (
+                            <span key={idx} className="bg-gray-800 text-gray-400 px-1.5 py-0.5 rounded text-[10px] border border-gray-700">
+                              {tag}
+                            </span>
+                          ))}
+                        </div>
+                      )}
                     </div>
-                  )}
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <button
+                      onClick={() => handleDeleteProblem(p._id)}
+                      className="p-2 text-gray-500 hover:bg-red-500/10 hover:text-red-500 rounded-lg transition-colors border border-transparent hover:border-red-500/20"
+                    >
+                      <Trash2 size={18} />
+                    </button>
+                  </div>
                 </div>
-              </div>
-              <div className="flex items-center gap-3">
-                <button
-                  onClick={() => handleDeleteProblem(p._id)}
-                  className="p-2 text-gray-500 hover:bg-red-500/10 hover:text-red-500 rounded-lg transition-colors border border-transparent hover:border-red-500/20"
-                >
-                  <Trash2 size={18} />
-                </button>
-              </div>
-            </div>
-          ))
+              ))}
+            
+            <Pagination 
+              currentPage={currentPage}
+              totalPages={Math.ceil(problems.length / itemsPerPage)}
+              onPageChange={(page) => {
+                setCurrentPage(page);
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+              }}
+            />
+          </>
         )}
       </div>
     </div>

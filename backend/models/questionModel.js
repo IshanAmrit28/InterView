@@ -10,7 +10,7 @@ const questionSchema = new mongoose.Schema(
     },
     category: {
       type: String,
-      enum: ["DBMS", "OS", "CN", "OOP", "RESUME", "ALGORITHM"],
+      enum: ["DBMS", "OS", "CN", "OOP", "ALGORITHM", "SQL"],
       required: true,
     },
   },

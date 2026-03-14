@@ -2,6 +2,7 @@
 const express = require("express");
 const {
   addQuestion,
+  bulkAddQuestions,
   getQuestions,
   getQuestionById,
   updateQuestion,
@@ -16,6 +17,7 @@ const questionRouter = express.Router();
 
 // ADD: Only Recruiters can add, update, or delete questions
 questionRouter.post("/", protect, isRecruiter, addQuestion); // Add question
+questionRouter.post("/bulk", protect, isRecruiter, bulkAddQuestions); // Bulk add questions
 questionRouter.get("/", protect, getQuestions); // Get all (Must be logged in to view)
 questionRouter.get("/:id", protect, getQuestionById); // Get single question
 questionRouter.put("/:id", protect, isRecruiter, updateQuestion); // Update question

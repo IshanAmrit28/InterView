@@ -209,19 +209,44 @@ const InterviewDashboard = () => {
                         <td className="p-4 text-gray-400 text-sm">
                           {formatDate(report.createdAt)}
                         </td>
-                        <td className="p-4 text-center">
+                         <td className="p-4 text-center">
                            <span className={`inline-flex items-center justify-center px-3 py-1 rounded-full text-xs font-bold ${
+                             report.status === "pending" ? "bg-blue-500/20 text-blue-400 border border-blue-500/30 animate-pulse" :
+                             report.status === "failed" ? "bg-red-500/20 text-red-400 border border-red-500/30" :
                              report.overallScore >= 80 ? "bg-green-500/20 text-green-400 border border-green-500/30" :
                              report.overallScore >= 50 ? "bg-yellow-500/20 text-yellow-400 border border-yellow-500/30" :
                              "bg-red-500/20 text-red-400 border border-red-500/30"
                            }`}>
-                             {report.overallScore}%
+                             {report.status === "pending" ? "Evaluating..." : report.status === "failed" ? "Failed" : `${report.overallScore}%`}
                            </span>
                         </td>
-                        <td className="p-4 text-right">
+                         <td className="p-4 text-right flex justify-end gap-2">
+                          {report.status === "failed" && (
+                            <button
+                              onClick={async (e) => {
+                                e.stopPropagation();
+                                try {
+                                  await api.post(`/report/retry-evaluation/${report.reportId}`);
+                                  // Refresh reports
+                                  const reportsRes = await getUserReports();
+                                  setReports(reportsRes.reports || []);
+                                } catch (err) {
+                                  alert("Retry failed: " + err.message);
+                                }
+                              }}
+                              className="inline-flex items-center gap-2 px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white rounded-lg font-medium text-sm transition-all shadow-md"
+                            >
+                              Retry Evaluation
+                            </button>
+                          )}
                           <button
                             onClick={() => navigate(`/candidate/report/${report.reportId}`)}
-                            className="inline-flex items-center gap-2 px-4 py-2 bg-gray-800 hover:bg-gray-700 text-indigo-400 hover:text-indigo-300 rounded-lg font-medium text-sm transition-all group-hover:shadow-md"
+                            className={`inline-flex items-center gap-2 px-4 py-2 rounded-lg font-medium text-sm transition-all ${
+                              report.status === "completed" 
+                                ? "bg-gray-800 hover:bg-gray-700 text-indigo-400 hover:text-indigo-300 group-hover:shadow-md" 
+                                : "bg-gray-800/50 text-gray-500 cursor-not-allowed"
+                            }`}
+                            disabled={report.status !== "completed"}
                           >
                             View Report
                             <ChevronRight className="w-4 h-4" />
@@ -242,21 +267,47 @@ const InterviewDashboard = () => {
                     <div className="flex justify-between items-start mb-3">
                       <h3 className="font-bold text-lg text-gray-200">{report.role}</h3>
                       <span className={`inline-flex items-center justify-center px-2.5 py-1 rounded-full text-xs font-bold ${
+                         report.status === "pending" ? "bg-blue-500/20 text-blue-400 border border-blue-500/30 animate-pulse" :
+                         report.status === "failed" ? "bg-red-500/20 text-red-400 border border-red-500/30" :
                          report.overallScore >= 80 ? "bg-green-500/20 text-green-400 border border-green-500/30" :
                          report.overallScore >= 50 ? "bg-yellow-500/20 text-yellow-400 border border-yellow-500/30" :
                          "bg-red-500/20 text-red-400 border border-red-500/30"
                        }`}>
-                         {report.overallScore}%
+                         {report.status === "pending" ? "Evaluating..." : report.status === "failed" ? "Failed" : `${report.overallScore}%`}
                        </span>
                     </div>
                     <p className="text-gray-400 text-sm mb-4">{formatDate(report.createdAt)}</p>
-                    <button
-                      onClick={() => navigate(`/candidate/report/${report.reportId}`)}
-                      className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-gray-800 hover:bg-gray-700 text-indigo-400 rounded-lg font-medium text-sm transition-all"
-                    >
-                      View Full Report
-                      <ChevronRight className="w-4 h-4" />
-                    </button>
+                    <div className="flex flex-col gap-2">
+                      {report.status === "failed" && (
+                        <button
+                          onClick={async (e) => {
+                            e.stopPropagation();
+                            try {
+                              await api.post(`/report/retry-evaluation/${report.reportId}`);
+                              const reportsRes = await getUserReports();
+                              setReports(reportsRes.reports || []);
+                            } catch (err) {
+                              alert("Retry failed: " + err.message);
+                            }
+                          }}
+                          className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-indigo-600 hover:bg-indigo-500 text-white rounded-lg font-medium text-sm transition-all shadow-md"
+                        >
+                          Retry Evaluation
+                        </button>
+                      )}
+                      <button
+                        onClick={() => navigate(`/candidate/report/${report.reportId}`)}
+                        className={`w-full flex items-center justify-center gap-2 px-4 py-3 rounded-lg font-medium text-sm transition-all ${
+                          report.status === "completed" 
+                            ? "bg-gray-800 hover:bg-gray-700 text-indigo-400" 
+                            : "bg-gray-800/50 text-gray-500 cursor-not-allowed"
+                        }`}
+                        disabled={report.status !== "completed"}
+                      >
+                        {report.status === "completed" ? "View Full Report" : "Processing..."}
+                        <ChevronRight className="w-4 h-4" />
+                      </button>
+                    </div>
                   </div>
                 ))}
               </div>

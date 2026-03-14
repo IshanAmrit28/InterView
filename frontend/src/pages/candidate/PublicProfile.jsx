@@ -158,16 +158,24 @@ const PublicProfile = () => {
                  <div className="flex-shrink-0 relative">
                     <div className="w-24 h-24 md:w-32 md:h-32 rounded-full bg-gradient-to-br from-indigo-500 via-purple-500 to-pink-500 p-1 flex items-center justify-center overflow-hidden">
                       <div className="w-full h-full bg-white dark:bg-gray-900 rounded-full flex items-center justify-center text-3xl font-extrabold uppercase tracking-widest text-transparent bg-clip-text bg-gradient-to-br from-indigo-600 to-purple-600 dark:from-indigo-300 dark:to-purple-300 overflow-hidden">
-                        {profileData.profilePhoto ? (
+                    {profileData.profilePhoto ? (
                           <img src={profileData.profilePhoto} alt="Profile" className="w-full h-full object-cover" />
                         ) : (
                           userName?.substring(0, 2) || "U"
                         )}
                       </div>
                     </div>
-                    {stats?.rank === 1 && (
-                       <div className="absolute -top-3 -right-3 bg-yellow-500/20 p-2.5 rounded-full border border-yellow-500/50 backdrop-blur-sm animate-pulse">
-                          <Trophy className="w-6 h-6 text-yellow-400" />
+                    {stats?.rank <= 3 && stats?.rank > 0 && (
+                       <div className={`absolute -top-3 -right-3 p-2.5 rounded-full border backdrop-blur-sm animate-bounce shadow-xl ${
+                          stats.rank === 1 ? 'bg-yellow-500/20 border-yellow-500/50' : 
+                          stats.rank === 2 ? 'bg-gray-300/20 border-gray-300/50' : 
+                          'bg-amber-700/20 border-amber-700/50'
+                       }`}>
+                          <Trophy className={`w-6 h-6 ${
+                            stats.rank === 1 ? 'text-yellow-400' : 
+                            stats.rank === 2 ? 'text-gray-300' : 
+                            'text-amber-600'
+                          }`} />
                        </div>
                     )}
                  </div>

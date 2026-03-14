@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { fetchAllCodingProblems, createCodingProblem, deleteCodingProblem } from "../../services/adminService";
 import { SquareTerminal, PlusCircle, Trash2, Loader2, XCircle, CheckCircle2, Code2 } from "lucide-react";
+import Pagination from "../../components/shared/Pagination";
 
 const AdminCodingProblems = () => {
   const [problems, setProblems] = useState([]);
@@ -9,7 +10,12 @@ const AdminCodingProblems = () => {
   const [successMsg, setSuccessMsg] = useState("");
   
   const [jsonInput, setJsonInput] = useState("");
+  const [filter, setFilter] = useState("all");
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  // Pagination state
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 10;
 
   useEffect(() => {
     loadProblems();
@@ -161,52 +167,96 @@ const AdminCodingProblems = () => {
         </div>
       </div>
 
-      <div className="flex justify-between items-center mb-4">
+      <div className="flex justify-between items-center mb-6">
         <h2 className="text-2xl font-bold text-gray-100">Coding Problems Bank</h2>
+        <div className="flex bg-gray-900/60 p-1.5 rounded-2xl border border-gray-800 shadow-inner">
+          {["all", "public", "private", "contest"].map((type) => (
+            <button
+              key={type}
+              onClick={() => {
+                setFilter(type);
+                setCurrentPage(1);
+              }}
+              className={`px-6 py-2 rounded-xl text-sm font-bold transition-all duration-300 ${
+                filter === type
+                  ? "bg-red-600 text-white shadow-[0_0_20px_-5px_rgba(220,38,38,0.5)]"
+                  : "text-gray-500 hover:text-gray-300 hover:bg-gray-800/50"
+              }`}
+            >
+              {type === "all" ? "All" : type === "private" ? "Company" : type.charAt(0).toUpperCase() + type.slice(1)}
+            </button>
+          ))}
+        </div>
         <span className="text-sm text-gray-400 bg-gray-800 px-3 py-1 rounded-full border border-gray-700">
-          {problems.length} problems
+          {problems.filter(p => filter === 'all' || p.visibilityStatus === filter).length} problems
         </span>
       </div>
 
-      <div className="space-y-3">
-        {problems.length === 0 ? (
-          <div className="text-gray-500 text-center py-8 bg-gray-800/20 border border-gray-800 rounded-xl">
-            No coding problems found. Add one above!
-          </div>
-        ) : (
-          problems.map((p) => (
-            <div key={p._id} className="flex items-center justify-between bg-gray-800/40 rounded-xl p-4 border border-gray-700/60 transition-colors group">
-              <div className="flex-1 pr-6 cursor-pointer">
-                <p className="text-red-400 font-bold mb-1">{p.title}</p>
-                <div className="flex items-center gap-4 text-xs font-mono text-gray-500">
-                  <span className={`px-2 py-0.5 rounded ${p.difficulty === 'Easy' ? 'bg-green-900/30 text-green-400' : p.difficulty === 'Medium' ? 'bg-yellow-900/30 text-yellow-500' : 'bg-red-900/30 text-red-400'}`}>
-                    {p.difficulty}
-                  </span>
-                  <span>Time: {p.timeLimit}s</span>
-                  <span>Mem: {p.memoryLimit}MB</span>
-                  {p.tags && p.tags.length > 0 && (
-                    <div className="flex gap-1">
-                      {p.tags.map((tag, idx) => (
-                        <span key={idx} className="bg-gray-700 text-gray-400 px-1.5 py-0.5 rounded text-[10px]">
-                          {tag}
-                        </span>
-                      ))}
-                    </div>
-                  )}
+      {(() => {
+        const filteredProblems = problems.filter(p => filter === 'all' || p.visibilityStatus === filter);
+        const totalPages = Math.ceil(filteredProblems.length / itemsPerPage);
+        const startIndex = (currentPage - 1) * itemsPerPage;
+        const paginatedProblems = filteredProblems.slice(startIndex, startIndex + itemsPerPage);
+
+        return (
+          <>
+            <div className="space-y-3">
+              {problems.length === 0 ? (
+                <div className="text-gray-500 text-center py-8 bg-gray-800/20 border border-gray-800 rounded-xl">
+                  No coding problems found. Add one above!
                 </div>
-              </div>
-              <div className="flex items-center gap-3 opacity-0 group-hover:opacity-100 transition-opacity">
-                <button
-                  onClick={() => handleDeleteProblem(p._id)}
-                  className="p-2 text-gray-500 hover:bg-red-500/20 hover:text-red-500 rounded-lg transition-colors"
-                >
-                  <Trash2 size={18} />
-                </button>
-              </div>
+              ) : filteredProblems.length === 0 ? (
+                <div className="text-gray-500 text-center py-8 bg-gray-800/20 border border-gray-800 rounded-xl italic">
+                  No {filter === 'private' ? 'Company' : filter} problems found.
+                </div>
+              ) : (
+                paginatedProblems.map((p) => (
+                  <div key={p._id} className="flex items-center justify-between bg-gray-800/40 rounded-xl p-4 border border-gray-700/60 transition-colors group">
+                    <div className="flex-1 pr-6 cursor-pointer">
+                      <p className="text-red-400 font-bold mb-1">{p.title}</p>
+                      <div className="flex items-center gap-4 text-xs font-mono text-gray-500">
+                        <span className={`px-2 py-0.5 rounded ${p.difficulty === 'Easy' ? 'bg-green-900/30 text-green-400' : p.difficulty === 'Medium' ? 'bg-yellow-900/30 text-yellow-500' : 'bg-red-900/30 text-red-400'}`}>
+                          {p.difficulty}
+                        </span>
+                        <span>Time: {p.timeLimit}s</span>
+                        <span>Mem: {p.memoryLimit}MB</span>
+                        {p.tags && p.tags.length > 0 && (
+                          <div className="flex gap-1">
+                            {p.tags.map((tag, idx) => (
+                              <span key={idx} className="bg-gray-700 text-gray-400 px-1.5 py-0.5 rounded text-[10px]">
+                                {tag}
+                              </span>
+                            ))}
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-3 opacity-0 group-hover:opacity-100 transition-opacity">
+                      <button
+                        onClick={() => handleDeleteProblem(p._id)}
+                        className="p-2 text-gray-500 hover:bg-red-500/20 hover:text-red-500 rounded-lg transition-colors"
+                      >
+                        <Trash2 size={18} />
+                      </button>
+                    </div>
+                  </div>
+                ))
+              )}
             </div>
-          ))
-        )}
-      </div>
+
+            {filteredProblems.length > 0 && (
+              <Pagination 
+                currentPage={currentPage}
+                totalPages={totalPages}
+                onPageChange={(page) => {
+                  setCurrentPage(page);
+                  window.scrollTo({ top: 0, behavior: 'smooth' });
+                }}
+              />
+            )}
+          </>
+        );
+      })()}
     </div>
   );
 };

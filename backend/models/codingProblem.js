@@ -7,7 +7,7 @@ const testCaseSchema = new mongoose.Schema({
     },
     expectedOutput: {
         type: String,
-        required: [true, 'Expected output is required']
+        default:"",
     },
     isHidden: {
         type: Boolean,

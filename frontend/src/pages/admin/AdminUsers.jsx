@@ -1,11 +1,16 @@
 import React, { useState, useEffect } from "react";
 import { fetchAllUsers } from "../../services/adminService";
 import { Users, Search, Loader2, XCircle } from "lucide-react";
+import Pagination from "../../components/shared/Pagination";
 
 const AdminUsers = () => {
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+
+  // Pagination state
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 10;
 
   useEffect(() => {
     loadUsers();
@@ -54,48 +59,69 @@ const AdminUsers = () => {
         </div>
       </div>
       
-      <div className="overflow-x-auto rounded-xl border border-gray-700/50">
-        <table className="w-full text-left">
-          <thead className="bg-gray-800/80 text-gray-400 text-xs uppercase tracking-wider">
-            <tr>
-              <th className="p-4 rounded-tl-xl font-semibold">User ID</th>
-              <th className="p-4 font-semibold">Name</th>
-              <th className="p-4 font-semibold">Email</th>
-              <th className="p-4 font-semibold">Role</th>
-              <th className="p-4 rounded-tr-xl font-semibold">Joined Date</th>
-            </tr>
-          </thead>
-          <tbody className="divide-y divide-gray-800/50 text-sm">
-            {users.length === 0 ? (
-              <tr>
-                <td colSpan={5} className="p-10 text-center text-gray-500">
-                  No users found in the system.
-                </td>
-              </tr>
-            ) : (
-              users.map((u) => (
-                <tr key={u._id} className="hover:bg-gray-800/30 transition-colors">
-                  <td className="p-4 text-gray-500 font-mono text-xs">{u._id}</td>
-                  <td className="p-4 font-medium text-gray-200">{u.userName}</td>
-                  <td className="p-4 text-gray-400">{u.email}</td>
-                  <td className="p-4">
-                    <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold ${
-                      u.userType === 'recruiter' 
-                        ? 'bg-indigo-500/20 text-indigo-400 border border-indigo-500/30' 
-                        : 'bg-green-500/20 text-green-400 border border-green-500/30'
-                    }`}>
-                      {u.userType.toUpperCase()}
-                    </span>
-                  </td>
-                  <td className="p-4 text-gray-500">
-                    {new Date(u.createdAt).toLocaleDateString()}
-                  </td>
-                </tr>
-              ))
+      {(() => {
+        const totalPages = Math.ceil(users.length / itemsPerPage);
+        const startIndex = (currentPage - 1) * itemsPerPage;
+        const paginatedUsers = users.slice(startIndex, startIndex + itemsPerPage);
+
+        return (
+          <>
+            <div className="overflow-x-auto rounded-xl border border-gray-700/50">
+              <table className="w-full text-left">
+                <thead className="bg-gray-800/80 text-gray-400 text-xs uppercase tracking-wider">
+                  <tr>
+                    <th className="p-4 rounded-tl-xl font-semibold">User ID</th>
+                    <th className="p-4 font-semibold">Name</th>
+                    <th className="p-4 font-semibold">Email</th>
+                    <th className="p-4 font-semibold">Role</th>
+                    <th className="p-4 rounded-tr-xl font-semibold">Joined Date</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-gray-800/50 text-sm">
+                  {users.length === 0 ? (
+                    <tr>
+                      <td colSpan={5} className="p-10 text-center text-gray-500">
+                        No users found in the system.
+                      </td>
+                    </tr>
+                  ) : (
+                    paginatedUsers.map((u) => (
+                      <tr key={u._id} className="hover:bg-gray-800/30 transition-colors">
+                        <td className="p-4 text-gray-500 font-mono text-xs">{u._id}</td>
+                        <td className="p-4 font-medium text-gray-200">{u.userName}</td>
+                        <td className="p-4 text-gray-400">{u.email}</td>
+                        <td className="p-4">
+                          <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold ${
+                            u.userType === 'recruiter' 
+                              ? 'bg-indigo-500/20 text-indigo-400 border border-indigo-500/30' 
+                              : 'bg-green-500/20 text-green-400 border border-green-500/30'
+                          }`}>
+                            {u.userType.toUpperCase()}
+                          </span>
+                        </td>
+                        <td className="p-4 text-gray-500">
+                          {new Date(u.createdAt).toLocaleDateString()}
+                        </td>
+                      </tr>
+                    ))
+                  )}
+                </tbody>
+              </table>
+            </div>
+
+            {users.length > 0 && (
+              <Pagination 
+                currentPage={currentPage}
+                totalPages={totalPages}
+                onPageChange={(page) => {
+                  setCurrentPage(page);
+                  window.scrollTo({ top: 0, behavior: 'smooth' });
+                }}
+              />
             )}
-          </tbody>
-        </table>
-      </div>
+          </>
+        );
+      })()}
     </div>
   );
 };

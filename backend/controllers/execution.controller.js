@@ -163,11 +163,19 @@ const submitCode = async (req, res) => {
             totalMemory = Math.max(totalMemory, parseInt(res.memory) || 0);
         });
 
+        // ✅ Conditional Code Preservation
+        // Only save full code for private (company assessment) problems.
+        // For public and contest problems, replace code with a placeholder to save storage.
+        let codeToSave = code;
+        if (problem.visibilityStatus !== 'private') {
+            codeToSave = `// Source code redacted for ${problem.visibilityStatus} problems. Contact admin for details if needed.`;
+        }
+
         const submission = await Submission.create({
             problem: problemId,
             user: req.user._id,
             language,
-            code,
+            code: codeToSave,
             status: finalStatus,
             results: results.map(r => ({ ...r, stdout: r.isHidden ? null : r.stdout })),
             totalTime,

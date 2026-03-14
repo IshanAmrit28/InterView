@@ -35,6 +35,34 @@ exports.createQuestion = async (req, res) => {
   }
 };
 
+// Bulk create questions
+exports.bulkCreateQuestions = async (req, res) => {
+  const { questions, category } = req.body;
+
+  if (!questions || !Array.isArray(questions) || !category) {
+    return res.status(400).json({ message: "Questions array and category are required" });
+  }
+
+  try {
+    const questionObjects = questions
+      .filter(q => q && q.trim())
+      .map(q => ({ question: q.trim(), category }));
+
+    if (questionObjects.length === 0) {
+      return res.status(400).json({ message: "No valid questions provided" });
+    }
+
+    const createdQuestions = await Question.insertMany(questionObjects);
+    res.status(201).json({ 
+      message: `${createdQuestions.length} questions created successfully`, 
+      questions: createdQuestions 
+    });
+  } catch (err) {
+    console.error("Error bulk creating questions:", err);
+    res.status(500).json({ message: "Internal server error" });
+  }
+};
+
 // Delete a question
 exports.deleteQuestion = async (req, res) => {
   const { id } = req.params;

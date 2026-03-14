@@ -11,15 +11,19 @@ const feedbackSchema = new mongoose.Schema({
 const questionSchema = new mongoose.Schema({
   questionId: { type: mongoose.Schema.Types.ObjectId, ref: "Question" },
   question: { type: String },
+  answer: { type: String, default: "" },
   aiScore: { type: Number, default: null },
 });
 
 const reportStructureSchema = new mongoose.Schema({
+  INTRO: [questionSchema],
   DBMS: [questionSchema],
   OS: [questionSchema],
   CN: [questionSchema],
   OOP: [questionSchema],
   ALGORITHM: [questionSchema],
+  SQL: [questionSchema],
+  HR: [questionSchema],
   resumeBasedQuestions: [questionSchema],
   ResumeScore: { type: Number, default: 0 },
   overallScore: { type: Number, default: 0 },
@@ -39,6 +43,12 @@ const reportSchema = new mongoose.Schema(
     role: { type: String },
     jobDescription: { type: String },
     resume: { type: String },
+    status: { 
+      type: String, 
+      enum: ["pending", "completed", "failed"], 
+      default: "pending" 
+    },
+    retryCount: { type: Number, default: 0 },
     reportStructure: reportStructureSchema,
   },
   { timestamps: true }

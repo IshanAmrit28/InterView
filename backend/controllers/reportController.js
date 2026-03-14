@@ -22,22 +22,37 @@ exports.startInterview = async (req, res) => {
 
     const fileBuffer = resumeFile.buffer; // --- 1. Fetch DB questions and AI analysis in parallel ---
 
-    const getRandom = (cat) =>
+    const getRandom = (cat, size = 3) =>
       Question.aggregate([
         { $match: { category: cat } },
-        { $sample: { size: 3 } }, // Using 3 as an example
+        { $sample: { size: size } },
       ]);
 
-    const [dbmsQ, osQ, cnQ, oopQ, codeQ, aiOutput] = await Promise.all([
-      getRandom("DBMS"),
-      getRandom("OS"),
-      getRandom("CN"),
-      getRandom("OOP"),
-      getRandom("ALGORITHM"),
+    const [dbmsQ, osQ, cnQ, oopQ, codeQ, sqlQ, hrQ, aiOutput] = await Promise.all([
+      getRandom("DBMS", 3),
+      getRandom("OS", 3),
+      getRandom("CN", 3),
+      getRandom("OOP", 3),
+      getRandom("ALGORITHM", 2),
+      getRandom("SQL", 2),
+      getRandom("HR", 5),
       processResume(fileBuffer, jobDescription, role),
     ]); // --- 2. Build the Report Structure for the DATABASE ---
 
+    // Define standard HR fallback if DB is empty
+    const hrFinal = hrQ.length > 0 ? hrQ : [
+        { question: "What are your career goals?" },
+        { question: "Why do you want to work for our company?" },
+        { question: "What is your greatest professional achievement?" },
+        { question: "Describe a difficult work situation and how you handled it." },
+        { question: "Where do you see yourself in 5 years?" }
+    ];
+
     const dbReportStructure = {
+      INTRO: [{
+        question: "Tell me about yourself.",
+        aiScore: null
+      }],
       DBMS: dbmsQ.map((q) => ({
         questionId: q._id,
         question: q.question,
@@ -63,12 +78,28 @@ exports.startInterview = async (req, res) => {
         question: q.question,
         aiScore: null,
       })),
-      resumeBasedQuestions: aiOutput.questionsData.map((q) => ({
+      SQL: sqlQ.map((q) => ({
+        questionId: q._id,
+        question: q.question,
+        aiScore: null,
+      })),
+      HR: hrFinal.map((q) => ({
+        questionId: q._id,
+        question: q.question,
+        aiScore: null,
+      })),
+      resumeBasedQuestions: aiOutput.isResume ? aiOutput.questionsData.map((q) => ({
         question: q, // AI questions don't have a questionId
         aiScore: null,
-      })), // Add the AI resume analysis
-      ResumeScore: aiOutput.scoreData.resumeScore,
-      feedbackOnResume: aiOutput.scoreData.feedbackOnResume,
+      })) : [{
+          question: "No resume detected or validation failed. Skipping resume-based questions.",
+          aiScore: 0
+      }], // Add the AI resume analysis
+      ResumeScore: aiOutput.isResume ? aiOutput.scoreData.resumeScore : 0,
+      feedbackOnResume: aiOutput.isResume ? aiOutput.scoreData.feedbackOnResume : {
+          strengths: ["N/A"],
+          weaknesses: ["The uploaded document does not appear to be a valid resume."]
+      },
       hiringChance: "",
     }; // --- 3. Save the report to the Database ---
 
@@ -83,6 +114,11 @@ exports.startInterview = async (req, res) => {
     // --- 4. Build the Report Structure for the CLIENT ---
 
     const clientReportStructure = {
+      INTRO: dbReportStructure.INTRO.map((q) => ({
+        question: q.question,
+        answer: "",
+        aiScore: null,
+      })),
       DBMS: dbReportStructure.DBMS.map((q) => ({
         questionId: q.questionId,
         question: q.question,
@@ -120,6 +156,18 @@ exports.startInterview = async (req, res) => {
           aiScore: null,
         })
       ),
+      SQL: dbReportStructure.SQL.map((q) => ({
+        questionId: q.questionId,
+        question: q.question,
+        answer: "",
+        aiScore: null,
+      })),
+      HR: dbReportStructure.HR.map((q) => ({
+        questionId: q.questionId,
+        question: q.question,
+        answer: "",
+        aiScore: null,
+      })),
     }; // --- 5. Send the client-specific structure as a response ---
 
     res.status(201).json({
@@ -134,20 +182,64 @@ exports.startInterview = async (req, res) => {
       .status(500)
       .json({ message: "Error starting interview", error: err.message });
   }
-};
-
-// 🔵 End Interview (MODIFIED)
+};// 🔵 End Interview (Refactored for background evaluation)
 exports.endInterview = async (req, res) => {
   try {
-    const { reportId, reportStructure } = req.body; // --- 1. Find the Report in the DB ---
+    const { reportId, reportStructure } = req.body;
     const candidateId = req.user._id.toString();
 
     const report = await Report.findById(reportId);
-    if (!report) return res.status(404).json({ message: "Report not found" }); // --- 2. Prepare QA data for AI Evaluation ---
+    if (!report) return res.status(404).json({ message: "Report not found" });
 
+    // --- 1. Save answers immediately as a precaution ---
+    const updateCategoryAnswers = (dbCategory, clientCategory) => {
+      if (Array.isArray(dbCategory) && Array.isArray(clientCategory)) {
+        dbCategory.forEach((q, index) => {
+          if (clientCategory[index]) {
+            q.answer = clientCategory[index].answer || "";
+          }
+        });
+      }
+    };
+
+    updateCategoryAnswers(report.reportStructure.INTRO, reportStructure.INTRO);
+    updateCategoryAnswers(report.reportStructure.DBMS, reportStructure.DBMS);
+    updateCategoryAnswers(report.reportStructure.OS, reportStructure.OS);
+    updateCategoryAnswers(report.reportStructure.CN, reportStructure.CN);
+    updateCategoryAnswers(report.reportStructure.OOP, reportStructure.OOP);
+    updateCategoryAnswers(report.reportStructure.ALGORITHM, reportStructure.ALGORITHM);
+    updateCategoryAnswers(report.reportStructure.SQL, reportStructure.SQL);
+    updateCategoryAnswers(report.reportStructure.HR, reportStructure.HR);
+    updateCategoryAnswers(report.reportStructure.resumeBasedQuestions, reportStructure["Resume based question"]);
+
+    report.status = "pending";
+    report.markModified("reportStructure");
+    await report.save();
+
+    // --- 2. Start background evaluation (Do not await) ---
+    evaluateReport(reportId, candidateId).catch(err => 
+      console.error(`Background evaluation failed for report ${reportId}:`, err)
+    );
+
+    // --- 3. Return immediate success response ---
+    res.json({
+      message: "Interview ended. Evaluation is processing in the background.",
+      reportId: report._id,
+      redirectUrl: "/candidate/practice"
+    });
+  } catch (err) {
+    console.error("Error ending interview:", err);
+    res.status(500).json({ message: "Error ending interview", error: err.message });
+  }
+};
+
+// 🔴 Background Evaluation Strategy
+const evaluateReport = async (reportId, candidateId) => {
+  let report = await Report.findById(reportId);
+  if (!report) return;
+
+  try {
     const qaList = [];
-    const clientQuestions = reportStructure; // from req.body // Helper to add questions to the list
-
     const addToList = (category) => {
       if (Array.isArray(category)) {
         category.forEach((q) => {
@@ -156,45 +248,54 @@ exports.endInterview = async (req, res) => {
       }
     };
 
-    addToList(clientQuestions.DBMS);
-    addToList(clientQuestions.OS);
-    addToList(clientQuestions.CN);
-    addToList(clientQuestions.OOP);
-    addToList(clientQuestions.ALGORITHM);
-    addToList(clientQuestions["Resume based question"]); // --- 3. Call AI to evaluate answers ---
+    addToList(report.reportStructure.INTRO);
+    addToList(report.reportStructure.DBMS);
+    addToList(report.reportStructure.OS);
+    addToList(report.reportStructure.CN);
+    addToList(report.reportStructure.OOP);
+    addToList(report.reportStructure.ALGORITHM);
+    addToList(report.reportStructure.SQL);
+    addToList(report.reportStructure.HR);
+    addToList(report.reportStructure.resumeBasedQuestions);
 
-    const aiEvaluation = await evaluateAnswers(qaList); // Create a map of AI scores for easy lookup
+    const aiEvaluation = await evaluateAnswers(qaList);
+    
+    // Normalize string for robust matching
+    const normalize = (str) => str?.toLowerCase().trim().replace(/[?.!,]/g, "") || "";
 
     const scoreMap = new Map(
-      aiEvaluation.scores_per_question.map((s) => [s.question, s.aiScore])
-    ); // --- 4. Update the report in the DB with AI scores --- // Helper function to update a category
+      aiEvaluation.scores_per_question.map((s) => [normalize(s.question), s.aiScore])
+    );
 
     const updateCategoryScores = (dbCategory) => {
       if (Array.isArray(dbCategory)) {
         dbCategory.forEach((q) => {
-          // q.question is the full question text
-          q.aiScore = scoreMap.get(q.question) || 0;
+          q.aiScore = scoreMap.get(normalize(q.question)) || 0;
+          // Clean up answer text after successful evaluation to save space
+          q.answer = undefined; 
         });
       }
-    }; // Update scores for all categories in the report object
+    };
 
+    updateCategoryScores(report.reportStructure.INTRO);
     updateCategoryScores(report.reportStructure.DBMS);
     updateCategoryScores(report.reportStructure.OS);
     updateCategoryScores(report.reportStructure.CN);
     updateCategoryScores(report.reportStructure.OOP);
     updateCategoryScores(report.reportStructure.ALGORITHM);
-    updateCategoryScores(report.reportStructure.resumeBasedQuestions); // Add the overall feedback and score
+    updateCategoryScores(report.reportStructure.SQL);
+    updateCategoryScores(report.reportStructure.HR);
+    updateCategoryScores(report.reportStructure.resumeBasedQuestions);
 
     report.reportStructure.overallScore = aiEvaluation.overallScore;
-    report.reportStructure.feedbackOnInterviewAnswers =
-      aiEvaluation.feedbackOnInterviewAnswers;
-    report.reportStructure.hiringChance = aiEvaluation.hiringChance; // Mark as modified before saving
+    report.reportStructure.feedbackOnInterviewAnswers = aiEvaluation.feedbackOnInterviewAnswers;
+    report.reportStructure.hiringChance = aiEvaluation.hiringChance;
+    report.status = "completed";
 
-    report.markModified("reportStructure"); // --- 5. Save the updated report ---
+    report.markModified("reportStructure");
+    await report.save();
 
-    await report.save(); // --- 6. Link to User and Update Rating ---
-
-    // Calculate rating delta
+    // Update User Rating
     let delta = (aiEvaluation.overallScore - 60) * 0.5;
     if (report.reportStructure?.ResumeScore) {
        delta += (report.reportStructure.ResumeScore - 50) / 10;
@@ -205,20 +306,43 @@ exports.endInterview = async (req, res) => {
       $push: { report: report._id },
       $inc: { rating: roundedDelta },
     });
-
-    // Ensure rating doesn't drop below 0
     await User.updateOne({ _id: candidateId, rating: { $lt: 0 } }, { $set: { rating: 0 } });
 
-    res.json({
-      message: "Interview ended and report updated successfully",
-      reportId: report._id,
-    });
   } catch (err) {
-    console.error("Error ending interview:", err);
-    res
-      .status(500)
-      .json({ message: "Error ending interview", error: err.message });
+    console.error(`AI Evaluation Attempt ${report.retryCount + 1} Failed:`, err);
+    
+    if (report.retryCount < 3) {
+      report.retryCount += 1;
+      await report.save();
+      // Exponential backoff: 30s, 2m, 5m
+      const backoff = [30000, 120000, 300000][report.retryCount - 1];
+      setTimeout(() => evaluateReport(reportId, candidateId), backoff);
+    } else {
+      report.status = "failed";
+      await report.save();
+    }
   }
+};
+
+// 🟡 Manual Retry for Evaluation
+exports.retryEvaluation = async (req, res) => {
+    try {
+        const { reportId } = req.params;
+        const candidateId = req.user._id.toString();
+        const report = await Report.findById(reportId);
+
+        if (!report) return res.status(404).json({ message: "Report not found" });
+        if (report.status === "completed") return res.status(400).json({ message: "Already evaluated" });
+
+        report.status = "pending";
+        report.retryCount = 0; // Reset retry count for manual retry
+        await report.save();
+
+        evaluateReport(reportId, candidateId);
+        res.json({ message: "Evaluation restarted" });
+    } catch (err) {
+        res.status(500).json({ message: "Error retrying evaluation", error: err.message });
+    }
 };
 
 // 🟣 View Report (Unchanged from previous step)
@@ -263,6 +387,9 @@ exports.viewReport = async (req, res) => {
       CN: await populateQuestions(reportStructureObj.CN),
       OOP: await populateQuestions(reportStructureObj.OOP),
       ALGORITHM: await populateQuestions(reportStructureObj.ALGORITHM),
+      SQL: await populateQuestions(reportStructureObj.SQL),
+      INTRO: await populateQuestions(reportStructureObj.INTRO),
+      HR: await populateQuestions(reportStructureObj.HR),
       "Resume based question": Array.isArray(reportStructureObj?.resumeBasedQuestions)
         ? reportStructureObj.resumeBasedQuestions.map((q) => ({
             question: q.question,
@@ -292,12 +419,21 @@ exports.getUserReports = async (req, res) => {
     const reports = await Report.find({ candidateId }).sort({ createdAt: -1 });
     
     // Map to a simplified structure for the dashboard table
-    const simplifiedReports = reports.map(report => ({
-      reportId: report._id,
-      role: report.role,
-      createdAt: report.createdAt,
-      overallScore: report.reportStructure?.overallScore || 0,
-    }));
+    const simplifiedReports = reports.map(report => {
+      // Use the raw document to check if 'status' field exists in MongoDB.
+      // Older documents won't have it, so we consider them "completed".
+      // Newer documents have it, defaulted to "pending" at initialization.
+      const isLegacy = !report._doc.hasOwnProperty('status');
+      const currentStatus = isLegacy ? "completed" : report.status;
+      
+      return {
+        reportId: report._id,
+        role: report.role,
+        createdAt: report.createdAt,
+        overallScore: report.reportStructure?.overallScore || 0,
+        status: currentStatus
+      };
+    });
 
     res.json({ reports: simplifiedReports });
   } catch (err) {

@@ -1,18 +1,24 @@
 import React, { useState, useEffect } from "react";
-import { fetchAllQuestions, createQuestion, deleteQuestion, updateQuestionCategory } from "../../services/adminService";
-import { Database, PlusCircle, Trash2, ArrowLeft, FolderOpen, Loader2, XCircle, CheckCircle2 } from "lucide-react";
+import { fetchAllQuestions, createQuestion, bulkCreateQuestions, deleteQuestion, updateQuestionCategory } from "../../services/adminService";
+import { Database, PlusCircle, Trash2, ArrowLeft, FolderOpen, Loader2, XCircle, CheckCircle2, ListPlus } from "lucide-react";
+import Pagination from "../../components/shared/Pagination";
 
-const CATEGORIES = ["DBMS", "OS", "CN", "OOP", "RESUME", "ALGORITHM"];
+const CATEGORIES = ["DBMS", "OS", "CN", "OOP", "ALGORITHM", "SQL"];
 
 const AdminQuestions = () => {
   const [questions, setQuestions] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [successMsg, setSuccessMsg] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
   
   const [newQuestionText, setNewQuestionText] = useState("");
   const [newQuestionCategory, setNewQuestionCategory] = useState("DBMS");
   const [selectedCategory, setSelectedCategory] = useState(null);
+
+  // Pagination state
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 10;
 
   useEffect(() => {
     loadQuestions();
@@ -33,16 +39,35 @@ const AdminQuestions = () => {
   const handleAddQuestion = async (e) => {
     e.preventDefault();
     if (!newQuestionText.trim()) return;
+
+    const lines = newQuestionText.split('\n').filter(line => line.trim());
+    
+    setIsSubmitting(true);
+    setError("");
+
     try {
-      const res = await createQuestion({
-        question: newQuestionText,
-        category: newQuestionCategory,
-      });
-      setQuestions([...questions, res.question]);
+      if (lines.length > 1) {
+        // Bulk mode
+        const res = await bulkCreateQuestions({
+          questions: lines,
+          category: newQuestionCategory
+        });
+        setQuestions([...questions, ...res.questions]);
+        showSuccess(`${res.questions.length} questions added successfully.`);
+      } else {
+        // Single mode
+        const res = await createQuestion({
+          question: newQuestionText.trim(),
+          category: newQuestionCategory,
+        });
+        setQuestions([...questions, res.question]);
+        showSuccess("Question added.");
+      }
       setNewQuestionText("");
-      showSuccess("Question added.");
     } catch (err) {
-      setError(err.message || "Failed to add question");
+      setError(err.message || "Failed to add question(s)");
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -113,6 +138,7 @@ const AdminQuestions = () => {
                   onClick={() => {
                     setSelectedCategory(category);
                     setNewQuestionCategory(category);
+                    setCurrentPage(1);
                   }}
                   className="bg-gray-800/40 border border-gray-700 hover:border-red-500/50 rounded-2xl p-6 cursor-pointer transition-all hover:bg-gray-800/60 group shadow-lg"
                 >
@@ -141,23 +167,32 @@ const AdminQuestions = () => {
 
           <div className="bg-gray-800/50 rounded-2xl p-6 border border-gray-700 mb-8">
             <h3 className="text-xl font-bold flex items-center gap-2 mb-4 text-red-100">
-              <PlusCircle size={20} className="text-red-500"/>
-              Add New {selectedCategory} Question
+              <ListPlus size={20} className="text-red-500"/>
+              Add {selectedCategory} Questions (Bulk Supported)
             </h3>
-            <form onSubmit={handleAddQuestion} className="flex gap-4">
-              <input
-                type="text"
+            <form onSubmit={handleAddQuestion} className="flex flex-col gap-4">
+              <textarea
                 value={newQuestionText}
                 onChange={(e) => setNewQuestionText(e.target.value)}
-                placeholder={`Enter full question...`}
-                className="flex-1 bg-gray-900 border border-gray-700 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-red-500 transition-colors"
+                placeholder={`Paste questions here... Tip: Put each question on a new line to add multiple.`}
+                className="w-full h-32 bg-gray-900 border border-gray-700 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-red-500 transition-colors resize-none"
               />
-              <button
-                type="submit"
-                className="bg-red-600 hover:bg-red-500 text-white font-bold px-6 py-3 rounded-xl transition-colors whitespace-nowrap"
-              >
-                Add to DB
-              </button>
+              <div className="flex justify-end">
+                <button
+                  type="submit"
+                  disabled={isSubmitting || !newQuestionText.trim()}
+                  className="bg-red-600 hover:bg-red-500 disabled:opacity-50 text-white font-bold px-8 py-3 rounded-xl transition-colors flex items-center gap-2"
+                >
+                  {isSubmitting ? (
+                    <>
+                      <Loader2 size={18} className="animate-spin" />
+                      Adding...
+                    </>
+                  ) : (
+                    "Add to Database"
+                  )}
+                </button>
+              </div>
             </form>
           </div>
 
@@ -168,32 +203,54 @@ const AdminQuestions = () => {
             </span>
           </div>
           
-          <div className="space-y-3">
-            {questions.filter(q => q.category === selectedCategory).map((q) => (
-              <div key={q._id} className="flex items-center justify-between bg-gray-800/40 rounded-xl p-4 border border-gray-700/60 transition-colors group">
-                <div className="flex-1 pr-6">
-                  <p className="text-gray-200 font-medium">{q.question}</p>
+          {(() => {
+            const filteredQuestions = questions.filter(q => q.category === selectedCategory);
+            const totalPages = Math.ceil(filteredQuestions.length / itemsPerPage);
+            const startIndex = (currentPage - 1) * itemsPerPage;
+            const paginatedQuestions = filteredQuestions.slice(startIndex, startIndex + itemsPerPage);
+
+            return (
+              <>
+                <div className="space-y-3">
+                  {paginatedQuestions.map((q) => (
+                    <div key={q._id} className="flex items-center justify-between bg-gray-800/40 rounded-xl p-4 border border-gray-700/60 transition-colors group">
+                      <div className="flex-1 pr-6">
+                        <p className="text-gray-200 font-medium">{q.question}</p>
+                      </div>
+                      <div className="flex items-center gap-3">
+                        <select
+                          value={q.category}
+                          onChange={(e) => handleUpdateCategory(q._id, e.target.value)}
+                          className="bg-gray-900 border border-gray-700 rounded-lg px-3 py-1.5 text-sm text-gray-300 cursor-pointer"
+                        >
+                          {CATEGORIES.map((cat) => (
+                            <option key={cat} value={cat}>{cat}</option>
+                          ))}
+                        </select>
+                        <button
+                          onClick={() => handleDeleteQuestion(q._id)}
+                          className="p-2 text-gray-500 hover:bg-red-500/20 hover:text-red-500 rounded-lg transition-colors"
+                        >
+                          <Trash2 size={18} />
+                        </button>
+                      </div>
+                    </div>
+                  ))}
                 </div>
-                <div className="flex items-center gap-3">
-                  <select
-                    value={q.category}
-                    onChange={(e) => handleUpdateCategory(q._id, e.target.value)}
-                    className="bg-gray-900 border border-gray-700 rounded-lg px-3 py-1.5 text-sm text-gray-300 cursor-pointer"
-                  >
-                    {CATEGORIES.map((cat) => (
-                      <option key={cat} value={cat}>{cat}</option>
-                    ))}
-                  </select>
-                  <button
-                    onClick={() => handleDeleteQuestion(q._id)}
-                    className="p-2 text-gray-500 hover:bg-red-500/20 hover:text-red-500 rounded-lg transition-colors"
-                  >
-                    <Trash2 size={18} />
-                  </button>
-                </div>
-              </div>
-            ))}
-          </div>
+
+                {filteredQuestions.length > 0 && (
+                  <Pagination 
+                    currentPage={currentPage}
+                    totalPages={totalPages}
+                    onPageChange={(page) => {
+                      setCurrentPage(page);
+                      window.scrollTo({ top: 0, behavior: 'smooth' });
+                    }}
+                  />
+                )}
+              </>
+            );
+          })()}
         </>
       )}
     </div>

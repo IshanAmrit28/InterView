@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from "react";
-import { Send, Bot, User, Loader2, Mic, Volume2 } from "lucide-react";
+import { Send, Bot, User, Loader2, Volume2 } from "lucide-react";
 import ReactMarkdown from "react-markdown";
 import { API_BASE_URL } from "../../utils/constant";
 import "./Chat.css";
@@ -14,16 +14,10 @@ function Chat() {
   ]);
   const [input, setInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
-  const [isListening, setIsListening] = useState(false);
 
   // Knowledge Base
   const [knowledgeBase, setKnowledgeBase] = useState([]);
   const messagesEndRef = useRef(null);
-
-  // Speech
-  const SpeechRecognition =
-    window.SpeechRecognition || window['webkitSpeechRecognition'];
-  const recognition = SpeechRecognition ? new SpeechRecognition() : null;
 
   useEffect(() => {
     fetch("/knowledge_base.json")
@@ -36,25 +30,6 @@ function Chat() {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
 
-  const toggleListening = () => {
-    if (!recognition)
-      return alert("Browser does not support speech recognition.");
-    if (isListening) {
-      recognition.stop();
-      setIsListening(false);
-    } else {
-      recognition.start();
-      setIsListening(true);
-    }
-  };
-
-  if (recognition) {
-    recognition.onresult = (e) => {
-      setInput(e.results[0][0].transcript);
-      setIsListening(false);
-    };
-    recognition.onerror = () => setIsListening(false);
-  }
 
   const speakText = (text) => {
     const synth = window.speechSynthesis;
@@ -138,7 +113,7 @@ function Chat() {
   };
 
   return (
-        <div className="min-h-screen bg-[#09090b] text-white pt-24 px-4 md:px-8 pb-12 font-sans overflow-x-hidden relative">
+        <div className="min-h-screen bg-[#09090b] text-white pt-12 px-4 md:px-8 pb-12 font-sans overflow-x-hidden relative">
             <div className="fixed top-[-20%] left-[-10%] w-[60%] h-[60%] rounded-full bg-indigo-900/10 blur-[80px] opacity-70 pointer-events-none" />
             <div className="fixed bottom-[-20%] right-[-10%] w-[50%] h-[50%] rounded-full bg-purple-900/10 blur-[80px] opacity-70 pointer-events-none" />
             
@@ -241,12 +216,6 @@ function Chat() {
             rows={1}
             className="chat-input"
           />
-          <button
-            className={`voice-btn ${isListening ? "listening" : ""}`}
-            onClick={toggleListening}
-          >
-            <Mic size={18} />
-          </button>
           <button
             className="send-btn"
             onClick={handleSend}

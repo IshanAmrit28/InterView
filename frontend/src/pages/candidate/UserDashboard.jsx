@@ -250,13 +250,13 @@ const UserDashboard = () => {
                 {profileData.rank <= 3 && profileData.rank > 0 && (
                    <div className={`absolute -top-3 -right-3 p-2.5 rounded-full border backdrop-blur-sm animate-bounce shadow-xl ${
                       profileData.rank === 1 ? 'bg-yellow-500/20 border-yellow-500/50' : 
-                      profileData.rank === 2 ? 'bg-gray-300/20 border-gray-300/50' : 
-                      'bg-amber-700/20 border-amber-700/50'
+                      profileData.rank === 2 ? 'bg-slate-400/20 border-slate-400/50' : 
+                      'bg-orange-700/20 border-orange-700/50'
                    }`}>
                       <Trophy className={`w-6 h-6 ${
                         profileData.rank === 1 ? 'text-yellow-400' : 
-                        profileData.rank === 2 ? 'text-gray-300' : 
-                        'text-amber-600'
+                        profileData.rank === 2 ? 'text-slate-300' : 
+                        'text-orange-500'
                       }`} />
                    </div>
                 )}

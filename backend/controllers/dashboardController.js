@@ -95,9 +95,9 @@ exports.getDashboardData = async (req, res) => {
     const userRankIndex = allRankings.findIndex(r => r.email === userEmailLower);
     const rank = userRankIndex !== -1 ? userRankIndex + 1 : 0;
     const rating = userRankIndex !== -1 ? allRankings[userRankIndex].rating : 0;
-    const percentile = totalRankedUsers > 1 && rank > 0
-        ? Math.round(((totalRankedUsers - rank) / (totalRankedUsers - 1)) * 100) 
-        : (rank === 1 ? 100 : 0);
+    const percentile = totalRankedUsers > 0 && rank > 0
+        ? Math.max(1, Math.round((rank / totalRankedUsers) * 100))
+        : 0;
 
     // Format Heatmap Data (Aggregate activity from multiple sources)
     const heatmapDataMap = {};
@@ -269,9 +269,9 @@ exports.getPublicProfile = async (req, res) => {
     const userRankIndex = allRankings.findIndex(r => r.userId && r.userId.toString() === userId.toString());
     const rank = userRankIndex !== -1 ? userRankIndex + 1 : 0;
     const rating = userRankIndex !== -1 ? allRankings[userRankIndex].rating : 0;
-    const percentile = totalRankedUsers > 1 && rank > 0
-        ? Math.round(((totalRankedUsers - rank) / (totalRankedUsers - 1)) * 100) 
-        : (rank === 1 ? 100 : 0);
+    const percentile = totalRankedUsers > 0 && rank > 0
+        ? Math.max(1, Math.round((rank / totalRankedUsers) * 100))
+        : 0;
 
     // Format Heatmap Data
     const heatmapDataMap = {};

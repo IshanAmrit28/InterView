@@ -23,7 +23,7 @@ import { endInterview } from "../../services/interviewService";
 const ControlButton = ({ onClick, className, children, disabled = false }) => (
   <button
     onClick={onClick}
-    className={`p-3 rounded-full text-gray-900 dark:text-white transition-all duration-200 shadow-md dark:shadow-xl ${className} ${
+    className={`p-3 rounded-full text-white transition-all duration-200 shadow-md dark:shadow-xl ${className} ${
       disabled ? "bg-gray-500 cursor-not-allowed opacity-70" : ""
     }`}
     disabled={disabled}
@@ -50,7 +50,7 @@ const ParticipantTile = ({
         <div
           className={`w-36 h-36 rounded-full flex items-center justify-center shadow-lg dark:shadow-2xl transition-all duration-300 ${isSpeaking ? "bg-gradient-to-br from-blue-600 to-indigo-600 scale-105" : "bg-[#111b27] border-2 border-slate-800"}`}
         >
-          <span className="text-6xl font-bold text-gray-900 dark:text-white tracking-wider">
+          <span className="text-6xl font-bold text-white tracking-wider">
             {name.charAt(0)}
           </span>
         </div>
@@ -74,7 +74,7 @@ const ParticipantTile = ({
       )}
     </div>
     <div className="absolute bottom-6 left-6 flex items-center gap-3 p-2.5 px-5 bg-[#09090b]/80 backdrop-blur-md rounded-xl shadow-lg border border-slate-800">
-      <span className="text-lg font-semibold text-gray-800 dark:text-gray-200">{name}</span>
+      <span className="text-lg font-semibold text-gray-200">{name}</span>
       {isMuted && (
         <div className="bg-red-500/20 p-1.5 rounded-lg">
           <MicOff className="w-5 h-5 text-red-500" />
@@ -91,12 +91,15 @@ const InterviewRoom = () => {
   const CANDIDATE_NAME = user?.userName || "Candidate";
 
   const initialReportData = location.state?.reportStructure || {
+    INTRO: [],
     DBMS: [],
     OS: [],
     CN: [],
     OOP: [],
     "Resume based question": [],
     ALGORITHM: [],
+    SQL: [],
+    HR: [],
   };
   const initialReportId = location.state?.reportId;
 
@@ -131,7 +134,7 @@ const InterviewRoom = () => {
   const totalQuestions = allQuestions.length;
   const currentQuestion = allQuestions[questionIndex];
 
-  const isAlgoQuestion = currentQuestion?.category === "ALGORITHM";
+  const isTextBoxQuestion = currentQuestion?.category === "ALGORITHM" || currentQuestion?.category === "SQL";
 
   useEffect(() => {
     questionIndexRef.current = questionIndex;
@@ -195,7 +198,7 @@ const InterviewRoom = () => {
   };
 
   const startListening = () => {
-    if (isAlgoQuestion || listening || !browserSupportsSpeechRecognition)
+    if (isTextBoxQuestion || listening || !browserSupportsSpeechRecognition)
       return;
     try {
       resetTranscript();
@@ -270,7 +273,7 @@ const InterviewRoom = () => {
   };
 
   const handleTextAnswerSubmit = () => {
-    if (isAlgoQuestion && interviewStatus === "running") {
+    if (isTextBoxQuestion && interviewStatus === "running") {
       handleAnswerSubmit(textAreaAnswer);
     }
   };
@@ -284,7 +287,7 @@ const InterviewRoom = () => {
     const nextIndex = questionIndexRef.current + 1;
     const nextQuestion = allQuestions[nextIndex];
     const nextQuestionText = nextQuestion.question;
-    const isNextAlgo = nextQuestion.category === "ALGORITHM";
+    const isNextTextBox = nextQuestion.category === "ALGORITHM" || nextQuestion.category === "SQL";
 
     setStatusMessage("Interviewer is speaking...");
 
@@ -292,7 +295,7 @@ const InterviewRoom = () => {
       .then(() => {
         setQuestionIndex(nextIndex);
 
-        if (isNextAlgo) {
+        if (isNextTextBox) {
           stopListening();
           setStatusMessage(
             "Ready for your code/answer. Type and click Submit.",
@@ -317,7 +320,7 @@ const InterviewRoom = () => {
     setTextAreaAnswer("");
 
     const greeting =
-      "Hello, and welcome to the interview simulator. We will have a rapid fire round. for fundamental questions answer duration is 30 seconds maximum, for coding and project or resume based question there will be no time limit. So now as the rules are clear. lets start.";
+      "Welcome to your AI-powered interview session. I am your interviewer for today. We will begin with a brief introduction, followed by technical assessments in core subjects and coding, then move on to HR-related questions, and finally discuss your background based on your resume. We aim for a professional and insightful conversation. Let's start with your introduction.";
     setStatusMessage("Interviewer is speaking...");
 
     await speakQuestion(greeting);
@@ -329,7 +332,7 @@ const InterviewRoom = () => {
     if (
       interviewStatus !== "running" ||
       isInterviewerSpeaking ||
-      isAlgoQuestion ||
+      isTextBoxQuestion ||
       !browserSupportsSpeechRecognition
     )
       return;
@@ -357,7 +360,8 @@ const InterviewRoom = () => {
     try {
       await endInterview(finalReportPayload);
 
-      navigate(`/candidate/report/${reportId}`, { replace: true });
+      // Redirect to practice dashboard immediately
+      navigate("/candidate/practice", { replace: true });
     } catch (err) {
       setError(err.message || "Submission failed. Check network.");
       setInterviewStatus("idle");
@@ -378,7 +382,7 @@ const InterviewRoom = () => {
           </p>
           <button
             onClick={() => navigate("/candidate/practice")}
-            className="bg-blue-600 hover:bg-blue-500 text-gray-900 dark:text-white px-6 py-3 rounded-lg font-semibold transition"
+            className="bg-blue-600 hover:bg-blue-500 text-white px-6 py-3 rounded-lg font-semibold transition"
           >
             Go to Practice Setup
           </button>
@@ -389,16 +393,16 @@ const InterviewRoom = () => {
 
   return (
     <div className="flex h-screen w-screen bg-[#09090b] text-white font-sans min-w-[1280px] bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-blue-900/10 via-gray-950 to-gray-950">
-      <div className="w-2/3 h-full p-8 flex flex-col gap-8 relative">
+      <div className="w-[30%] h-full p-8 flex flex-col gap-8 relative">
         <div className="absolute top-0 left-0 w-full h-32 bg-gradient-to-b from-gray-950 to-transparent z-10 pointer-events-none"></div>
         <div className="relative z-20 mb-[-1rem]"></div>
 
         <div className="h-[45%] z-20 relative">
           <ParticipantTile
             name={CANDIDATE_NAME}
-            isMuted={!isMicOn || isAlgoQuestion}
+            isMuted={!isMicOn || isTextBoxQuestion}
             isCameraOff={true}
-            isSpeaking={listening && !isAlgoQuestion}
+            isSpeaking={listening && !isTextBoxQuestion}
             avatarUrl="https://placehold.co/500x500/27272a/ffffff?text=CANDIDATE"
           />
         </div>
@@ -413,10 +417,10 @@ const InterviewRoom = () => {
         </div>
       </div>
 
-      <div className="w-1/3 h-full bg-[#111b27]/80 backdrop-blur-xl border-l border-slate-800 p-8 flex flex-col justify-between shadow-2xl relative">
+      <div className="w-[70%] h-full bg-[#111b27]/80 backdrop-blur-xl border-l border-slate-800 p-8 flex flex-col justify-between shadow-2xl relative">
         <div className="flex justify-between items-center pb-8 border-b border-slate-800">
           <div className="flex flex-col">
-            <span className="text-sm font-bold text-gray-600 dark:text-gray-400 uppercase tracking-widest mb-1">
+            <span className="text-sm font-bold text-gray-400 uppercase tracking-widest mb-1">
               Progress
             </span>
             <div className="text-3xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-cyan-300">
@@ -427,10 +431,10 @@ const InterviewRoom = () => {
           </div>
           <div className="flex flex-col items-end">
 
-            <p className="text-sm font-bold text-gray-600 dark:text-gray-400 uppercase tracking-widest mb-1">
+            <p className="text-sm font-bold text-gray-400 uppercase tracking-widest mb-1">
               Time Elapsed
             </p>
-            <span className="text-3xl font-mono font-bold text-gray-900 dark:text-white tracking-tight">
+            <span className="text-3xl font-mono font-bold text-white tracking-tight">
               {formatTime(elapsedTime)}
             </span>
           </div>
@@ -443,12 +447,12 @@ const InterviewRoom = () => {
               <span className="w-2 h-2 rounded-full bg-blue-500 mr-2 animate-pulse"></span>
               Interviewer
             </h3>
-            <p className="text-xl text-gray-900 dark:text-gray-100 leading-relaxed font-medium">
+            <p className="text-xl text-gray-100 leading-relaxed font-medium">
               {currentQuestion?.question || statusMessage}
             </p>
           </div>
 
-          {isAlgoQuestion && interviewStatus === "running" && (
+          {isTextBoxQuestion && interviewStatus === "running" && (
             <div className="p-6 bg-[#09090b]/80 rounded-2xl border border-blue-500/30 shadow-[0_0_30px_-10px_rgba(59,130,246,0.2)] transition-all">
               <h3 className="font-bold text-sm uppercase tracking-wider text-blue-300 mb-4 flex items-center">
                 <FileText className="w-4 h-4 mr-2" />
@@ -494,7 +498,7 @@ const InterviewRoom = () => {
 
           {interviewStatus === "running" || interviewStatus === "submitting" ? (
             <div className="w-full flex flex-col gap-4">
-              {!isAlgoQuestion && (
+              {!isTextBoxQuestion && (
                 <div className="flex gap-4 mb-2">
                   <ControlButton
                     onClick={handleMicToggle}
@@ -519,14 +523,6 @@ const InterviewRoom = () => {
                         <MicOff size={24} className="mr-2" /> Start Recording
                       </>
                     )}
-                  </ControlButton>
-
-                  <ControlButton
-                    onClick={() => {}}
-                    className="w-16 h-16 flex justify-center items-center bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-700 hover:bg-gray-700 text-gray-500 rounded-xl cursor-not-allowed"
-                    disabled={true}
-                  >
-                    <VideoOff size={24} />
                   </ControlButton>
                 </div>
               )}

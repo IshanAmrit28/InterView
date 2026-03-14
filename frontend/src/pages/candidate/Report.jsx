@@ -71,7 +71,7 @@ const Report = () => {
             className="animate-spin text-blue-500 mx-auto mb-4"
           />
           <p className="text-gray-400 text-xl">
-            Generating AI Report, please wait...
+           Loading your report...
           </p>
         </div>
       </div>
